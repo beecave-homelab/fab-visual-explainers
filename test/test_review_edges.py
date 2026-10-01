@@ -3,14 +3,14 @@
 from collections.abc import Callable
 
 from playwright.sync_api import BrowserContext, Page
-from support import ROOT
+from support import visual_path
 
 
 def test_go_no_go_cockpit__rejection_keyboard_and_fallback(
     page: Page, artifact: Callable[[str], str], new_context: Callable[..., BrowserContext]
 ) -> None:
     """Afkeuring of onbekend bewijs kan niet via de bediening worden omzeild."""
-    page.goto((ROOT / "fab-go-no-go-cockpit.html").as_uri())
+    page.goto(visual_path("fab-go-no-go-cockpit.html").as_uri())
     page.wait_for_load_state("networkidle")
     page.evaluate("""() => {
       for(const b of document.querySelectorAll('[data-crit]')) {
@@ -48,7 +48,7 @@ def test_decision_canvas__rejection_keyboard_and_fallback(
     page: Page, artifact: Callable[[str], str], new_context: Callable[..., BrowserContext]
 ) -> None:
     """Afkeuring of onbekend bewijs kan niet via de bediening worden omzeild."""
-    page.goto((ROOT / "fab-decision-canvas.html").as_uri())
+    page.goto(visual_path("fab-decision-canvas.html").as_uri())
     page.wait_for_load_state("networkidle")
     page.locator("#gateEditor").screenshot(path=artifact("fab-decision-review.png"))
     page.evaluate(
@@ -60,7 +60,7 @@ def test_decision_canvas__rejection_keyboard_and_fallback(
     page.keyboard.press("End")
     assert page.locator("#tab-bron").get_attribute("aria-selected") == "true"
     nojs = new_context(java_script_enabled=False).new_page()
-    nojs.goto((ROOT / "fab-decision-canvas.html").as_uri(), wait_until="networkidle")
+    nojs.goto(visual_path("fab-decision-canvas.html").as_uri(), wait_until="networkidle")
     assert nojs.locator("#summaryTitle").inner_text() == "Geen optie toelaatbaar"
     nojs.close()
 
@@ -69,7 +69,7 @@ def test_oorzaakopsporing__rejection_keyboard_and_fallback(
     page: Page, artifact: Callable[[str], str], new_context: Callable[..., BrowserContext]
 ) -> None:
     """Afkeuring of onbekend bewijs kan niet via de bediening worden omzeild."""
-    page.goto((ROOT / "fab-oorzaakopsporing.html").as_uri())
+    page.goto(visual_path("fab-oorzaakopsporing.html").as_uri())
     page.wait_for_load_state("networkidle")
     page.evaluate(
         "Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new Error('test denied')}}})"

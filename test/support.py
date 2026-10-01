@@ -5,7 +5,33 @@ from pathlib import Path
 from playwright.sync_api import Page
 
 ROOT = Path(__file__).resolve().parent.parent
-HTML_FILES = tuple(sorted(path.name for path in ROOT.glob("*.html")))
+VISUALS = ROOT / "visuals"
+
+
+def discover_visuals(directory: Path) -> dict[str, Path]:
+    """Vind alle prototypes en weiger een lege inventaris of ambigue namen."""
+    paths: dict[str, Path] = {}
+    for path in sorted(directory.rglob("*.html")):
+        if path.name in paths:
+            raise ValueError(f"Dubbele HTML-bestandsnaam: {paths[path.name]} en {path}")
+        paths[path.name] = path
+    if not paths:
+        raise ValueError(f"Geen HTML-prototypes gevonden in {directory}")
+    return paths
+
+
+HTML_PATHS = discover_visuals(VISUALS)
+HTML_FILES = tuple(HTML_PATHS)
+
+
+def visual_path(filename: str) -> Path:
+    """Zoek een prototype op unieke bestandsnaam, onafhankelijk van de categorie."""
+    try:
+        return HTML_PATHS[filename]
+    except KeyError as error:
+        raise FileNotFoundError(f"HTML-prototype ontbreekt: {filename}") from error
+
+
 TASK_FILES = (
     "fab-test-coverage-map.html",
     "fab-continuiteitskaart.html",
@@ -15,7 +41,7 @@ TASK_FILES = (
 
 def open_page(page: Page, name: str) -> None:
     """Open een FAB-pagina vanuit de checkout."""
-    page.goto((ROOT / f"fab-{name}.html").as_uri(), wait_until="networkidle")
+    page.goto(visual_path(f"fab-{name}.html").as_uri(), wait_until="networkidle")
 
 
 def copy_text(page: Page, button: str) -> str:

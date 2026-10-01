@@ -51,7 +51,7 @@ Verbind **JML aan autorisatiebeheer** en **gegevenskwaliteit en gerichte lineage
 1. **Continuïteitskaart:** verbind uitval aan getroffen zorgprocessen, een bevoegde noodwerkwijze, contactroute en herstelcontrole. De informatie moet ook zonder de getroffen applicatie beschikbaar zijn.
 1. **Data Quality Map:** verbind kwaliteitsregels en vastgestelde afwijkingen aan gevolgen voor zorg, planning en verantwoording, met eigenaar en herstelroute.
 
-Deze drie zijn eerst als synthetische verdieping van bestaande HTML uitgewerkt: testdekking van zorgoverdracht naar een woonzorglocatie in Releaseatelier, ECD-uitval op een woonzorglocatie in beide incidentvarianten, en kwaliteitsregels voor overdrachtsberichten in Ketenkaart. Op 1 oktober 2026 zijn daarnaast drie zelfstandige prototypes toegevoegd: [Test Coverage Map](fab-test-coverage-map.html), [Continuïteitskaart](fab-continuiteitskaart.html) en [Data Quality Map](fab-data-quality-map.html). Ze gebruiken dezelfde casusreferenties, maar hebben eigen demodata en synchroniseren niet. De precieze overlap in de kwaliteitslens is bewust verzonnen; de Ketenkaart stelt die overlap niet vast. Deze zelfstandige uitwerking volgt de ontwerpvraag, niet een aangetoonde behoefte aan meer losse tools. Laat inhoud en praktische meerwaarde toetsen tegenover het bestaande testplan, noodplan en kwaliteitsregister.
+Deze drie zijn eerst als synthetische verdieping van bestaande HTML uitgewerkt: testdekking van zorgoverdracht naar een woonzorglocatie in Releaseatelier, ECD-uitval op een woonzorglocatie in beide incidentvarianten, en kwaliteitsregels voor overdrachtsberichten in Ketenkaart. Op 1 oktober 2026 zijn daarnaast drie zelfstandige prototypes toegevoegd: [Test Coverage Map](visuals/wijziging_en_acceptatie/fab-test-coverage-map.html), [Continuïteitskaart](visuals/incident_en_continuiteit/fab-continuiteitskaart.html) en [Data Quality Map](visuals/gegevens_en_ketens/fab-data-quality-map.html). Ze gebruiken dezelfde casusreferenties, maar hebben eigen demodata en synchroniseren niet. De precieze overlap in de kwaliteitslens is bewust verzonnen; de Ketenkaart stelt die overlap niet vast. Deze zelfstandige uitwerking volgt de ontwerpvraag, niet een aangetoonde behoefte aan meer losse tools. Laat inhoud en praktische meerwaarde toetsen tegenover het bestaande testplan, noodplan en kwaliteitsregister.
 
 ### Gedeelde casus is nog geen gedeelde bron
 
@@ -129,40 +129,40 @@ Een vinkje zegt niet dat de visual klaar is voor productie of met gebruikers is 
 ### FAB-processen, ketens en beheer
 
 - [x] **Van melding naar oplossing** — Incidentafhandeling in vijf klikbare stappen: melding, triage, analyse, herstel en leren. Per stap verschijnen vragen, overdrachtsinformatie en voorwaarden om verder te gaan. De gebruiker kan wisselen tussen context- en focusmodus.
-  - Bestanden: [algemene variant](incident-onepager.html) en [Attent-variant](incident-onepager-attent.html).
+  - Bestanden: [algemene variant](visuals/incident_en_continuiteit/incident-onepager.html) en [Attent-variant](visuals/incident_en_continuiteit/incident-onepager-attent.html).
 - [x] **Releaseatelier** — Een wijzigingsdossier met vijf fasen: intake, impact, testen, communicatie en nazorg. Een klik op een fase toont de bijbehorende vragen, werkstukken, beslisregels en voorwaarden voor de volgende stap. De voorbeeldcasus gaat over nieuwe teamrollen in een roosterportaal.
-  - Bestand: [fab-releaseatelier.html](fab-releaseatelier.html).
+  - Bestand: [fab-releaseatelier.html](visuals/wijziging_en_acceptatie/fab-releaseatelier.html).
 - [x] **Serviceradar** — Een dienst in verstoring staat centraal, met zes klikbare perspectieven: melder, proces, applicatie, data, koppeling en leverancier. Per perspectief verschijnen diagnosevragen en het volgende beslismoment. Dit is een operationeel ketenbeeld voor incidentregie, geen technische integratiekaart.
-  - Bestand: [fab-serviceradar.html](fab-serviceradar.html).
+  - Bestand: [fab-serviceradar.html](visuals/incident_en_continuiteit/fab-serviceradar.html).
 - [x] **Applicatielandschap** — Een netwerkkaart met negen systemen en hun gegevensstromen in een fictieve zorgorganisatie. De gebruiker kan zoeken op naam of functie, vier soorten gegevensstromen aan- of uitzetten en directe of ketenbrede afhankelijkheden uitlichten. Het detailpaneel toont functies, gebruikers, eigenaarschap, kritikaliteit, processen en FAB-controlepunten.
-  - Bestand: [fab-applicatielandschap.html](fab-applicatielandschap.html).
+  - Bestand: [fab-applicatielandschap.html](visuals/landschap_en_processen/fab-applicatielandschap.html).
 - [x] **Beheerbaarheid Scan** — Een klikbare beheerring rond configureren, testen, monitoren, ondersteunen en borgen. De vijf domeinen bevatten vijftien controles met verwachte bronreferenties en de status geaccepteerd, niet getoetst, aandacht of blocker. Acceptatie vraagt volledige beoordelingsgegevens; bronlabels tellen niet als bewijs. De gebruiker kan beoordelingen simuleren, de volledige checklist lezen en een samenvatting kopiëren. De voorbeeldcasus is een cliëntportaalrelease.
-  - Bestand: [fab-beheerbaarheid-scan.html](fab-beheerbaarheid-scan.html).
+  - Bestand: [fab-beheerbaarheid-scan.html](visuals/wijziging_en_acceptatie/fab-beheerbaarheid-scan.html).
 - [x] **Ketenkaart / Integration Map** — Een lichtblauw schakelbord volgt een fictieve cliëntmutatie vanuit het ECD via ontvangst en controle naar financiën, het datawarehouse en BI. Een klik op een systeem of overdracht licht de bijbehorende routes uit en toont gegevens, eigenaar, beheer- en herstelafspraken en fictieve bewijsfragmenten. De gebruiker kan een afnemer kiezen, wisselen tussen de normale stroom en een onbekende teamcode, en een ketensamenvatting kopiëren. Op mobiel staat de keten verticaal.
-  - Bestand: [fab-ketenkaart.html](fab-ketenkaart.html). Op 1 oktober 2026 opnieuw uitgewerkt op basis van de eerder beschreven casus; dit is een nieuwe implementatie, niet het teruggevonden oorspronkelijke bestand.
+  - Bestand: [fab-ketenkaart.html](visuals/gegevens_en_ketens/fab-ketenkaart.html). Op 1 oktober 2026 opnieuw uitgewerkt op basis van de eerder beschreven casus; dit is een nieuwe implementatie, niet het teruggevonden oorspronkelijke bestand.
 - [x] **Change Impact Map** — Een rimpelrooster voor de fictieve wijziging *Teamindeling per wijk* (ECD 2026.4, RFC-2026-118). Zes beheergebieden (proces, gebruiker, data, koppeling, rapportage, beheer) staan tegenover drie ordes van effect (direct, afgeleid, randvoorwaarde). Zestien impactpunten met ernst zijn via lijnen van oorzaak naar gevolg verbonden. Een selectie licht de hele keten van oorzaken en gevolgen uit. De gebruiker kan wisselen tussen de situatie zonder en met maatregelen, filteren op ernst en een impactsamenvatting kopiëren.
-  - Bestand: [fab-change-impact-map.html](fab-change-impact-map.html).
+  - Bestand: [fab-change-impact-map.html](visuals/wijziging_en_acceptatie/fab-change-impact-map.html).
 - [x] **Proces × Applicatie-map** — Een matrix van zes processtappen (van aanmelding tot eerste zorgmoment) en vijf applicaties. Per cel staat welke registratie in die stap ontstaat. Pijlen tonen elf overdrachten, waarvan drie handmatig. De gebruiker kan een stap, applicatie, registratie of overdracht kiezen, filteren op rol en alleen de handmatige overdrachten tonen. Het detailpaneel toont velden, rollen, risico's bij de overdracht en FAB-controlepunten. Op mobiel staan de overdrachten onder de stappen.
-  - Bestand: [fab-proces-applicatie-map.html](fab-proces-applicatie-map.html).
+  - Bestand: [fab-proces-applicatie-map.html](visuals/landschap_en_processen/fab-proces-applicatie-map.html).
 - [x] **Autorisatielandschap** — Een matrix van acht rollen en zes applicaties met vier toegangsniveaus, gevoeligheidsklassen per applicatie (medisch, BSN, financieel) en lopende uitzonderingen: tijdelijke rechten, break-the-glass, een conflict in functiescheiding en een verlopen hercertificering. De gebruiker kan een rol, applicatie of recht kiezen, alleen de uitzonderingen tonen, filteren op gevoeligheid en een hercertificeringslijst kopiëren. De voorbeeldcasus is de kwartaalhercertificering van Q4 2026.
-  - Bestand: [fab-autorisatielandschap.html](fab-autorisatielandschap.html).
+  - Bestand: [fab-autorisatielandschap.html](visuals/toegang/fab-autorisatielandschap.html).
 - [x] **Go/No-Go Cockpit** — Een besluitstrip met het berekende advies (go, go onder voorwaarden of no-go) en een tijdlijn met beslismomenten tot en met de nazorg. Daaronder staan achttien criteria in zes groepen en de open bevindingen P1–P4, vergeleken met een zichtbare drempel. De gebruiker kan de status van een criterium wijzigen; het advies wordt dan direct opnieuw berekend. Een besluitadvies is te kopiëren. De voorbeeldcasus is de livegang van *Teamindeling per wijk*.
-  - Bestand: [fab-go-no-go-cockpit.html](fab-go-no-go-cockpit.html).
+  - Bestand: [fab-go-no-go-cockpit.html](visuals/wijziging_en_acceptatie/fab-go-no-go-cockpit.html).
 - [x] **Decision Canvas** — De besluitvraag *Hoe voeren we de teamindeling per wijk in?* met drie opties (in één keer, gefaseerd per regio of uitstel) en vijf invalshoeken: feiten, risico's, afhankelijkheden, inspanning en gevolgen voor gebruikers. Aannames zijn gemarkeerd. Met vier schuifregelaars stelt de gebruiker de weging in; de scores en de volgorde worden direct opnieuw berekend. Het canvas meldt nadrukkelijk dat het een hulpmiddel is en geen besluit. Een besluitnotitie is te kopiëren.
-  - Bestand: [fab-decision-canvas.html](fab-decision-canvas.html).
+  - Bestand: [fab-decision-canvas.html](visuals/wijziging_en_acceptatie/fab-decision-canvas.html).
 
 ### Bronnen, kennis en vraaggestuurd lezen
 
 - [x] **Bronkaart** — Een grote bron teruggebracht tot vijf hoofdthema's, een themakaart en een detailpaneel. Zoeken en selecteren verbinden de kern met context, bewijs, effecten en onzekerheden. Bronfragmenten verschijnen op verzoek; de voorbeeldbron is een fictieve evaluatie van digitale dienstverlening.
-  - Bestand: [bronkaart-onepager.html](bronkaart-onepager.html).
+  - Bestand: [bronkaart-onepager.html](visuals/bronnen_en_kennis/bronkaart-onepager.html).
 - [x] **BronScanner** — Een bron als verticale strook met acht secties. De strook toont de relatieve informatiedichtheid; een selectie opent de samenvatting, kernpunten, een citaat, onderbouwing, impact en aandachtspunten. Een apart bewijsspoor blijft naast de inhoud zichtbaar. Zoeken en vorige/volgende helpen bij het verkennen.
-  - Bestand: [bron-scanner.html](bron-scanner.html).
+  - Bestand: [bron-scanner.html](visuals/bronnen_en_kennis/bron-scanner.html).
 - [x] **Kennisatlas** — Een netwerk van acht inzichten met verbanden tussen oorzaken, effecten, randvoorwaarden, bewijs en onzekerheden. Leesroutes en filters leggen de nadruk op een gekozen invalshoek. Een klik op een knooppunt toont de samenvatting, relevantie, onderbouwing en bronverwijzing zonder de kaart te verlaten.
-  - Bestand: [kennisatlas.html](kennisatlas.html).
+  - Bestand: [kennisatlas.html](visuals/bronnen_en_kennis/kennisatlas.html).
 - [x] **Vraagdossier** — Een document geordend rond vijf beslisvragen: kernconclusie, verklaring, betekenis, voorwaarden en grenzen. De gebruiker kiest een antwoord in 30 seconden, meer context in 2 minuten of de bronlaag. Losse bewijsstroken openen een toelichting; het bronpad blijft zichtbaar.
-  - Bestand: [vraagdossier.html](vraagdossier.html).
+  - Bestand: [vraagdossier.html](visuals/bronnen_en_kennis/vraagdossier.html).
 - [x] **VraagKompas** — Zes vraaggestuurde leesroutes rond aanleiding, verandering, bewijs, risico's, acties en betrokkenen. Per vraag zijn een kort antwoord, onderbouwing en brontekst beschikbaar, met bronverwijzingen en logische vervolgvragen. Een zoekvraag helpt om de passende ingang te vinden.
-  - Bestand: [vraagkompas.html](vraagkompas.html).
+  - Bestand: [vraagkompas.html](visuals/bronnen_en_kennis/vraagkompas.html).
 
 ## Aanvullende templatekandidaten
 
@@ -173,24 +173,24 @@ Inhoudelijke overlap betekent niet dat een kandidaat al is uitgewerkt. Een open 
 ### Landschap, processen, toegang en gegevens
 
 - [ ] **Data Lineage** — Waar gegevens ontstaan, wijzigen, worden doorgestuurd en uiteindelijk gebruikt.
-- [x] **Joiner-Mover-Leaver-flow** — Medewerker van HR-trigger via IAM naar het toekennen, wijzigen en intrekken van accounts en rechten. Uitgewerkt als dagenraster met schuifregelaar en vergelijking tussen bedoeld en werkelijk verloop. Bestand: [fab-joiner-mover-leaver.html](fab-joiner-mover-leaver.html).
-- [x] **Data Quality Map** — Een controlelens over 120 synthetische overdrachtsberichten, met drie kwaliteitsregels, expliciete demo-overlap, betrokken afnemers en veilige herstelroutes. Voorstel, uitvoering en aansluitcontrole zijn afzonderlijk te simuleren; een gewijzigde regelversie vraagt herbeoordeling. Geen totaalpercentage datakwaliteit. Bestand: [fab-data-quality-map.html](fab-data-quality-map.html).
-- [x] **Rapportage Lineage** — KPI/dashboard → berekening → gegevensveld → bronsysteem. Uitgewerkt als doorsnede in vier lagen, met simulatie van achterlopende bronnen. Bestand: [fab-rapportage-lineage.html](fab-rapportage-lineage.html).
+- [x] **Joiner-Mover-Leaver-flow** — Medewerker van HR-trigger via IAM naar het toekennen, wijzigen en intrekken van accounts en rechten. Uitgewerkt als dagenraster met schuifregelaar en vergelijking tussen bedoeld en werkelijk verloop. Bestand: [fab-joiner-mover-leaver.html](visuals/toegang/fab-joiner-mover-leaver.html).
+- [x] **Data Quality Map** — Een controlelens over 120 synthetische overdrachtsberichten, met drie kwaliteitsregels, expliciete demo-overlap, betrokken afnemers en veilige herstelroutes. Voorstel, uitvoering en aansluitcontrole zijn afzonderlijk te simuleren; een gewijzigde regelversie vraagt herbeoordeling. Geen totaalpercentage datakwaliteit. Bestand: [fab-data-quality-map.html](visuals/gegevens_en_ketens/fab-data-quality-map.html).
+- [x] **Rapportage Lineage** — KPI/dashboard → berekening → gegevensveld → bronsysteem. Uitgewerkt als doorsnede in vier lagen, met simulatie van achterlopende bronnen. Bestand: [fab-rapportage-lineage.html](visuals/gegevens_en_ketens/fab-rapportage-lineage.html).
 - [ ] **Functional Blueprint** — Proces, gebruiker, applicatie, data en koppeling als aan- en uitzetbare informatielagen.
 
 ### Wijzigingen, testen en livegang
 
-- [x] **Test Coverage Map** — Vijf herleidbare testsporen voor zorgoverdracht naar een woonzorglocatie: eis/inrichting, scenario, uitvoering, bewijscontrole en bevoegd akkoord. Uitvoering, mislukking, controle, akkoord en afkeuring zijn apart te simuleren; gewijzigde bewijsversies maken eerdere acceptatie ongeldig. Terugvaltest blijft geblokkeerd zonder lokaal noodplan. Bestand: [fab-test-coverage-map.html](fab-test-coverage-map.html).
+- [x] **Test Coverage Map** — Vijf herleidbare testsporen voor zorgoverdracht naar een woonzorglocatie: eis/inrichting, scenario, uitvoering, bewijscontrole en bevoegd akkoord. Uitvoering, mislukking, controle, akkoord en afkeuring zijn apart te simuleren; gewijzigde bewijsversies maken eerdere acceptatie ongeldig. Terugvaltest blijft geblokkeerd zonder lokaal noodplan. Bestand: [fab-test-coverage-map.html](visuals/wijziging_en_acceptatie/fab-test-coverage-map.html).
 - [ ] **Omgevingsvergelijker** — Verschillen tussen productie-, test- en acceptatieomgevingen.
 - [ ] **Release Impact Explorer** — Release notes vertaald naar impact voor processen, gebruikers en beheer.
 - [ ] **Applicatie Life Cycle Map** — Versies, upgrades, EOL, projecten, migraties en vervanging.
 
 ### Incidenten, ondersteuning en continuïteit
 
-- [x] **Root Cause Map** — Symptomen, hypothesen, checks en afzonderlijke bewijsbeoordeling. Antwoorden geven aanwijzingen, geen automatische uitsluitingen of bewezen oorzaak. Het raster ondersteunt een volgende check en houdt onbekend en meerdere oorzaken mogelijk. Bestand: [fab-oorzaakopsporing.html](fab-oorzaakopsporing.html).
+- [x] **Root Cause Map** — Symptomen, hypothesen, checks en afzonderlijke bewijsbeoordeling. Antwoorden geven aanwijzingen, geen automatische uitsluitingen of bewezen oorzaak. Het raster ondersteunt een volgende check en houdt onbekend en meerdere oorzaken mogelijk. Bestand: [fab-oorzaakopsporing.html](visuals/incident_en_continuiteit/fab-oorzaakopsporing.html).
 - [ ] **Known Error / Workaround Map** — Bekende verstoringen, diagnose, workaround en structurele oplossing.
 - [ ] **Escalatiekaart** — Wie wanneer verantwoordelijk wordt bij incidenten en ketenproblemen.
-- [x] **Continuïteitskaart** — Een uitklapbare oefenkaart met parallelle banen voor zorgregie en technisch herstel. Wisselen tussen ECD-, netwerk- en IAM-uitval toont andere bereikbaarheidseisen; planstatus, vier herstelcontroles en afzonderlijke bevoegde bevestiging zijn te simuleren. Bevat geen echt noodplan of contactroute; gereedheid blijft niet aangetoond. Bestand: [fab-continuiteitskaart.html](fab-continuiteitskaart.html).
+- [x] **Continuïteitskaart** — Een uitklapbare oefenkaart met parallelle banen voor zorgregie en technisch herstel. Wisselen tussen ECD-, netwerk- en IAM-uitval toont andere bereikbaarheidseisen; planstatus, vier herstelcontroles en afzonderlijke bevoegde bevestiging zijn te simuleren. Bevat geen echt noodplan of contactroute; gereedheid blijft niet aangetoond. Bestand: [fab-continuiteitskaart.html](visuals/incident_en_continuiteit/fab-continuiteitskaart.html).
 
 ### Eigenaarschap, risico's en besluitvorming
 

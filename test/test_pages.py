@@ -8,7 +8,7 @@ from urllib.parse import unquote, urlsplit
 
 import pytest
 from playwright.sync_api import BrowserContext, Page, expect
-from support import HTML_FILES, ROOT, TASK_FILES
+from support import HTML_FILES, TASK_FILES, visual_path
 
 
 class Document(HTMLParser):
@@ -31,7 +31,7 @@ class Document(HTMLParser):
 @pytest.mark.parametrize("filename", HTML_FILES)
 def test_html__local_links_and_static_ids(filename: str) -> None:
     """Iedere lokale link bestaat en statische HTML-fragmenten zijn uniek."""
-    path = ROOT / filename
+    path = visual_path(filename)
     document = Document(path)
     assert len(document.ids) == len(set(document.ids)), f"Dubbele statische IDs: {filename}"
     for href in document.links:
@@ -49,7 +49,7 @@ def test_html__local_links_and_static_ids(filename: str) -> None:
 @pytest.mark.parametrize("filename", HTML_FILES)
 def test_html__mobile_ids_and_management_context(page: Page, filename: str) -> None:
     """Initialisatie, beheergegevens en mobiele breedte werken voor iedere pagina."""
-    page.goto((ROOT / filename).as_uri(), wait_until="networkidle")
+    page.goto(visual_path(filename).as_uri(), wait_until="networkidle")
     assert page.evaluate("""() => {
         const ids = [...document.querySelectorAll('[id]')].map(el => el.id);
         return ids.length === new Set(ids).size;
@@ -86,7 +86,7 @@ def test_critical_content__without_javascript(
 ) -> None:
     """Kritieke taakinhoud is leesbaar zonder JavaScript en in afdrukmodus."""
     page = new_context(java_script_enabled=False, viewport={"width": 390, "height": 844}).new_page()
-    page.goto((ROOT / filename).as_uri(), wait_until="networkidle")
+    page.goto(visual_path(filename).as_uri(), wait_until="networkidle")
     expect(page.locator(selector)).to_be_visible()
     page.emulate_media(media="print")
     expect(page.locator(selector)).to_be_visible()
@@ -101,7 +101,7 @@ def test_task_views__print_and_nojs(
         page = new_context(
             java_script_enabled=javascript, viewport={"width": 320, "height": 900}
         ).new_page()
-        page.goto((ROOT / filename).as_uri(), wait_until="networkidle")
+        page.goto(visual_path(filename).as_uri(), wait_until="networkidle")
         expect(page.locator("h1")).to_be_visible()
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), filename
         if not javascript:
@@ -138,7 +138,7 @@ def test_task_views__clipboard_and_keyboard(page: Page, filename: str, denied: b
     page.add_init_script(
         f"Object.defineProperty(navigator, 'clipboard', {{value: {{writeText: async text => {{{action}}}}}}})"
     )
-    page.goto((ROOT / filename).as_uri(), wait_until="networkidle")
+    page.goto(visual_path(filename).as_uri(), wait_until="networkidle")
     page.keyboard.press("Tab")
     expect(page.locator(".skip")).to_be_focused()
     page.keyboard.press("Enter")

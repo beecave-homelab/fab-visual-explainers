@@ -5,9 +5,9 @@ import re
 from collections.abc import Callable
 
 from playwright.sync_api import BrowserContext, Page, expect
-from support import ROOT
+from support import ROOT, visual_path
 
-URL = (ROOT / "fab-ketenkaart.html").as_uri()
+URL = visual_path("fab-ketenkaart.html").as_uri()
 
 
 def test_ketenkaart__routes_keyboard_and_copy_fallback(

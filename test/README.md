@@ -2,6 +2,8 @@
 
 Deze map bevat lokale browserregressies voor de zelfstandige HTML-prototypes. De tijdelijke scripts zijn geselecteerd en herwerkt naar afzonderlijke pytest-scenario’s. Diagnose-experimenten en previewservers zijn niet opgenomen.
 
+De inventaris wordt recursief uit `visuals/` opgebouwd. `support.py` biedt `visual_path()` voor het openen van een prototype op unieke bestandsnaam, ongeacht de categorie. Een lege inventaris, dubbele bestandsnaam of ontbrekend gevraagd bestand geeft een fout.
+
 ## Omgeving
 
 Python 3.11 of hoger, uv en lokaal geïnstalleerd Google Chrome zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
@@ -27,6 +29,7 @@ Gebruik voor `--basetemp` uitsluitend een aparte testmap: pytest verwijdert best
 
 | Bestand                | Doel                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test_inventory.py`    | Recursieve ontdekking, lege inventaris, dubbele namen en ontbrekende gevraagde prototypes.                                                              |
 | `test_pages.py`        | Alle aanwezige HTML: lokale links, unieke IDs, mobiele breedte, beheerinformatie; kritieke inhoud zonder JavaScript; afdruk en clipboard van taakviews. |
 | `test_review_logic.py` | Diagnose, Go/No-Go, optiekeuze, rapportagedefinities, autorisatie, JML, impact en procesbevoegdheden.                                                   |
 | `test_review_edges.py` | Drempels, afkeuring, onbekende uitkomsten, toetsenbord en exportfallbacks.                                                                              |
@@ -44,7 +47,7 @@ Behoud bewijslast: maak een falende controle niet groen door de verwachting te v
 uv run --locked ruff check test
 uv run --locked ruff format --check test
 uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check *.html
+uv run --locked djlint --check visuals/
 ```
 
 Opmaak bijwerken:
@@ -53,7 +56,7 @@ Opmaak bijwerken:
 uv run --locked ruff check test --fix
 uv run --locked ruff format test
 uv run --locked mdformat *.md test/README.md
-uv run --locked djlint --reformat *.html
+uv run --locked djlint --reformat visuals/
 ```
 
 Ruff controleert Python, mdformat met GFM en frontmatter ondersteunt tabellen, checkboxes en YAML-metadata, djLint verzorgt HTML-opmaak. CSS en JavaScript binnen HTML worden niet door djLint geformatteerd. Voer na HTML-opmaak de browserregressies uit; formatterchecks beoordelen geen werking of visuele toegankelijkheid.

@@ -6,6 +6,8 @@ Deze map bevat 23 zelfstandige HTML-prototypes voor 22 concepten: 17 FAB-concept
 
 De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de inventaris, selectie en actuele status. De blijvende werkafspraken uit de ideeënnotitie en de VVT-review zijn op 1 oktober 2026 hier samengebracht; AGENTS.md is daarvoor de centrale instructiebron. Het afzonderlijke reviewrapport is na verwerking verwijderd en blijft terug te vinden in de Git-historie. De functiebeschrijving is het aangeleverde toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 
+De HTML staat onder `visuals/`, in `incident_en_continuiteit/`, `wijziging_en_acceptatie/`, `landschap_en_processen/`, `toegang/`, `gegevens_en_ketens/` en `bronnen_en_kennis/`. Kies één categorie op basis van de hoofdtaak; mapnamen gebruiken snake_case, bestaande HTML-bestandsnamen blijven behouden. Houd bestandsnamen binnen `visuals/` uniek. Werk bij verplaatsingen relatieve links (ook tussen categorieën en inclusief fragmenten) en documentverwijzingen bij.
+
 ## Toelating en selectie
 
 - Een concept gaat pas door naar uitwerking als de hoofdtaak, primaire gebruiker, bron, inhoudelijk eigenaar en concrete vervolgstap duidelijk zijn. Onbekende bronhouder of onduidelijk resultaat: eerst onderzoek, geen extra visual.
@@ -63,12 +65,14 @@ uv run --locked pytest
 uv run --locked ruff check test
 uv run --locked ruff format --check test
 uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check *.html
+uv run --locked djlint --check visuals/
 ```
 
 Gebruik na installatie desgewenst `uv run --offline --locked pytest`. Werk dependencies bewust via `pyproject.toml` en `uv lock` bij; commit de lockfile samen met dependencywijzigingen. Er is geen Markdown-build of Python-distributie.
 
 De tests gebruiken `sync_playwright()` en `chromium.launch(channel='chrome', headless=True)`, openen bestanden via `Path.as_uri()` en wachten op `networkidle`. Iedere test heeft een eigen browsercontext; onverwachte externe requests en JavaScript-fouten laten de test falen. De bekende Google Fonts-aanvraag van de algemene incidentpagina wordt geblokkeerd; die pagina wordt met lokale fallbackfonts getoetst. Screenshots en PDF’s gaan naar pytest-tijdelijke mappen. Gebruik `--basetemp` uitsluitend voor een aparte testmap, omdat pytest de bestaande inhoud verwijdert.
+
+De tests ontdekken HTML recursief onder `visuals/`; `test/support.py` zoekt bestanden op unieke bestandsnaam. Een lege inventaris, dubbele bestandsnaam of ontbrekend gevraagd prototype geeft een fout. Gebruik deze centrale padresolver bij nieuwe tests.
 
 Pas nieuwe tests aan de bestaande fixtures en scenario-indeling aan. Geen browserwerk tijdens module-import, absolute gebruikerspaden, vaste serverpoorten of ongecontroleerde CSS-experimenten in de tests. Test gedrag en veiligheidsvoorwaarden, niet historische tellingen of een vaste revisiedatum. Onderzoek falende assertions; verzwak geen inhoudelijke verwachting alleen om een groene run te krijgen. Sluit eigen browsercontexten en servers ook bij fouten.
 

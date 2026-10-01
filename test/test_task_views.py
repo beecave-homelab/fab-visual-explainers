@@ -1,7 +1,7 @@
 """Bewijsfasen, herstelvoorwaarden en overlap in drie zelfstandige taakviews."""
 
 from playwright.sync_api import Page
-from support import ROOT
+from support import visual_path
 
 FILES = ["fab-test-coverage-map.html", "fab-continuiteitskaart.html", "fab-data-quality-map.html"]
 
@@ -13,7 +13,7 @@ def ensure(value: bool, message: str) -> None:
 
 def open_file(page: Page, name: str) -> None:
     """Open een taakview uit de huidige checkout."""
-    page.goto((ROOT / name).as_uri(), wait_until="networkidle")
+    page.goto(visual_path(name).as_uri(), wait_until="networkidle")
 
 
 def test_coverage__evidence_rejection_and_filter_focus(page: Page) -> None:
