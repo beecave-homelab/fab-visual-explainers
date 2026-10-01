@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Serviceradar · Functioneel applicatiebeheer</title>
+<style>
+:root{
+  --plum:#611750;
+  --berry:#9D3293;
+  --berry-2:#c86dc0;
+  --ink:#fff8fd;
+  --muted:#e4d2e1;
+  --line:rgba(255,255,255,.16);
+  --line-strong:rgba(255,255,255,.32);
+  --panel:rgba(255,255,255,.08);
+  --panel-2:rgba(255,255,255,.12);
+  --good:#9ed7c2;
+  --warn:#f2c178;
+  --danger:#e48699;
+  --shadow:0 28px 70px rgba(48,6,38,.28);
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Segoe UI",Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 20% -10%, rgba(191,88,181,.28), transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(157,50,147,.17), transparent 28%),
+    linear-gradient(145deg,#4f123f 0%,#611750 44%,#43113a 100%);
+}
+button{font:inherit;color:inherit}
+.shell{min-height:100vh;display:grid;grid-template-columns:320px minmax(0,1fr) 360px;gap:18px;padding:18px}
+.panel{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.045));backdrop-filter:blur(15px);box-shadow:var(--shadow);border-radius:28px;overflow:hidden}
+.left{display:flex;flex-direction:column;padding:28px;position:relative}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:42px}.brandmark{width:38px;height:38px;border:1px solid rgba(255,255,255,.3);border-radius:12px;display:grid;place-items:center;font-weight:800;background:rgba(255,255,255,.09)}.brand strong{display:block;font-size:1rem}.brand span{font-size:.82rem;color:var(--muted)}
+.kicker{font-size:.82rem;color:var(--muted);margin:0 0 10px}.left h1{font-size:clamp(3.2rem,5vw,5.5rem);line-height:.88;letter-spacing:-.065em;margin:0;max-width:5.1ch}.left .intro{font-size:1rem;line-height:1.72;color:#eadce8;margin:28px 0 0;max-width:27ch}
+.design-note{margin-top:24px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem;line-height:1.65}.design-note p{margin:0 0 10px}.left-bottom{margin-top:auto;padding-top:38px}.statusline{display:grid;gap:11px}.statusrow{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;color:#eadde8;font-size:.87rem}.dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 5px rgba(255,255,255,.04)}
+.center{display:grid;grid-template-rows:auto auto 1fr auto;min-height:calc(100vh - 36px)}.center-head{padding:24px 26px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.center-head h2{margin:0;font-size:1.35rem}.center-head p{margin:7px 0 0;color:var(--muted);font-size:.92rem}.incident{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.06);font-size:.85rem;color:#eadce8;white-space:nowrap}.incident strong{color:#fff}
+.mobile-prompt{display:none;padding:0 20px 4px;color:#eadce8;font-size:.86rem}
+.radar-wrap{display:grid;place-items:center;padding:8px 24px 18px;min-height:520px}.radar{width:min(690px,88%);aspect-ratio:1/1;position:relative;display:grid;place-items:center}.ring{position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%;inset:8%}.ring.r2{inset:21%}.ring.r3{inset:34%}.axis::before,.axis::after{content:"";position:absolute;background:rgba(255,255,255,.10)}.axis::before{width:1px;height:88%;top:6%;left:50%}.axis::after{height:1px;width:88%;left:6%;top:50%}
+.core{position:relative;z-index:4;width:176px;height:176px;border-radius:50%;display:grid;place-items:center;text-align:center;padding:18px;background:radial-gradient(circle at 35% 25%,#c256b6,#8a2b79 52%,#611750 100%);box-shadow:0 0 0 14px rgba(255,255,255,.05),0 0 60px rgba(191,88,181,.35)}.core strong{display:block;font-size:1.4rem;letter-spacing:-.03em}.core span{display:block;color:#f0dcec;font-size:.78rem;margin-top:5px}
+.node{position:absolute;z-index:5;width:124px;min-height:124px;border-radius:50%;border:1px solid rgba(255,255,255,.26);background:rgba(92,25,77,.82);color:#fff;cursor:pointer;display:grid;place-items:center;text-align:center;padding:14px;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;color:inherit;box-shadow:0 16px 34px rgba(35,5,27,.16)}.node strong{display:block;font-size:.95rem}.node small{display:block;color:#dcc7d8;font-size:.73rem;margin-top:5px;line-height:1.25}.node:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.48);background:rgba(123,31,105,.95)}.node:focus-visible{outline:3px solid rgba(255,255,255,.78);outline-offset:3px}.node.active{background:#fff;color:var(--plum);border-color:#fff;box-shadow:0 0 0 8px rgba(255,255,255,.08),0 18px 40px rgba(25,0,18,.27)}.node.active small{color:#7c5d76}
+.n1{top:4%;left:50%;transform:translateX(-50%)}.n2{top:22%;right:3%}.n3{bottom:14%;right:10%}.n4{bottom:5%;left:50%;transform:translateX(-50%)}.n5{bottom:14%;left:10%}.n6{top:22%;left:3%}
+.legend{margin:0 24px 24px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}.legend>div{padding:17px 14px;border-right:1px solid var(--line)}.legend>div:last-child{border-right:0}.legend strong{display:block;font-size:1.45rem;letter-spacing:-.04em}.legend span{display:block;color:var(--muted);font-size:.82rem;line-height:1.45;margin-top:4px}
+.right{padding:24px;display:flex;flex-direction:column}.stepcode{width:58px;height:58px;border-radius:18px;background:#fff;color:var(--plum);display:grid;place-items:center;font-weight:800;font-size:1.1rem;margin-bottom:24px}.right h2{font-size:2rem;line-height:1.05;letter-spacing:-.045em;margin:0}.lead{color:#e7d7e3;line-height:1.66;margin:18px 0 24px}.questions{display:grid;gap:11px}.q{border:1px solid var(--line);background:rgba(255,255,255,.07);border-radius:18px;padding:16px}.q strong{display:block;margin-bottom:6px;font-size:.93rem}.q p{margin:0;color:#d9c6d5;font-size:.84rem;line-height:1.56}.gate{margin-top:auto;padding-top:22px;border-top:1px solid var(--line);color:#d9c6d5;font-size:.86rem;line-height:1.55}.gate strong{display:block;color:#fff;font-size:1rem;margin-top:8px}
+@media(max-width:1120px){.shell{grid-template-columns:1fr}.center{min-height:auto}.left{min-height:0}.left-bottom{margin-top:38px}.right{min-height:0}.radar-wrap{min-height:0;padding-top:14px}}
+@media(max-width:760px){.shell{padding:10px;gap:10px}.panel{border-radius:22px}.left,.right{padding:20px}.left h1{font-size:3.55rem}.center-head{padding:20px;flex-direction:column}.incident{white-space:normal}.mobile-prompt{display:block}.radar-wrap{min-height:0;padding:8px 14px 12px}.radar{width:100%;aspect-ratio:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}.ring,.axis{display:none}.core{grid-column:1/-1;justify-self:center;width:150px;height:150px;margin:2px auto 10px}.node{position:static;width:100%;min-height:94px;height:auto;border-radius:20px;padding:14px 12px;box-shadow:0 12px 26px rgba(35,5,27,.16)}.node:hover{transform:none}.n1,.n2,.n3,.n4,.n5,.n6{top:auto;right:auto;bottom:auto;left:auto;transform:none}.node strong{font-size:.92rem}.node small{font-size:.74rem}.legend{grid-template-columns:1fr;margin:0 14px 14px}.legend>div{border-right:0;border-bottom:1px solid var(--line)}.legend>div:last-child{border-bottom:0}.right h2{font-size:1.7rem}}
+@media(max-width:520px){.left h1{font-size:3.05rem}.center-head h2{font-size:1.2rem}.core{width:138px;height:138px}.node{min-height:86px}.node strong{font-size:.88rem}.node small{font-size:.7rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.review-context a { color:inherit; text-underline-offset:3px; }
+@media print { body { background:white;color:black; } .shell { display:none; } .review-context details > :not(summary) { display:block!important; } }
+</style>
+</head>
+<body>
+<main class="shell">
+  <aside class="panel left">
+    <div class="brand"><div class="brandmark">A</div><div><strong>Attent</strong><span>functioneel applicatiebeheer</span></div></div>
+    <p class="kicker">Concept · incidentregie</p>
+    <h1>Service radar</h1>
+    <p class="intro">Gebruik dit ontwerp wanneer je bij een verstoring snel van losse meldingen naar een gedeeld ketenbeeld wilt. De dienst staat centraal; daaromheen klik je op de perspectieven die nodig zijn om impact, oorzaak en eigenaarschap scherp te krijgen.</p>
+    <div class="design-note">
+      <p>De richting is bewust donker en geconcentreerd: een regiescherm in plaats van een dashboard met losse kaarten.</p>
+      <p>De Attent-kleuren zijn hier ingezet als diepe werkruimte met helder wit als actieve selectie. De radiale navigatie blijft op desktop leidend, maar valt op mobiel terug naar klikbare perspectiefkaarten zodat het geheel prettig leesbaar blijft.</p>
+    </div>
+    <div class="left-bottom">
+      <div class="statusline">
+        <div class="statusrow"><span class="dot" style="background:var(--danger)"></span><span>Impact op roosterproces</span><strong>hoog</strong></div>
+        <div class="statusrow"><span class="dot" style="background:var(--warn)"></span><span>Workaround beschikbaar</span><strong>deels</strong></div>
+        <div class="statusrow"><span class="dot" style="background:var(--good)"></span><span>Eigenaar benoemd</span><strong>ja</strong></div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="panel center">
+    <header class="center-head">
+      <div><h2>Ketenbeeld</h2><p>Klik op een perspectief om de uitvraag en het volgende beslismoment te zien.</p></div>
+      <div class="incident"><span>INC-2741</span><strong>Roosterportaal</strong><span>08:42</span></div>
+    </header>
+    <p class="mobile-prompt">Op mobiel werken de perspectieven als duidelijke selectiekaarten. De witte kaart is actief.</p>
+    <div class="radar-wrap">
+      <div class="radar" aria-label="Interactieve serviceradar">
+        <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div><div class="axis"></div>
+        <div class="core"><div><strong>Roosterportaal</strong><span>dienst in verstoring</span></div></div>
+        <button class="node n1 active" data-key="melder" aria-pressed="true"><span><strong>Melder</strong><small>wat wordt ervaren?</small></span></button>
+        <button class="node n2" data-key="proces" aria-pressed="false"><span><strong>Proces</strong><small>wat valt stil?</small></span></button>
+        <button class="node n3" data-key="applicatie" aria-pressed="false"><span><strong>Applicatie</strong><small>wat doet het systeem?</small></span></button>
+        <button class="node n4" data-key="data" aria-pressed="false"><span><strong>Data</strong><small>kloppen de gegevens?</small></span></button>
+        <button class="node n5" data-key="koppeling" aria-pressed="false"><span><strong>Koppeling</strong><small>waar breekt de keten?</small></span></button>
+        <button class="node n6" data-key="leverancier" aria-pressed="false"><span><strong>Leverancier</strong><small>wat moet worden opgeschaald?</small></span></button>
+      </div>
+    </div>
+    <footer class="legend">
+      <div><strong>1 bron</strong><span>Uitvraag, besluiten en voortgang blijven bij hetzelfde incident.</span></div>
+      <div><strong>6 blikken</strong><span>Je onderzoekt dezelfde verstoring vanuit verschillende functionele perspectieven.</span></div>
+      <div><strong>1 volgende stap</strong><span>Per perspectief wordt zichtbaar welke functionele vraag of escalatie nu nodig is.</span></div>
+    </footer>
+  </section>
+
+  <aside class="panel right" aria-live="polite">
+    <div class="stepcode" id="stepCode">01</div>
+    <p class="kicker" id="detailKicker">Geselecteerd perspectief · melder</p>
+    <h2 id="detailTitle">De melding maakt het probleem navolgbaar</h2>
+    <p class="lead" id="detailLead">Begin bij wat de gebruiker ervaart. Niet bij aannames over de techniek, maar bij zichtbaar gedrag, context en impact op het werk.</p>
+    <div class="questions" id="detailQuestions"></div>
+    <div class="gate" id="detailGate"></div>
+  </aside>
+</main>
+<script>
+const data={
+  melder:{code:'01',kicker:'Geselecteerd perspectief · melder',title:'De melding maakt het probleem navolgbaar',lead:'Begin bij wat de gebruiker ervaart. Niet bij aannames over de techniek, maar bij zichtbaar gedrag, context en impact op het werk.',questions:[['Wat gebeurt er?','Beschrijf zichtbaar gedrag, foutmelding, verwachte werking en wat de gebruiker precies wilde doen.'],['Waar gebeurt het?','Leg applicatie, scherm, processtap en betrokken rol of afdeling vast.'],['Sinds wanneer?','Noteer moment, frequentie en eventuele recente wijziging of piekbelasting.']],gate:['Door naar volgende stap wanneer','de melding concreet genoeg is om patroon en impact te herkennen.']},
+  proces:{code:'02',kicker:'Geselecteerd perspectief · proces',title:'Procesimpact bepaalt de echte prioriteit',lead:'Niet elke fout is even urgent. Kijk naar het proces dat stilvalt, vertraagt of foutieve uitkomsten produceert.',questions:[['Welke stap stokt?','Benoem welk bedrijfsproces geraakt wordt en of er een handmatige workaround bestaat.'],['Wie merkt het?','Maak zichtbaar welke teams, locaties of ketenpartners nu hinder ondervinden.'],['Wat staat op het spel?','Denk aan planning, cliëntveiligheid, wettelijke termijnen, facturatie of roostercontinuïteit.']],gate:['Door naar volgende stap wanneer','de procesimpact vertaald is naar prioriteit, hinder en herstelurgentie.']},
+  applicatie:{code:'03',kicker:'Geselecteerd perspectief · applicatie',title:'Applicatiegedrag maakt onderzoek gericht',lead:'Pas nu zoom je in op schermen, functies, foutcodes en gedrag binnen de applicatie zelf.',questions:[['Wat werkt nog wel?','Zoek de grens van het probleem. Werkt het alleen op één scherm, rol of locatie niet?'],['Wat veranderde recent?','Check releases, instellingen, rechtenwijzigingen of onderhoudsvensters.'],['Is het reproduceerbaar?','Test of het gedrag herhaalbaar is en leg de stappen vast in dezelfde volgorde.']],gate:['Door naar volgende stap wanneer','je de storing reproduceerbaar of aantoonbaar afgebakend hebt.']},
+  data:{code:'04',kicker:'Geselecteerd perspectief · data',title:'Datakwaliteit kan incidenten verklaren of maskeren',lead:'Soms lijkt een functie kapot, terwijl het echte probleem in ontbrekende, verouderde of foutief geïnterpreteerde gegevens zit.',questions:[['Welke gegevens zijn betrokken?','Leg vast welke cliënt-, planning-, autorisatie- of stamgegevens in deze situatie meespelen.'],['Zijn waarden plausibel?','Vergelijk brondata, schermdata en rapportages op volledigheid en actualiteit.'],['Wat is het effect van correctie?','Bepaal of herstel in data voldoende is of dat ook proces- of systeemherstel nodig is.']],gate:['Door naar volgende stap wanneer','duidelijk is of data de oorzaak, de versneller of alleen het symptoom is.']},
+  koppeling:{code:'05',kicker:'Geselecteerd perspectief · koppeling',title:'Koppelvlakken zijn vaak het verborgen breekpunt',lead:'Veel verstoringen ontstaan niet in de hoofdapplicatie, maar in overdracht tussen systemen, taken of gegevensstromen.',questions:[['Welke systemen raken elkaar?','Benoem bron, doel en wat daartussen zit: API, batch, mailbox, broker of handmatige stap.'],['Waar stopt de keten?','Check wachtrijen, synchronisatie, logs of tijdstippen waarop informatie niet meer doorloopt.'],['Wie beheert welk stuk?','Maak eigenaarschap expliciet zodat het incident niet tussen partijen blijft hangen.']],gate:['Door naar volgende stap wanneer','duidelijk is waar de keten onderbroken raakt en wie moet aanhaken.']},
+  leverancier:{code:'06',kicker:'Geselecteerd perspectief · leverancier',title:'Opschalen werkt alleen met strakke context',lead:'Wanneer je moet escaleren, wil je leveranciers niet meenemen in je zoektocht, maar in een al scherp geformuleerd probleem.',questions:[['Wat stuur je mee?','Geef tijdstip, impact, reproducerende stappen, relevante logs en prioriteit mee in één compact pakket.'],['Wat verwacht je terug?','Vraag expliciet om analyse, workaround, ETA of bevestiging van oorzaak.'],['Welke afspraken gelden?','Check SLA, onderhoudsvensters, escalatieroutes en wie intern eigenaar blijft.']],gate:['Door naar volgende stap wanneer','de leverancier precies weet wat onderzocht moet worden en wat jij nodig hebt.']}
+};
+const nodes=[...document.querySelectorAll('.node')];
+const qWrap=document.getElementById('detailQuestions');
+function render(key){
+  const d=data[key];
+  document.getElementById('stepCode').textContent=d.code;
+  document.getElementById('detailKicker').textContent=d.kicker;
+  document.getElementById('detailTitle').textContent=d.title;
+  document.getElementById('detailLead').textContent=d.lead;
+  qWrap.innerHTML=d.questions.map(([h,p])=>`<article class="q"><strong>${h}</strong><p>${p}</p></article>`).join('');
+  document.getElementById('detailGate').innerHTML=`${d.gate[0]}<strong>${d.gate[1]}</strong>`;
+  nodes.forEach(node=>{
+    const active=node.dataset.key===key;
+    node.classList.toggle('active',active);
+    node.setAttribute('aria-pressed',active?'true':'false');
+  });
+}
+nodes.forEach(node=>node.addEventListener('click',()=>render(node.dataset.key)));
+render('melder');
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('radarChecklist').innerHTML = Object.values(data).map(d => `<li><strong>${d.title}</strong><p>${d.lead}</p><ul>${d.questions.map(([h,p])=>`<li><strong>${h}</strong> ${p}</li>`).join('')}</ul><p>${d.gate.join(': ')}</p></li>`).join('');
+});
+</script>
+<section class="review-context" aria-label="Beheerkaart en incidentanalyse" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Incidentanalyse vanuit zes perspectieven</h2>
+  <p><strong>Hoofdvraag:</strong> welk proces, gegeven of ketenonderdeel moet ik nu controleren? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en overleg bij triage; geen actuele monitor of meldingenregistratie. <strong>Uitkomst:</strong> controlepunt, zorgimpact, eigenaar en veilig escalatiepakket in de bestaande melding.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische INC-2741, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De gekleurde statussen zijn illustraties, geen uitgevoerde of geaccepteerde controles. Geldigheid: demonstratie, niet lokaal gevalideerd. De proceseigenaar beoordeelt zorgimpact en noodwerkwijze; ICT en leverancier voeren technische acties uit; FAB onderzoekt, signaleert en adviseert.</p>
+  <nav aria-label="Incidentviews"><a href="incident-onepager.html#continuity">Incidentingang en continuïteit</a> · <a href="fab-oorzaakopsporing.html">Hypothesen onderzoeken (andere casus)</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a></nav>
+  <p>Bij stilgevallen zorgondersteuning: start direct het goedgekeurde lokale continuïteitsproces via de afgesproken contactroute, ook voordat de oorzaak bekend is. Geen leveranciermelding is geen bewijs dat de leverancier werkt. Deel via de bevoegde route alleen noodzakelijke, beveiligde meldinformatie; geen cliëntgegevens of volledige logs in deze HTML.</p>
+  <details id="readableRadar"><summary>Alle zes perspectieven als leesbare checklist</summary><ol id="radarChecklist"><li>Melder: gedrag, verwachting, context, moment en frequentie.</li><li>Proces: zorgimpact, privacy, veilige lokaal goedgekeurde omweg en prioriteit.</li><li>Applicatie: wat werkt nog, recente wijzigingen en gecontroleerde reproductie.</li><li>Data: volledigheid, plausibiliteit, actualiteit en gecontroleerde herstelroute.</li><li>Koppeling: ontvangst, inhoudelijke verwerking, aantallen en eigenaar per overdracht.</li><li>Leverancier: bestaand contactpunt, bevoegdheid, beveiligd escalatiepakket en interne opvolging.</li></ol></details>
+  <p><strong>Onderhoud en toelating:</strong> herzie bij proces- of bronwijziging; wijs eerst bronhouder en vervolgactie aan. Leg datum, versie, beoordelaar en uitkomst in de bestaande melding vast, niet in een extra administratie. Vergelijk radar en checklist op juiste controle, zoekwerk en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

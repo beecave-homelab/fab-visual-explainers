@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Change Impact Map — teamindeling per wijk</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --paper: #dfe0ec;
+  --surface: #f4f4f9;
+  --ink: #1c1f4a;
+  --muted: #4d5175;
+  --accent: #3b4a9a;
+  --accent-tint: #e6e8f6;
+  --ok: #25806d;
+  --warn: #8f5e12;
+  --danger: #b3283a;
+  --rule: #a9acc8;
+  --body: Seravek, "Segoe UI", Arial, sans-serif;
+  --display: Futura, "Century Gothic", "Avenir Next", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+[hidden] { display: none !important; }
+a { color: var(--accent); text-underline-offset: 4px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2 { font-family: var(--display); }
+h1 { font-size: clamp(38px, 4.2vw, 58px); line-height: 1.05; letter-spacing: -.025em; font-weight: 700; }
+h2 { font-size: 28px; line-height: 1.15; font-weight: 650; }
+h3 { font-size: 17px; line-height: 1.4; }
+p { max-width: 72ch; }
+.skip { position: fixed; top: -100px; left: 16px; padding: 12px; background: white; z-index: 20; }
+.skip:focus { top: 16px; }
+.skip:not(:focus) { clip-path: inset(50%); }
+.page { max-width: 1560px; padding: 32px 44px 20px; margin: auto; }
+.mast { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
+.mast p { margin-top: 12px; max-width: 56ch; font-size: 16px; color: var(--muted); }
+.case { flex: 0 0 270px; border-left: 3px solid var(--rule); padding: 4px 0 4px 20px; }
+.case strong { display: block; font-size: 16px; }
+.case span { display: block; color: var(--muted); font-size: 13px; margin-top: 5px; }
+.toolbar { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 24px 0 20px; }
+.control { display: flex; align-items: center; gap: 12px; }
+.control-label { font-size: 14px; font-weight: 600; }
+.segment { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+.segment button { border: 0; border-radius: 5px; background: transparent; padding: 8px 16px; min-height: 42px; font-size: 14px; }
+.segment button[aria-pressed="true"] { background: var(--ink); color: white; }
+select { min-height: 44px; border: 1px solid var(--rule); border-radius: 5px; padding: 8px 32px 8px 12px; background: var(--surface); max-width: 100%; }
+.quiet-button { border: 0; background: transparent; padding: 10px 2px; min-height: 44px; text-decoration: underline; text-underline-offset: 5px; font-size: 14px; }
+.toolbar > .quiet-button { margin-left: auto; }
+.impact-board { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; background: var(--surface); }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 24px; gap: 16px; border-bottom: 1px solid var(--rule); }
+.board-head h2 { font: 600 17px/1.4 var(--body); }
+.board-head p { color: var(--muted); font-size: 13px; }
+.stage { position: relative; aspect-ratio: 1480 / 740; margin: 0 8px; }
+.grid-svg { display: block; width: 100%; height: 100%; }
+.wire { fill: none; stroke: #8d90b4; stroke-width: 1.75; marker-end: url(#imp-arrow); }
+.wire.related { stroke: var(--ink); stroke-width: 3; marker-end: url(#imp-arrow-accent); }
+.wire.dim { opacity: .1; }
+.grid-line { stroke: var(--rule); stroke-width: 1; }
+.col-head { font: 600 15px var(--display); fill: var(--ink); letter-spacing: .01em; }
+.row-head { font: 600 12.5px var(--display); fill: var(--muted); letter-spacing: .03em; }
+.band-0 { fill: #eef0f8; }
+.band-1 { fill: #e9eaf4; }
+.band-2 { fill: #e3e4f0; }
+.ring { fill: none; stroke: #c2c4da; stroke-width: 1; }
+.pulse { fill: none; stroke: var(--accent); stroke-width: 3; opacity: .7; animation: ripple .9s ease-out forwards; }
+@keyframes ripple { from { r: 60; opacity: .7; } to { r: 640; opacity: 0; } }
+.src-block {
+  position: absolute;
+  left: calc(8 / 1480 * 100%); top: calc(272 / 740 * 100%);
+  width: calc(196 / 1480 * 100%); height: auto; aspect-ratio: 1;
+  border: 2px solid var(--ink); border-radius: 50%; background: var(--surface);
+  padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 5px;
+}
+.src-block .src-kind { font-size: clamp(10px, .8vw, 12px); color: var(--muted); }
+.src-block strong { font: 700 clamp(13px, 1.15vw, 18px)/1.15 var(--display); letter-spacing: -.01em; }
+.src-block .src-meta { font-size: clamp(10px, .82vw, 12px); color: var(--muted); }
+.src-block .src-rfc { margin-top: 6px; font-size: clamp(10px, .82vw, 12px); color: var(--accent); font-weight: 600; }
+.pt {
+  position: absolute;
+  left: calc(var(--x) / 1480 * 100%); top: calc(var(--y) / 740 * 100%);
+  width: calc(var(--w) / 1480 * 100%); height: calc(var(--h) / 740 * 100%);
+  text-align: left; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0;
+  background: var(--ptbg, var(--surface)); padding: 6px 8px 6px 26px; display: flex; flex-direction: column; gap: 2px;
+  overflow: hidden;
+}
+.pt[data-band="0"] { --ptbg: #eef0f8; }
+.pt[data-band="1"] { --ptbg: #e9eaf4; }
+.pt[data-band="2"] { --ptbg: #e3e4f0; }
+.pt:hover { background: rgba(59, 74, 154, .12); }
+.pt .pt-meta { display: flex; align-items: center; gap: 6px; font-size: clamp(9px, .74vw, 11px); color: var(--muted); }
+.pt strong { font-size: clamp(11px, .95vw, 14px); line-height: 1.2; font-weight: 650; }
+.pt .pt-rest { font-size: clamp(9px, .74vw, 11px); color: var(--accent); font-weight: 600; }
+.pt .pt-where { display: none; }
+.mark { width: 4px; height: 15px; flex: 0 0 auto; display: inline-block; }
+.pt .mark { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); }
+.mark-hoog { background: var(--danger); box-shadow: 6px 0 0 var(--danger), 12px 0 0 var(--danger); margin-right: 12px; }
+.mark-midden { background: var(--warn); box-shadow: 6px 0 0 var(--warn); margin-right: 12px; }
+.mark-laag { background: var(--sev-laag, #5d6180); background: #5d6180; margin-right: 12px; }
+.pt .pt-rest { display: none; }
+.met-maatregelen .pt.was-higher .pt-rest { display: block; }
+.pt[aria-pressed="true"] { background: var(--accent); color: #fff; border-bottom-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.pt[aria-pressed="true"] .pt-meta, .pt[aria-pressed="true"] .pt-rest { color: #d9dcf2; }
+.pt[aria-pressed="true"] .pt-where { color: #d9dcf2; }
+.pt.related:not([aria-pressed="true"]) { border-bottom-color: var(--accent); }
+.pt.dim { opacity: .28; }
+.pt.out { opacity: .12; pointer-events: none; }
+.selection-jump { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.board-foot { padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-top: 1px solid var(--rule); font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 20px; color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 8px; }
+.legend i.wire-key { width: 26px; border-top: 2px solid #8d90b4; position: relative; }
+.legend i.wire-key::after { content: ""; position: absolute; right: -1px; top: -4px; border-left: 7px solid #8d90b4; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+#pathText { font-weight: 600; }
+.impact-summary { padding: 18px 0 22px; display: flex; align-items: baseline; gap: 20px; }
+.impact-summary strong { min-width: 170px; font-size: 14px; }
+.impact-summary p { color: var(--muted); font-size: 14px; }
+.inspector { display: grid; grid-template-columns: minmax(250px, .78fr) minmax(0, 1.65fr); gap: 32px; border-top: 2px solid var(--ink); padding-top: 22px; }
+.selection-head { padding: 2px 0 16px; }
+.selection-kind { display: inline-block; margin-bottom: 10px; color: var(--accent); font-size: 14px; }
+.selection-head p { color: var(--muted); margin-top: 12px; font-size: 14px; max-width: 45ch; }
+.owner { margin-top: 18px; display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+.owner span { color: var(--muted); }
+.detail-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 18px; }
+.detail-tabs button { border: 0; border-bottom: 3px solid transparent; background: transparent; padding: 0 2px 12px; min-height: 44px; color: var(--muted); font-size: 14px; }
+.detail-tabs button[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 650; }
+.detail-panel { min-height: 174px; }
+.detail-panel p { font-size: 14px; }
+.detail-panel h3 { margin-bottom: 10px; }
+.facts { margin: 0; display: grid; grid-template-columns: 140px 1fr; gap: 8px 18px; font-size: 14px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; max-width: 64ch; overflow-wrap: anywhere; }
+.detail-list { margin: 8px 0 0; padding-left: 20px; font-size: 14px; }
+.detail-list li + li { margin-top: 8px; }
+.sev-tag { display: inline-flex; align-items: center; gap: 7px; font-weight: 650; font-size: 14px; }
+.sev-tag .mark { width: 4px; height: 14px; }
+.evidence { background: var(--paper); border-left: 3px solid var(--accent); padding: 16px 18px; margin-top: 14px; }
+.evidence strong { font-size: 14px; }
+.evidence p { color: var(--muted); margin-top: 6px; }
+.evidence code { display: block; font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 12px; }
+.copy-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
+.copy-button { background: white; border: 1px solid var(--rule); padding: 9px 14px; border-radius: 5px; font-size: 13px; min-height: 44px; }
+#copyStatus { font-size: 13px; color: var(--muted); }
+#copyFallback { width: 100%; min-height: 150px; font: 13px/1.5 var(--body); padding: 12px; margin-top: 8px; }
+.about { margin-top: 28px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.about summary { cursor: pointer; min-height: 44px; padding: 8px 0; font-size: 14px; }
+.about p { color: var(--muted); margin: 8px 0; font-size: 13px; }
+footer { margin-top: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+.nojs { padding: 14px; border: 1px solid var(--rule); margin: 16px 0; }
+@media screen and (max-width: 1180px) {
+  .page { padding: 24px 16px 20px; }
+  .mast { flex-direction: column; gap: 18px; }
+  .case { flex-basis: auto; padding-left: 12px; }
+  .case span { display: inline; margin-right: 12px; }
+  .toolbar { gap: 12px; padding: 20px 0 16px; align-items: flex-start; }
+  .control { flex-wrap: wrap; gap: 8px; }
+  .toolbar > .quiet-button { margin-left: 0; }
+  .board-head { padding: 16px; flex-direction: column; gap: 4px; }
+  .stage { aspect-ratio: auto; margin: 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .grid-svg { display: none; }
+  .src-block { position: static; width: auto; height: auto; aspect-ratio: auto; border-radius: 14px; text-align: left; padding: 14px; }
+  .src-block .src-rfc { margin-top: 6px; }
+  .pt { position: static; width: auto; height: auto; min-height: 44px; }
+  .pt .pt-where { display: inline; }
+  .board-foot { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .legend { gap: 12px; font-size: 12px; }
+  .impact-summary { flex-direction: column; gap: 6px; padding-bottom: 20px; }
+  .inspector { grid-template-columns: 1fr; gap: 4px; }
+  .selection-head p { max-width: 65ch; }
+  .detail-tabs { gap: 20px; flex-wrap: wrap; }
+  .facts { grid-template-columns: 105px 1fr; gap: 10px; font-size: 13px; }
+  .selection-jump { display: flex; align-items: center; position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 10; background: var(--accent); color: white; border: 2px solid white; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-size: 14px; text-decoration: none; }
+  .selection-jump span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  body:has(.selection-jump:not([hidden])) { padding-bottom: 80px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  body { background: white; font-size: 11px; zoom: .62; }
+  .page { padding: 0; max-width: none; }
+  .mast { flex-direction: row; gap: 24px; }
+  .mast h1 { font-size: 28px; }
+  .mast p { margin-top: 6px; font-size: 11px; }
+  .case { flex: 0 0 220px; }
+  .case strong { font-size: 12px; }
+  .case span { display: block; font-size: 10px; }
+  .toolbar, .copy-row, .about, .skip, .selection-jump { display: none !important; }
+  .impact-board { margin-top: 12px; break-inside: avoid; }
+  .board-head, .board-foot { flex-direction: row; align-items: center; padding: 6px 12px; gap: 12px; font-size: 10px; }
+  .board-head h2 { font-size: 14px; }
+  .board-head p, .legend { font-size: 10px; }
+  .legend { gap: 12px; }
+  .pt.dim, .pt.out, .wire.dim { opacity: 1; }
+  .pt, .src-block, .grid-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .pt strong { font-size: 11px; }
+  .pt .pt-meta { font-size: 9px; }
+  .stage { aspect-ratio: 1480 / 560; }
+  .impact-summary { flex-direction: row; padding: 10px 0 14px; }
+  .impact-summary strong, .impact-summary p { font-size: 11px; }
+  .inspector { grid-template-columns: .8fr 1.6fr; gap: 24px; padding-top: 14px; break-inside: avoid; }
+  .selection-head { padding-bottom: 0; }
+  .selection-head h2 { font-size: 22px; }
+  .selection-kind, .selection-head p, .owner { font-size: 10px; margin-top: 6px; }
+  .selection-kind { margin-top: 0; margin-bottom: 6px; }
+  .detail-tabs { display: none; }
+  .detail-panel { min-height: 0; }
+  .detail-panel p, .facts, .detail-list { font-size: 11px; }
+  .evidence code { font-size: 10px; }
+  footer { margin-top: 12px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#inspector">Naar de impactdetails</a>
+<main class="page">
+  <header class="mast">
+    <div>
+      <h1>Change Impact Map</h1>
+      <p>Eén wijziging, veel golven. Zie in welke beheergebieden de teamindeling per wijk iets verandert, en hoe de effecten door elkaar heen lopen.</p>
+    </div>
+    <div class="case">
+      <strong>Teamindeling per wijk in het ECD</strong>
+      <span>Release ECD 2026.4 · wijziging RFC-2026-118</span>
+      <span>Beoogde livegang maandag 2 november 2026</span>
+    </div>
+  </header>
+  <noscript><p class="nojs">JavaScript staat uit. Je ziet alle impactpunten op een rij, zonder oorzaak-gevolglijnen. Zet JavaScript aan om ketens te selecteren en maatregelen te bekijken.</p></noscript>
+  <div class="toolbar" aria-label="Impact verkennen">
+    <div class="control">
+      <span class="control-label" id="modeLabel">Beeld</span>
+      <div class="segment" role="group" aria-labelledby="modeLabel">
+        <button type="button" data-mode="zonder" aria-pressed="true" disabled>Zonder maatregelen</button>
+        <button type="button" data-mode="met" aria-pressed="false" disabled>Hypothese na maatregelen</button>
+      </div>
+    </div>
+    <div class="control">
+      <label class="control-label" for="sevSelect">Ernst</label>
+      <select id="sevSelect" disabled>
+        <option value="alle">Alle ernsten</option>
+        <option value="hoog">Alleen hoog</option>
+        <option value="midden">Alleen midden</option>
+        <option value="laag">Alleen laag</option>
+      </select>
+    </div>
+    <button type="button" class="quiet-button" id="resetButton" disabled>Herstel overzicht</button>
+  </div>
+  <section class="impact-board" aria-labelledby="boardTitle">
+    <div class="board-head">
+      <h2 id="boardTitle">Van wijziging naar gevolg</h2>
+      <p>Kolommen zijn beheergebieden, rijen de orde van het effect. Selecteer een punt om de hele keten te zien.</p>
+    </div>
+    <div class="stage">
+      <svg class="grid-svg" viewBox="0 0 1480 740" role="img" aria-labelledby="imp-title imp-desc">
+        <title id="imp-title">Impactrooster van de wijziging Teamindeling per wijk</title>
+        <desc id="imp-desc">Zestien impactpunten in zes beheergebieden en drie orden van effect; dunne lijnen tonen oorzaak en gevolg.</desc>
+        <defs>
+          <marker id="imp-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#8d90b4"/></marker>
+          <marker id="imp-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#1c1f4a"/></marker>
+        </defs>
+        <g id="gridLayer"></g>
+        <g id="wireLayer"></g>
+      </svg>
+      <div class="src-block">
+        <span class="src-kind">De wijziging</span>
+        <strong>Teams per wijk in plaats van per locatie</strong>
+        <span class="src-meta">Het ECD deelt zorgteams vanaf 2 november 2026 in per wijk. Teamcodes, autorisaties en koppelingen volgen die indeling.</span>
+        <span class="src-rfc">RFC-2026-118 · ECD 2026.4</span>
+      </div>
+      <button type="button" class="pt" data-pt="intake" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:214;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Proces · direct · </span>ernst hoog</span><strong>Intake wijst wijkteam toe</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="dossier" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:428;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Gebruiker · direct · </span>ernst midden</span><strong>Dossier toont wijkteam</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="teamcode" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:640;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Data · direct · </span>ernst hoog</span><strong>Teamcode wijzigt</strong><span class="pt-rest">rest: hoog</span></button>
+      <button type="button" class="pt" data-pt="vertaal" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:856;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Koppeling · direct · </span>ernst hoog</span><strong>Vertaaltabel koppelservice</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="finrapport" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:1070;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Rapportage · direct · </span>ernst midden</span><strong>Kostenplaats in financiële stuurinfo</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="auth" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:1284;--y:70;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Beheer · direct · </span>ernst hoog</span><strong>Autorisatieprofielen per wijkteam</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="briefing" data-sev="laag" aria-pressed="false" aria-controls="inspector" style="--x:214;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-laag"></i><span class="pt-where">Proces · afgeleid · </span>ernst laag</span><strong>Teams informeren over indeling</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="planner" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:428;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Gebruiker · afgeleid · </span>ernst midden</span><strong>Planner denkt in locaties</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="portaal" data-sev="laag" aria-pressed="false" aria-controls="inspector" style="--x:428;--y:386;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-laag"></i><span class="pt-where">Gebruiker · afgeleid · </span>ernst laag</span><strong>Portaal toont "jouw team"</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="kpl" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:640;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Data · afgeleid · </span>ernst hoog</span><strong>Kostenplaats-afleiding KPL</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="rooster" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:856;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Koppeling · afgeleid · </span>ernst midden</span><strong>Roosterkoppeling leest teamcode</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="bireport" data-sev="hoog" aria-pressed="false" aria-controls="inspector" style="--x:1070;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-hoog"></i><span class="pt-where">Rapportage · afgeleid · </span>ernst hoog</span><strong>Rapport per team: breuk in trend</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="hercert" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:1284;--y:300;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Beheer · afgeleid · </span>ernst midden</span><strong>Hercertificering autorisaties</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="instructies" data-sev="laag" aria-pressed="false" aria-controls="inspector" style="--x:214;--y:528;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-laag"></i><span class="pt-where">Proces · randvoorwaarde · </span>ernst laag</span><strong>Werkinstructies bijwerken</strong><span class="pt-rest">rest: laag</span></button>
+      <button type="button" class="pt" data-pt="archief" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:640;--y:528;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Data · randvoorwaarde · </span>ernst midden</span><strong>Historische teamtoewijzing bewaren</strong><span class="pt-rest">rest: midden</span></button>
+      <button type="button" class="pt" data-pt="monitoring" data-sev="midden" aria-pressed="false" aria-controls="inspector" style="--x:1284;--y:528;--w:180;--h:66" disabled><span class="pt-meta"><i class="mark mark-midden"></i><span class="pt-where">Beheer · randvoorwaarde · </span>ernst midden</span><strong>Monitoring op mutatieverwerking</strong><span class="pt-rest">rest: laag</span></button>
+    </div>
+    <div class="board-foot">
+      <div class="legend" aria-label="Legenda"><span><i class="mark mark-hoog"></i>Ernst hoog</span><span><i class="mark mark-midden"></i>Ernst midden</span><span><i class="mark mark-laag"></i>Ernst laag</span><span><i class="wire-key"></i>Oorzaak → gevolg</span></div>
+      <p id="pathText">Alle impact zichtbaar</p>
+    </div>
+  </section>
+  <div class="impact-summary" id="impactSummary" role="status">
+    <strong id="summaryTitle">16 impactpunten</strong>
+    <p id="summaryText">6 hoog, 7 midden, 3 laag — 8 maatregelen open vóór de livegang van 2 november.</p>
+  </div>
+  <p class="sr-only" id="selectionStatus" role="status"></p>
+  <a class="selection-jump" id="selectionJump" href="#inspector" hidden><span id="jumpText">Bekijk impactdetails</span></a>
+  <section class="inspector" id="inspector" aria-labelledby="selectionTitle" tabindex="-1">
+    <div class="selection-head">
+      <span class="selection-kind" id="selectionKind">De volledige wijziging</span>
+      <h2 id="selectionTitle">Van teamcode tot trendlijn</h2>
+      <p id="selectionIntro">De teamindeling per wijk begint bij de teamcode in het ECD en golft door naar vertaaltabellen, roosters, autorisaties en rapportages. Selecteer een punt om te zien wat eraan voorafgaat en wat erna komt.</p>
+      <div class="owner"><span>Regie</span><strong id="selectionOwner">FAB Zorg &amp; wijzigingencoördinator</strong></div>
+    </div>
+    <div>
+      <div class="detail-tabs" role="tablist" aria-label="Impactdetails">
+        <button type="button" id="tab-impact" role="tab" data-tab="impact" aria-selected="true" aria-controls="panel-impact" tabindex="0" disabled>Impact</button>
+        <button type="button" id="tab-maatregel" role="tab" data-tab="maatregel" aria-selected="false" aria-controls="panel-maatregel" tabindex="-1" disabled>Maatregel</button>
+        <button type="button" id="tab-bewijs" role="tab" data-tab="bewijs" aria-selected="false" aria-controls="panel-bewijs" tabindex="-1" disabled>Bewijs</button>
+      </div>
+      <div class="detail-panel" id="panel-impact" role="tabpanel" aria-labelledby="tab-impact" tabindex="0"></div>
+      <div class="detail-panel" id="panel-maatregel" role="tabpanel" aria-labelledby="tab-maatregel" tabindex="0" hidden></div>
+      <div class="detail-panel" id="panel-bewijs" role="tabpanel" aria-labelledby="tab-bewijs" tabindex="0" hidden></div>
+      <div class="copy-row"><button type="button" class="copy-button" id="copyButton" disabled>Kopieer impactsamenvatting</button><span id="copyStatus" role="status"></span></div>
+      <textarea id="copyFallback" aria-label="Impactsamenvatting om handmatig te kopiëren" readonly hidden></textarea>
+    </div>
+  </section>
+  <details class="about">
+    <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
+    <p>Het rimpelrooster leest van links naar rechts én van boven naar beneden: kolommen zijn beheergebieden, rijen hoe ver het effect van de bron af staat. Directe effecten volgen meteen op de wijziging; afgeleide effecten komen via een ander punt; randvoorwaarden moeten geregeld zijn voor een nette livegang.</p>
+    <p>Selecteer een impactpunt om de keten op te lichten. Het beeld na maatregelen is uitsluitend een hypothese: alle maatregelen zijn voorgenomen; uitvoering, controle en bevoegde acceptatie zijn niet aangetoond. Een lagere kleur of ernst bewijst geen risicoreductie. Leg per maatregel bron, versie, controledatum, beoordelaar en uitkomst vast in het wijzigingsdossier.</p>
+    <p>Alle punten, maatregelen, versies en bewijsfragmenten zijn fictief. De teamcodes (ZT-xxx), kostenplaatsen (KPL-xxx) en teamdimensies (TEAM-xxx) sluiten aan bij de ketenkaart-casus, maar er is geen echte koppeling met een systeem.</p>
+  </details>
+  <footer><span>FAB Change Impact Map — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span></footer>
+</main>
+<script>
+(() => {
+  const AREAS = ['Proces', 'Gebruiker', 'Data', 'Koppeling', 'Rapportage', 'Beheer'];
+  const ORDERS = ['Direct', 'Afgeleid', 'Randvoorwaarde'];
+  const CX = { intake: 304, dossier: 518, teamcode: 730, vertaal: 946, finrapport: 1160, auth: 1374,
+    briefing: 304, planner: 518, portaal: 518, kpl: 730, rooster: 946, bireport: 1160, hercert: 1374,
+    instructies: 304, archief: 730, monitoring: 1374 };
+  const CY = { intake: 103, dossier: 103, teamcode: 103, vertaal: 103, finrapport: 103, auth: 103,
+    briefing: 333, planner: 333, portaal: 419, kpl: 333, rooster: 333, bireport: 333, hercert: 333,
+    instructies: 561, archief: 561, monitoring: 561 };
+  const LINKS = [
+    ['intake', 'planner'], ['intake', 'briefing'], ['intake', 'instructies'],
+    ['teamcode', 'dossier'], ['teamcode', 'vertaal'], ['teamcode', 'kpl'], ['teamcode', 'auth'], ['teamcode', 'archief'],
+    ['dossier', 'portaal'],
+    ['vertaal', 'rooster'], ['vertaal', 'bireport'], ['vertaal', 'monitoring'],
+    ['kpl', 'finrapport'], ['kpl', 'bireport'],
+    ['auth', 'hercert']
+  ];
+  const POINTS = {
+    intake: { title: 'Intake wijst wijkteam toe', area: 0, order: 0, sev: 'hoog', sevMet: 'midden',
+      impact: [['Wat verandert', 'De intake kiest geen locatieteam meer maar een wijkteam. De keuzelijst in het ECD krijgt wijknamen in plaats van locatiecodes.'], ['Voor wie', 'Zorgbemiddelaars en het intakebureau; zij bepalen welk team een cliënt krijgt.'], ['Waarom deze ernst', 'Een verkeerde teamtoewijzing bij de intake werkt meteen door naar roosters, autorisaties en rapportage.']],
+      maatregel: ['Nieuwe keuzelijst met wijkteams testen met het intakebureau, inclusief drie grensgevallen (postcode op een wijkgrens).', 'FAB Zorg', 'vrijdag 23 oktober 2026', 'Midden: medewerkers kunnen in de eerste week nog het oude team zoeken in de lijst.'],
+      bewijs: ['Impactsessie-notulen 12 oktober 2026', 'In de sessie schetste het intakebureau drie aanmeldvormen die allemaal op de nieuwe keuzelijst uitkomen.', 'sessie-impact-118.md · item 2\nkeuzelijst "wijkteam" vervangt "locatieteam"\nbetrokkenen: intakebureau, FAB Zorg'] },
+    dossier: { title: 'Dossier toont wijkteam', area: 1, order: 0, sev: 'midden', sevMet: 'laag',
+      impact: [['Wat verandert', 'In het cliëntdossier staat voortaan het wijkteam als zorgverlenend team. Schermen en het journаal tonen de wijknaam.'], ['Voor wie', 'Alle dossiergebruikers: wijkverpleegkundigen, verzorgenden, teamleiders.'], ['Waarom deze ernst', 'Vooral een gewenningskwestie; de inhoud van het dossier verandert niet.']],
+      maatregel: ['Schermvoorbeelden verspreiden via de teamleiders en een korte werkinstructie in het ECD.', 'FAB Zorg', 'woensdag 28 oktober 2026', 'Laag: verwarring in de eerste dagen, geen gegevensrisico.'],
+      bewijs: ['Schermafdruk testomgeving ECD 2026.4', 'Het dossier toont "Team Wijk Noord-Oost" waar voorheen "Locatie Wilhelmina" stond.', 'ECD 2026.4 · dossierkaart\nteam: WT-NO (was: LOC-WIL)\nteamcode: ZT-114'] },
+    teamcode: { title: 'Teamcode wijzigt', area: 2, order: 0, sev: 'hoog', sevMet: 'hoog',
+      impact: [['Wat verandert', 'Teams krijgen nieuwe teamcodes (ZT-1xx in plaats van ZT-0xx). De code is de sleutel die koppelingen, autorisaties en rapportages gebruiken.'], ['Voor wie', 'Vrijwel niemand ziet de code zelf, maar álle afnemers rekenen ermee.'], ['Waarom deze ernst', 'Dit is de wortel van de meeste vervolgimpact: wie de code niet kent, wijst mutaties af of rapporteert op oude teams.']],
+      maatregel: ['Codetabel met oude en nieuwe teams vastleggen, bevriezen op 26 oktober en als bron voor alle afnemers gebruiken.', 'FAB Zorg + Data & BI-beheer', 'maandag 26 oktober 2026', 'Hoog: de code wijzigt hoe dan ook; de maatregel voorkomt alleen dat afnemers met een andere lijst werken.'],
+      bewijs: ['Codetabel wijkteams, versie 1.4 (concept)', 'De tabel koppelt elke wijk aan een nieuwe teamcode en een geldigheidsdatum.', 'codetabel-teams-v1.4.csv\nLOC-WIL / ZT-014  →  WT-NO / ZT-114\ngeldig vanaf: 2026-11-02'] },
+    vertaal: { title: 'Vertaaltabel koppelservice', area: 3, order: 0, sev: 'hoog', sevMet: 'midden',
+      impact: [['Wat verandert', 'De koppelservice vertaalt ZT-codes naar kostenplaats (KPL) en teamdimensie (TEAM). De tabel moet de nieuwe wijkteams kennen voordat de eerste mutatie arriveert.'], ['Voor wie', 'Integratiebeheer; indirect elke afnemer van de cliëntmutaties.'], ['Waarom deze ernst', 'Een onbekende code wordt afgewezen: dan blijven financiën en het datawarehouse op de oude stand staan.']],
+      maatregel: ['Vertaaltabel v3.3 in de keten testen met tien reële mutaties, waaronder een cliënt die van wijk verandert.', 'Integratiebeheer', 'donderdag 29 oktober 2026', 'Midden: een gemiste vertaling valt pas op bij de eerste echte mutatie na livegang.'],
+      bewijs: ['Vertaaltabel teams v3.3 (concept) en ketentestplan T-118', 'De test set mutaties met ZT-1xx-codes af tegen de verwachte KPL- en TEAM-waarden.', 'testgeval T-118-07\nin: teamCode ZT-114\nverwacht: KPL-231 / TEAM-114\nstatus: nog niet gedraaid'] },
+    finrapport: { title: 'Kostenplaats in financiële stuurinfo', area: 4, order: 0, sev: 'midden', sevMet: 'laag',
+      impact: [['Wat verandert', 'Declaraties en kosten volgen de nieuwe kostenplaatsen per wijk. De financiële maandrapportage van november toont een andere verdeling dan oktober.'], ['Voor wie', 'FAB Bedrijfsvoering en de controllers.'], ['Waarom deze ernst', 'Geen fout, maar wel een sprong in de cijfers die uitgelegd moet worden.']],
+      maatregel: ['Een overbruggingstabel oude-nieuwe kostenplaatsen bij de novemberrapportage voegen.', 'FAB Bedrijfsvoering', 'vrijdag 13 november 2026', 'Laag: de cijfers kloppen, de leesbaarheid is het enige risico.'],
+      bewijs: ['Voorbeeld-maandrapportage november (concept)', 'De kolom kostenplaats wisselt van locatie- naar wijkstructuur per 2 november.', 'kpl-mapping november\nKPL-230 (locatie) → KPL-231/232/233 (wijken)\nlet op: halve maand overgang'] },
+    auth: { title: 'Autorisatieprofielen per wijkteam', area: 5, order: 0, sev: 'hoog', sevMet: 'midden',
+      impact: [['Wat verandert', 'Functiescheiding en dossierautorisaties hangen aan teams. Met nieuwe wijkteams moet elk profiel opnieuw aan de juiste groepen worden gekoppeld.'], ['Voor wie', 'Alle medewerkers met dossierautorisatie; informatiebeveiliging kijkt mee.'], ['Waarom deze ernst', 'Te ruime toegang is een privacyrisico; te nauwe toegang verstoort de zorg in de eerste week.']],
+      maatregel: ['Autorisatiematrix per wijkteam vaststellen met de bevoegde autorisatieverantwoordelijke; IAM/FAB voert uit. Toets feitelijke team-/cliëntscope, negatieve toegang en tijdelijke medewerkers, meerdere teamrollen en externe portalen waar relevant. Bij een knelpunt alleen een noodzakelijke, begrensde uitzondering met goedkeuring, einddatum, logging en toezicht.', 'Autorisatieverantwoordelijke + FAB Zorg + IAM; informatiebeveiliging adviseert', 'vrijdag 30 oktober 2026', 'Verwacht midden, nog niet aangetoond: geen automatisch breder profiel. Restrisico blijft open tot uitvoering, feitelijke toegangscontrole en bevoegde acceptatie.'],
+      bewijs: ['Autorisatiematrix wijkteams v5.2-concept', 'Elke functiegroep krijgt een wijkteamprofiel met dezelfde bevoegdheden als het huidige locatieprofiel.', 'profiel WVK-WIJK-NO\nlezen: cliënten wijk Noord-Oost\nmuteren: eigen casus\nbron: matrix v5.2, regel 14'] },
+    briefing: { title: 'Teams informeren over indeling', area: 0, order: 1, sev: 'laag', sevMet: 'laag',
+      impact: [['Wat verandert', 'Wijkteams moeten weten dat hun naam, code en samenstelling in de systemen verandert, ook al blijft hun dagelijkse werk hetzelfde.'], ['Voor wie', 'Teamleiders en hun teams, bijvoorbeeld Teamleider Wijk Noord.'], ['Waarom deze ernst', 'Vooral communicatie; wie niets hoort, denkt bij de eerste afwijkende melding aan een storing.']],
+      maatregel: ['Eén A4 met "dit zie je vanaf 2 november" via de teamleiders, plus een melding in de nieuwsbrief van het portaal.', 'FAB Zorg', 'week 44', 'Laag.'],
+      bewijs: ['Communicatieplan RFC-2026-118', 'De briefing verwijst voor vragen naar FAB Zorg in plaats van naar de servicedesk.', 'communicatieplan §3\ndoelgroep: 12 wijkteams\nmoment: week 44, herhaling week 45'] },
+    planner: { title: 'Planner denkt in locaties', area: 1, order: 1, sev: 'midden', sevMet: 'midden',
+      impact: [['Wat verandert', 'Planning & Rooster groepeert medewerkers voortaan per wijkteam. Bestaande roosterpatronen zijn op locatie opgebouwd.'], ['Voor wie', 'Planners die de diensten indelen.'], ['Waarom deze ernst', 'De eerste roosters na livegang vergen meer handwerk; een gemiste omzetting blijft een paar weken voelbaar.']],
+      maatregel: ['Roosterpatronen voor november en december handmatig omzetten en steekproefsgewijs laten controleren door een planner.', 'FAB Planning & Rooster', 'vrijdag 30 oktober 2026', 'Midden: handwerk blijft nodig totdat de patronen vanzelf per wijk lopen.'],
+      bewijs: ['Conversienotitie roosterpatronen', 'Van de 41 actieve patronen hangen er 33 aan een locatiecode die een wijkteam moet worden.', 'patroonconversie\ntotaal: 41 patronen\nom te zetten: 33\nsteekproef: 8 patronen'] },
+    portaal: { title: 'Portaal toont "jouw team"', area: 1, order: 1, sev: 'laag', sevMet: 'laag',
+      impact: [['Wat verandert', 'Het cliëntportaal toont het zorgteam aan de cliënt. Na livegang ziet de cliënt een wijknaam in plaats van een locatienaam.'], ['Voor wie', 'Cliënten en mantelzorgers die het portaal gebruiken.'], ['Waarom deze ernst', 'Cosmetisch; er verandert niets aan wie de zorg levert.']],
+      maatregel: ['Een regel uitleg bij het teamblok in het portaal ("Uw team heet nu…") voor de eerste vier weken.', 'FAB Cliëntportaal', 'maandag 2 november 2026', 'Laag.'],
+      bewijs: ['Schermvoorbeeld cliëntportaal 4.9', 'Het teamblok toont wijknaam en contactgegevens; de opmaak is ongewijzigd.', 'portaal 4.9 · teamblok\n"Uw team: Wijk Noord-Oost"\ntoelichting tonen t/m 30-11-2026'] },
+    kpl: { title: 'Kostenplaats-afleiding KPL', area: 2, order: 1, sev: 'hoog', sevMet: 'midden',
+      impact: [['Wat verandert', 'Uit de teamcode wordt de kostenplaats afgeleid (ZT-114 → KPL-231). Die afleiding moet per wijkteam kloppen, anders landen kosten op de verkeerde plaats.'], ['Voor wie', 'Het financiële systeem en daarmee elke stuurrapportage.'], ['Waarom deze ernst', 'Een foutieve afleiding corrigeert niet vanzelf; fouten stapelen op in de maandcijfers.']],
+      maatregel: ['De afleidingsregels naast de codetabel leggen en door FAB Bedrijfsvoering laten aftekenen; na livegang twee weken dagelijks steekproeven.', 'FAB Zorg + FAB Bedrijfsvoering', 'donderdag 29 oktober 2026', 'Midden: afwijkingen zijn pas zichtbaar als er echt geboekt is.'],
+      bewijs: ['Afleidingstabel ZT→KPL bij codetabel v1.4', 'Elke wijkteamcode heeft precies één kostenplaats; randgevallen zijn gemarkeerd.', 'afleiding ZT→KPL\nZT-114 → KPL-231\nZT-115 → KPL-232\naantekening: splitcode KPL-239 voor wijkgrensgevallen'] },
+    rooster: { title: 'Roosterkoppeling leest teamcode', area: 3, order: 1, sev: 'midden', sevMet: 'laag',
+      impact: [['Wat verandert', 'De koppeling tussen ECD en Planning & Rooster gebruikt de teamcode om medewerkers en cliënten te groeperen.'], ['Voor wie', 'Planners; indirect elke medewerker in een rooster.'], ['Waarom deze ernst', 'Zonder bijgewerkte koppeling roostert het systeem op oude teams.']],
+      maatregel: ['Koppeling meenemen in dezelfde ketentest als de vertaaltabel; na livegang een week lang de dagelijkse roostercontrole uitvoeren.', 'Integratiebeheer + FAB Planning & Rooster', 'donderdag 29 oktober 2026', 'Laag: de roostercontrole vangt restfouten snel op.'],
+      bewijs: ['Ketentestplan T-118, geval roosterkoppeling', 'Test dat een wijziging van wijkteam in het ECD binnen een uur in het rooster zichtbaar is.', 'testgeval T-118-11\nmutatie: medewerker → ZT-114\nverwacht: roostergroep WT-NO binnen 60 min'] },
+    bireport: { title: 'Rapport per team: breuk in trend', area: 4, order: 1, sev: 'hoog', sevMet: 'midden',
+      impact: [['Wat verandert', 'BI-rapportages per team krijgen nieuwe teamdimensies (TEAM-1xx). De trendlijn per team breekt op 2 november tenzij de historie wordt doorverbonden.'], ['Voor wie', 'Data & BI-beheer, rapportage-eigenaren en de stuurtafels die ermee sturen.'], ['Waarom deze ernst', 'Zonder doorverbinding lijkt november een dip of piek; vergelijkingen over het jaar heen gaan mis.']],
+      maatregel: ['Een mapping oude TEAM→nieuwe TEAM in het datawarehouse opnemen zodat rapportages de trend doortrekken.', 'Data & BI-beheer', 'vrijdag 6 november 2026', 'Midden: de mapping werkt voor hoofdlijnen; detailanalyses per oude teamcode vragen maatwerk.'],
+      bewijs: ['DWH-dimensievoorstel teamhistorie', 'De teamdimensie krijgt een geldig-vanaf-datum zodat oude en nieuwe toewijzingen naast elkaar blijven bestaan.', 'dim_team voorstel\nTEAM-014 geldig t/m 2026-11-01\nTEAM-114 geldig vanaf 2026-11-02\nmappingtabel: team_historie_v1'] },
+    hercert: { title: 'Hercertificering autorisaties', area: 5, order: 1, sev: 'midden', sevMet: 'laag',
+      impact: [['Wat verandert', 'De kwartaalhercertificering van Q4 2026 valt midden in de overgang; approvers moeten nieuwe wijkteamprofielen beoordelen.'], ['Voor wie', 'Teamleiders die toegangen goedkeuren en informatiebeveiliging.'], ['Waarom deze ernst', 'Verwarrende dubbele lijsten (oud én nieuw) leiden tot verkeerde akkoorden.']],
+      maatregel: ['De hercertificeringslijst eerst op de nieuwe wijkteamprofielen zetten en approvers een korte toelichting geven.', 'Informatiebeveiliging + FAB Zorg', 'maandag 9 november 2026', 'Laag.'],
+      bewijs: ['Hercertificeringskalender Q4 2026', 'De ronde is verzet naar 9 november zodat approvers alleen de nieuwe profielen zien.', 'hercertificering Q4\nronde verschoven: 02-11 → 09-11\nscope: wijkteamprofielen v5.2'] },
+    instructies: { title: 'Werkinstructies bijwerken', area: 0, order: 2, sev: 'laag', sevMet: 'laag',
+      impact: [['Wat verandert', 'Werkinstructies die "locatieteam" of oude teamcodes noemen moeten naar wijktermen worden omgeschreven.'], ['Voor wie', 'Iedereen die instructies gebruikt, vooral nieuwe medewerkers.'], ['Waarom deze ernst', 'Verouderde instructies werken door tot verkeerde registraties, maar niet meteen.']],
+      maatregel: ['De zes meest gebruikte instructies vóór livegang bijwerken; de rest in de eerstvolgende beheerronde.', 'FAB Zorg', 'vrijdag 30 oktober 2026 (top 6)', 'Laag.'],
+      bewijs: ['Instructie-inventaris FAB Zorg', 'Van de 34 instructies verwijzen er 9 naar locatieteams of teamcodes.', 'instructie-scan\n34 instructies gescand\n9 bevatten "locatieteam" of ZT-0xx'] },
+    archief: { title: 'Historische teamtoewijzing bewaren', area: 2, order: 2, sev: 'midden', sevMet: 'midden',
+      impact: [['Wat verandert', 'Oude locatieteam-toewijzingen moeten met hun geldigheidsperiode bewaard blijven, zodat dossiers en rapportages over het verleden herleidbaar blijven.'], ['Voor wie', 'Iedereen die later moet reconstrueren welk team wanneer zorgde.'], ['Waarom deze ernst', 'Overschrijven in plaats van bijschrijven maakt verleden en aansprakelijkheid onduidelijk.']],
+      maatregel: ['Vóór conversie een bevroren export van de huidige teamtoewijzingen opslaan en de conversie op "geldig vanaf" inrichten.', 'Data & BI-beheer + FAB Zorg', 'vrijdag 30 oktober 2026', 'Midden: controleer na conversie een steekproef op oude cliënttoewijzingen.'],
+      bewijs: ['Conversiebesluit RFC-2026-118, punt 6', 'De conversie schrijft nieuwe toewijzingen met ingangsdatum; oude records krijgen een einddatum in plaats van overschrijving.', 'conversie-regel\ntoewijzing: historisch bewaren\neinddatum oud: 2026-11-01\nstartdatum nieuw: 2026-11-02'] },
+    monitoring: { title: 'Monitoring op mutatieverwerking', area: 5, order: 2, sev: 'midden', sevMet: 'laag',
+      impact: [['Wat verandert', 'De eerste weken na livegang tellen afwijzingen van onbekende teamcodes mee; monitoring moet daarop alarmeren in plaats van alleen op technische storingen.'], ['Voor wie', 'Integratiebeheer en FAB Zorg.'], ['Waarom deze ernst', 'Een stijgende afwijzingsstroom zonder alarm merk je pas bij de maandrapportage.']],
+      maatregel: ['Tijdelijk alarm op "afgewezen: onbekend team" met dagelijkse aantallen aan FAB Zorg, actief tot 16 november.', 'Integratiebeheer', 'maandag 2 november 2026', 'Laag: alarm kan na twee rustige weken uit.'],
+      bewijs: ['Monitoringafspraak T-118', 'Het alarm telt mutaties met reden UNKNOWN_TEAM per dag in de koppelservice.', 'alarm: unknown-team-count\ndrempel: > 0 per dag\nactief: 02-11 t/m 16-11\nmail: FAB Zorg'] }
+  };
+  const REVIEW = { version: 'demo v2', date: '2026-10-01', state: 'Voorgenomen; uitvoering, controle en acceptatie niet aangetoond' };
+  Object.values(POINTS).forEach(p => { p.state = REVIEW.state; p.reviewer = 'Nog geen bevoegde beoordelaar vastgelegd'; });
+  let mode = 'zonder';
+  let sevFilter = 'alle';
+  let selection = null;
+  let copyVersion = 0;
+  const $ = id => document.getElementById(id);
+  const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const SEV_LABEL = { hoog: 'hoog', midden: 'midden', laag: 'laag' };
+  const SEV_ORDER = { hoog: 2, midden: 1, laag: 0 };
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function buildGrid() {
+    const g = $('gridLayer');
+    const add = (name, attrs) => { const el = document.createElementNS(svgNS, name); for (const k in attrs) el.setAttribute(k, attrs[k]); g.appendChild(el); return el; };
+    const x0 = 200, x1 = 1480, w = (x1 - x0) / 6, y0 = 52, y1 = 740, h = (y1 - y0) / 3;
+    const ECX = 106, ECY = 370;
+    ORDERS.forEach((name, i) => add('rect', { x: x0, y: y0 + h * i, width: x1 - x0, height: h, class: 'band-' + i }));
+    for (let r = 220; r <= 1500; r += 160) add('circle', { cx: ECX, cy: ECY, r, class: 'ring' });
+    AREAS.forEach((name, i) => { const t = add('text', { x: x0 + w * i + w / 2, y: 34, 'text-anchor': 'middle', class: 'col-head' }); t.textContent = name; });
+    ORDERS.forEach((name, i) => { const cy = y0 + h * i + h / 2; const t = add('text', { x: 214, y: cy, 'text-anchor': 'middle', transform: `rotate(-90 214 ${cy})`, class: 'row-head' }); t.textContent = name; });
+    for (let i = 0; i <= 6; i++) add('line', { x1: x0 + w * i, y1: y0, x2: x0 + w * i, y2: y1, class: 'grid-line' });
+    add('line', { x1: x0, y1: y0, x2: x1, y2: y0, class: 'grid-line' });
+    add('line', { x1: 194, y1: y0, x2: 194, y2: y1, class: 'grid-line' });
+    const wl = $('wireLayer');
+    const WIRE_D = {
+      'intake>planner': 'M304 136 C 330 210, 490 240, 518 300',
+      'intake>briefing': 'M304 136 L304 300',
+      'intake>instructies': 'M304 136 C 405 230, 412 440, 412 540 C 412 558, 400 561, 394 561',
+      'teamcode>dossier': 'M640 103 C 632 148, 616 148, 608 103',
+      'teamcode>vertaal': 'M820 103 C 830 148, 846 148, 856 103',
+      'teamcode>kpl': 'M730 136 L730 300',
+      'teamcode>auth': 'M820 103 C 880 165, 1210 165, 1284 103',
+      'teamcode>archief': 'M730 136 C 810 230, 838 420, 838 500 C 838 522, 800 528, 730 528',
+      'dossier>portaal': 'M518 136 C 610 240, 624 300, 624 352 C 624 375, 570 386, 518 386',
+      'vertaal>rooster': 'M946 136 L946 300',
+      'vertaal>bireport': 'M946 136 C 990 210, 1120 240, 1160 300',
+      'vertaal>monitoring': 'M946 136 C 946 260, 1374 420, 1374 528',
+      'kpl>finrapport': 'M730 300 C 830 200, 1120 190, 1160 136',
+      'kpl>bireport': 'M820 333 C 880 382, 1010 382, 1070 333',
+      'auth>hercert': 'M1374 136 L1374 300'
+    };
+    LINKS.forEach(([a, b]) => {
+      const p = document.createElementNS(svgNS, 'path');
+      p.setAttribute('d', WIRE_D[a + '>' + b]);
+      p.setAttribute('class', 'wire');
+      p.dataset.wire = a + '>' + b;
+      wl.appendChild(p);
+    });
+  }
+
+  function curSev(id) { const p = POINTS[id]; return mode === 'met' ? p.sevMet : p.sev; }
+
+  function relatedSet(id) {
+    const seen = new Set([id]);
+    const walk = (start, dir) => {
+      const queue = [start];
+      while (queue.length) {
+        const cur = queue.shift();
+        LINKS.forEach(([a, b]) => {
+          const next = dir === 'down' ? (a === cur ? b : null) : (b === cur ? a : null);
+          if (next && !seen.has(next)) { seen.add(next); queue.push(next); }
+        });
+      }
+    };
+    walk(id, 'down'); walk(id, 'up');
+    return seen;
+  }
+
+  function updateMap() {
+    document.querySelector('.stage').classList.toggle('met-maatregelen', mode === 'met');
+    const rel = selection ? relatedSet(selection) : null;
+    const relWires = new Set();
+    if (rel) LINKS.forEach(([a, b]) => { if (rel.has(a) && rel.has(b)) relWires.add(a + '>' + b); });
+    let counts = { hoog: 0, midden: 0, laag: 0 };
+    let open = 0;
+    Object.keys(POINTS).forEach(id => {
+      const p = POINTS[id];
+      const sev = curSev(id);
+      counts[sev]++;
+      const el = document.querySelector(`[data-pt="${id}"]`);
+      el.dataset.sevCur = sev;
+      el.classList.toggle('was-higher', SEV_ORDER[p.sevMet] < SEV_ORDER[p.sev]);
+      el.setAttribute('aria-pressed', String(selection === id));
+      el.classList.toggle('related', !!rel && rel.has(id) && selection !== id);
+      el.classList.toggle('dim', !!rel && !rel.has(id));
+      const out = sevFilter !== 'alle' && sev !== sevFilter;
+      el.classList.toggle('out', out);
+      el.tabIndex = out ? -1 : 0;
+      const restEl = el.querySelector('.pt-rest');
+      if (restEl) restEl.textContent = 'verwacht: ' + p.sevMet;
+      const mark = el.querySelector('.mark');
+      mark.className = 'mark mark-' + sev;
+      const where = el.querySelector('.pt-where');
+      where.textContent = `${AREAS[p.area]} · ${ORDERS[p.order].toLowerCase()} · `;
+      where.nextSibling.textContent = 'ernst ' + SEV_LABEL[sev];
+    });
+    open = mode === 'zonder'
+      ? Object.keys(POINTS).filter(id => POINTS[id].sev !== 'laag').length
+      : Object.keys(POINTS).filter(id => POINTS[id].sevMet !== 'laag').length;
+    document.querySelectorAll('[data-wire]').forEach(el => {
+      const onPath = relWires.has(el.dataset.wire);
+      el.classList.toggle('related', !!rel && onPath);
+      el.classList.toggle('dim', !!rel && !onPath);
+    });
+    document.querySelectorAll('[data-mode]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.mode === mode)));
+    const total = Object.keys(POINTS).length;
+    $('summaryTitle').textContent = `${total} impactpunten`;
+    $('summaryText').textContent = `${counts.hoog} hoog, ${counts.midden} midden, ${counts.laag} laag — ${total} voorgenomen maatregelen; uitvoering, controle en acceptatie niet aangetoond.${mode === 'met' ? ' Hypothetisch beeld na maatregelen, geen bewezen risicoreductie.' : ' Huidige risico-inschatting zonder bewezen maatregelen.'}`;
+    $('pathText').textContent = selection ? 'Causale keten van de selectie' : sevFilter !== 'alle' ? `Gefilterd op ernst ${sevFilter}` : 'Alle impact zichtbaar';
+    $('imp-desc').textContent = selection
+      ? `Geselecteerd: ${POINTS[selection].title}. Opgelicht: ${rel.size - 1} verbonden punten in dezelfde keten.`
+      : 'Zestien impactpunten in zes beheergebieden en drie orden van effect; dunne lijnen tonen oorzaak en gevolg.';
+  }
+
+  function currentDetails() {
+    if (!selection) return {
+      name: 'Van teamcode tot trendlijn', kind: 'De volledige wijziging', owner: 'FAB Zorg & wijzigingencoördinator',
+      intro: 'De teamindeling per wijk begint bij de teamcode in het ECD en golft door naar vertaaltabellen, roosters, autorisaties en rapportages. Selecteer een punt om te zien wat eraan voorafgaat en wat erna komt.',
+      impact: [['Wijziging', 'Zorgteams per wijk in plaats van per locatie (ECD 2026.4, RFC-2026-118).'], ['Grootste risicoketen', 'Teamcode → vertaaltabel → BI-rapportage: een gemiste vertaling breekt zowel de financiële verwerking als de trendlijn.'], ['Meest ver', 'Historische teamtoewijzing en hercertificering: geen directe gevolgen, wel voorwaarden voor een nette overgang.']],
+      maatregel: [`${Object.keys(POINTS).length} voorgenomen maatregelen; uitvoering, toets en acceptatie niet aangetoond.`, 'Diverse uitvoerders; proces-/risico-eigenaren beoordelen en accepteren', 'Per maatregel, inclusief nazorg na 2 november', 'Restrisico is een verwachting. Ketentests en goedgekeurde herstelcontroles moeten werking aantonen; wachten op live-mutaties vervangt geen acceptatietest.'],
+      bewijs: ['Impactsessie 12 oktober 2026 + vertaaltabel v3.3-concept', 'De kaart volgt de notulen van de impactsessie; de codetabel v1.4 is de enige bron van waarheid voor teamcodes.', 'sessie-impact-118.md · 16 punten beoordeeld\n5× hoog · 8× midden · 3× laag (beeld zonder maatregelen)']
+    };
+    const p = POINTS[selection];
+    return { name: p.title, kind: `${AREAS[p.area]} · ${ORDERS[p.order].toLowerCase()}`, owner: p.maatregel[1].split(' + ')[0].split(' & ')[0],
+      intro: p.impact[0][1], impact: p.impact, maatregel: p.maatregel, bewijs: p.bewijs, sev: p.sev, sevMet: p.sevMet };
+  }
+
+  function markHtml(sev) { return `<span class="sev-tag"><i class="mark mark-${sev}"></i>Ernst ${sev}</span>`; }
+
+  function renderDetails() {
+    const d = currentDetails();
+    $('selectionKind').textContent = d.kind;
+    $('selectionTitle').textContent = d.name;
+    $('selectionIntro').textContent = d.intro;
+    $('selectionOwner').textContent = d.owner;
+    $('selectionStatus').textContent = selection ? `Geselecteerd: ${d.name}. Details staan onder het rooster.` : '';
+    $('selectionJump').hidden = !selection;
+    $('jumpText').textContent = `Bekijk details: ${d.name}`;
+    const sevLine = selection ? `<dt>${mode === 'met' ? 'Hypothetische ernst' : 'Ernst zonder bewezen maatregelen'}</dt><dd>${markHtml(curSev(selection))}${mode === 'met' ? `; verwachting, niet gerealiseerd (huidig ${d.sev})` : ''}</dd>` : '';
+    $('panel-impact').innerHTML = `<dl class="facts">${d.impact.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join('')}${sevLine}<dt>Toetsstatus</dt><dd>${escape(REVIEW.state)}</dd></dl>`;
+    $('panel-maatregel').innerHTML = `<h3>Voorgenomen maatregel en verwacht restrisico</h3><dl class="facts"><dt>Maatregel</dt><dd>${escape(d.maatregel[0])}</dd><dt>Uitvoerder / betrokken rollen</dt><dd>${escape(d.maatregel[1])}</dd><dt>Deadline (demo)</dt><dd>${escape(d.maatregel[2])}</dd><dt>Verwacht restrisico</dt><dd>${escape(d.maatregel[3])}</dd><dt>Uitvoering / toets / acceptatie</dt><dd>Niet aangetoond. Leg bron, versie, controledatum, beoordelaar en uitkomst vast. De bevoegde proces-/risico-eigenaar accepteert het restrisico; FAB adviseert.</dd></dl>`;
+    $('panel-bewijs').innerHTML = `<h3>${escape(d.bewijs[0])}</h3><p>${escape(d.bewijs[1])}</p><p>Bronstatus: fictief fragment bij ${REVIEW.version}, revisie ${REVIEW.date}. Uitkomst: niet getoetst; beoordelaar: niet vastgelegd. Geen uitvoerings- of acceptatiebewijs.</p><div class="evidence"><strong>Fictief bronfragment, geen bewezen maatregel</strong><code>${escape(d.bewijs[2])}</code></div>`;
+    clearCopy();
+  }
+
+  function clearCopy() {
+    copyVersion++;
+    $('copyStatus').textContent = '';
+    $('copyFallback').hidden = true;
+  }
+
+  function select(id) {
+    selection = id; updateMap(); renderDetails();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const c = document.createElementNS(svgNS, 'circle');
+      c.setAttribute('class', 'pulse'); c.setAttribute('cx', 106); c.setAttribute('cy', 370);
+      $('gridLayer').appendChild(c);
+      c.addEventListener('animationend', () => c.remove());
+    }
+  }
+
+  function setTab(tab, focus = false) {
+    document.querySelectorAll('[data-tab]').forEach(button => {
+      const selected = button.dataset.tab === tab;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      $('panel-' + button.dataset.tab).hidden = !selected;
+      if (selected && focus) button.focus();
+    });
+  }
+
+  document.querySelectorAll('[data-pt]').forEach(button => button.addEventListener('click', () => select(button.dataset.pt)));
+  document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => { mode = button.dataset.mode; updateMap(); renderDetails(); }));
+  $('sevSelect').addEventListener('change', event => {
+    sevFilter = event.target.value;
+    if (selection && curSev(selection) !== sevFilter && sevFilter !== 'alle') selection = null;
+    updateMap(); renderDetails();
+  });
+  $('resetButton').addEventListener('click', () => {
+    mode = 'zonder'; sevFilter = 'alle'; selection = null;
+    $('sevSelect').value = 'alle';
+    setTab('impact'); updateMap(); renderDetails();
+  });
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    button.addEventListener('click', () => setTab(button.dataset.tab));
+    button.addEventListener('keydown', event => {
+      const tabs = ['impact', 'maatregel', 'bewijs'];
+      let index = tabs.indexOf(button.dataset.tab);
+      if (event.key === 'ArrowRight') index = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') index = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === 'Home') index = 0;
+      else if (event.key === 'End') index = tabs.length - 1;
+      else return;
+      event.preventDefault(); setTab(tabs[index], true);
+    });
+  });
+  $('copyButton').addEventListener('click', async () => {
+    const token = ++copyVersion;
+    const perArea = AREAS.map(area => {
+      const pts = Object.entries(POINTS).filter(([, p]) => AREAS[p.area] === area);
+      const highs = pts.filter(([id]) => curSev(id) === 'hoog').map(([, p]) => p.title);
+      const mids = pts.filter(([id]) => curSev(id) === 'midden').map(([, p]) => p.title);
+      const measures = pts.map(([, p]) => `${p.title} — ${p.maatregel[1]}, uiterlijk ${p.maatregel[2]}`);
+      return `${area}\n  hoog: ${highs.join('; ') || 'geen'}\n  midden: ${mids.join('; ') || 'geen'}\n  maatregelen: ${measures.join(' | ')}`;
+    }).join('\n');
+    const text = `FAB Change Impact Map — fictieve ${REVIEW.version}\nBron: synthetische impactsessie RFC-2026-118; revisie ${REVIEW.date}; export ${new Date().toISOString()}\nBeoogde livegang: 2 november 2026\nBeeld: ${mode === 'met' ? 'hypothetisch na maatregelen, geen bewezen risicoreductie' : 'zonder bewezen maatregelen'}\n${$('summaryText').textContent}\nStatus: ${REVIEW.state}; beoordelaar en acceptatie niet vastgelegd.\nFAB adviseert; bevoegde proces-/risico-eigenaar accepteert restrisico.\n\n${perArea}`;
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      if (token === copyVersion) { $('copyFallback').hidden = true; $('copyStatus').textContent = 'Impactsamenvatting gekopieerd.'; }
+    } catch {
+      if (token !== copyVersion) return;
+      $('copyStatus').textContent = 'Automatisch kopiëren lukt niet. Selecteer de tekst hieronder en kopieer die.';
+      $('copyFallback').hidden = false;
+      $('copyFallback').value = text;
+      $('copyFallback').focus(); $('copyFallback').select();
+    }
+  });
+  document.querySelectorAll('[data-pt]').forEach(el => { el.dataset.band = POINTS[el.dataset.pt].order; });
+  document.querySelectorAll('button:disabled, select:disabled').forEach(el => el.disabled = false);
+  buildGrid();
+  updateMap(); renderDetails();
+})();
+</script>
+<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welke gevolgen en maatregelen missen we in deze wijziging?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren, ICT, gebruikers en leverancier vóór acceptatie en livegang. <strong>Uitkomst:</strong> impact, maatregelen, bewijs, eigenaren en open acties in het wijzigingsdossier RFC-2026-118. Neem effecten voor zorgmedewerkers, planners, cliëntadministratie, cliënten/naasten en ketenpartners mee waar relevant.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische impactsessie RFC-2026-118, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. FAB onderzoekt en adviseert, aangewezen uitvoerders realiseren, bevoegde proces-/risico-eigenaren toetsen en accepteren restrisico. Geldigheid: demonstratie, geen lokaal gevalideerd wijzigingsadvies of bewezen risicoreductie.</p>
+  <nav aria-label="Wijzigingsviews"><a href="fab-releaseatelier.html">Wijzigingsingang en testdekking</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies RFC-2026-118</a> · <a href="fab-decision-canvas.html">Optiekeuze RFC-2026-118</a> · <a href="incident-onepager.html#continuity">Continuïteitsvoorwaarden</a></nav>
+  <p>Dezelfde RFC is alleen een voorbeeldreferentie, geen gekoppeld dossier. Alle maatregelen zijn voorgenomen; uitgevoerd, gecontroleerd en geaccepteerd vragen eigen bewijs met bron, versie, datum, beoordelaar en uitkomst. Een lagere kleur toont uitsluitend een verwachting. Onderscheid zorguitval, privacy, hinder en financiële impact; een goedgekeurd noodplan is niet door deze kaart vastgesteld.</p>
+  <p><strong>Onderhoud en toelating:</strong> bronhouder en vervolgactie vooraf aanwijzen; herzie bij eis-, bron- of maatregelwijziging. Echte acties en besluiten horen één keer in het bestaande wijzigingsdossier, geen tweede administratie. Deel alleen synthetische gegevens, geen cliëntgegevens of volledige logs. Vergelijk met de huidige impactchecklist op gemiste gevolgen en onderhoudslast. Gebruikerswaarde is nog niet bewezen.</p>
+</section>
+</body>
+</html>

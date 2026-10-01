@@ -1,0 +1,1297 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FAB Applicatielandschap</title>
+<style>
+  :root {
+    --paper: #f5f8f8;
+    --panel: #edf2f3;
+    --panel-2: #e5ecee;
+    --ink: #172228;
+    --muted: #64747d;
+    --line: #c7d2d6;
+    --white: #ffffff;
+    --teal: #087d78;
+    --blue: #2d63a8;
+    --violet: #7656a8;
+    --amber: #b47112;
+    --danger: #b4483b;
+    --good: #357756;
+    --focus: #0a63c9;
+    --shadow: 0 12px 30px rgba(26, 43, 51, .09);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    overflow: auto;
+  }
+
+  button, input { font: inherit; }
+
+  button { color: inherit; }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--focus) 80%, white);
+    outline-offset: 3px;
+  }
+
+  .shell {
+    height: 100vh;
+    min-height: 700px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  header {
+    min-height: 90px;
+    padding: 18px 22px 16px;
+    display: grid;
+    grid-template-columns: minmax(340px, 1fr) auto;
+    align-items: end;
+    gap: 18px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(245, 248, 248, .96);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+  }
+
+  .title-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .title-mark {
+    width: 10px;
+    height: 50px;
+    border-radius: 3px;
+    background:
+      linear-gradient(to bottom,
+        var(--violet) 0 25%,
+        var(--teal) 25% 50%,
+        var(--blue) 50% 75%,
+        var(--amber) 75% 100%);
+    flex: 0 0 auto;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: "Avenir Next Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+    font-size: clamp(30px, 3vw, 46px);
+    line-height: .92;
+    letter-spacing: -.035em;
+    font-weight: 750;
+  }
+
+  .subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 72ch;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ghost-btn,
+  .mode-btn,
+  .layer-btn,
+  .impact-btn {
+    border: 1px solid var(--line);
+    background: var(--white);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background .16s ease, border-color .16s ease, transform .16s ease;
+  }
+
+  .ghost-btn:hover,
+  .mode-btn:hover,
+  .layer-btn:hover,
+  .impact-btn:hover { background: #f9fbfb; border-color: #9eb0b6; }
+
+  .ghost-btn:active,
+  .mode-btn:active,
+  .layer-btn:active,
+  .impact-btn:active { transform: translateY(1px); }
+
+  .mode-btn[aria-pressed="true"],
+  .layer-btn[aria-pressed="true"],
+  .impact-btn[aria-pressed="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  .workspace {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 248px minmax(540px, 1fr) 360px;
+  }
+
+  aside,
+  .map-zone {
+    min-height: 0;
+  }
+
+  .left-rail {
+    border-right: 1px solid var(--line);
+    background: var(--panel);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: auto;
+  }
+
+  .right-rail {
+    border-left: 1px solid var(--line);
+    background: var(--white);
+    padding: 18px 18px 16px;
+    overflow: auto;
+  }
+
+  .section-title {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  .section-copy {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: var(--muted);
+    pointer-events: none;
+  }
+
+  .search {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 10px 10px 10px 34px;
+    background: white;
+    color: var(--ink);
+  }
+
+  .search::placeholder { color: #87969d; }
+
+  .layers {
+    display: grid;
+    gap: 8px;
+  }
+
+  .layer-btn {
+    width: 100%;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .layer-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .route-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--route-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--route-color) 16%, transparent);
+  }
+
+  .count {
+    color: inherit;
+    opacity: .68;
+    font-size: 11px;
+  }
+
+  .key {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+
+  .legend-row {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin: 8px 0;
+  }
+
+  .legend-shape {
+    width: 20px;
+    height: 14px;
+    border: 2px solid var(--ink);
+    background: white;
+  }
+
+  .legend-shape.core { border-radius: 7px; }
+  .legend-shape.support { border-radius: 3px; }
+  .legend-shape.external {
+    border-radius: 50%;
+    border-style: dashed;
+  }
+
+  .map-zone {
+    position: relative;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(23,34,40,.085) 1px, transparent 1.2px) 0 0 / 24px 24px,
+      #f8fafa;
+    overflow: hidden;
+  }
+
+  .map-toolbar {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 16px;
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    pointer-events: none;
+  }
+
+  .map-toolbar > * { pointer-events: auto; }
+
+  .context-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.88);
+    border: 1px solid rgba(199,210,214,.9);
+    box-shadow: 0 6px 20px rgba(23,34,40,.05);
+    font-size: 12px;
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+  }
+
+  .context-chip strong { color: var(--ink); font-weight: 700; }
+
+  .impact-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    background: rgba(255,255,255,.9);
+    border: 1px solid rgba(199,210,214,.95);
+    border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(23,34,40,.05);
+  }
+
+  .impact-btn {
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    font-size: 11px;
+  }
+
+  .map-scroll {
+    width: 100%;
+    height: 100%;
+    min-height: 560px;
+  }
+
+  #landscape {
+    width: 100%;
+    height: 100%;
+    min-height: 560px;
+    display: block;
+  }
+
+  .route-line {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .68;
+    transition: opacity .2s ease, stroke-width .2s ease, filter .2s ease;
+  }
+
+  .route-line.route-identity { stroke: var(--violet); }
+  .route-line.route-client { stroke: var(--teal); }
+  .route-line.route-operation { stroke: var(--blue); }
+  .route-line.route-reporting { stroke: var(--amber); }
+
+  .route-line.is-muted { opacity: .08; }
+  .route-line.is-active {
+    opacity: 1;
+    stroke-width: 10;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,.13));
+  }
+
+  .app-node {
+    cursor: pointer;
+    transition: opacity .18s ease, transform .18s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .app-node:hover { transform: translateY(-2px); }
+  .app-node.is-muted { opacity: .18; }
+  .app-node.is-search-hidden { opacity: .07; pointer-events: none; }
+
+  .app-node .halo {
+    fill: rgba(255,255,255,.78);
+    stroke: transparent;
+    stroke-width: 12;
+  }
+
+  .app-node .node-shape {
+    fill: white;
+    stroke: #203039;
+    stroke-width: 2.3;
+    filter: drop-shadow(0 4px 7px rgba(24,38,45,.10));
+    transition: stroke-width .18s ease, fill .18s ease;
+  }
+
+  .app-node.type-external .node-shape { stroke-dasharray: 5 4; }
+  .app-node.type-support .node-shape { rx: 7; }
+  .app-node.type-core .node-shape { rx: 14; }
+
+  .app-node.is-selected .node-shape {
+    stroke-width: 5;
+    fill: #fff;
+  }
+
+  .app-node .node-title {
+    font-size: 18px;
+    font-weight: 760;
+    fill: var(--ink);
+    letter-spacing: -.02em;
+    pointer-events: none;
+  }
+
+  .app-node .node-subtitle {
+    font-size: 11px;
+    fill: var(--muted);
+    pointer-events: none;
+  }
+
+  .app-node .node-code {
+    font-size: 10px;
+    font-weight: 700;
+    fill: white;
+    pointer-events: none;
+  }
+
+  .app-node .code-pill { fill: var(--ink); }
+
+  .app-node .status-dot { stroke: white; stroke-width: 2; }
+  .status-ok { fill: var(--good); }
+  .status-watch { fill: var(--amber); }
+  .status-risk { fill: var(--danger); }
+
+  .detail-header {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .detail-kicker {
+    margin: 0 0 6px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .detail-title {
+    margin: 0;
+    font-family: "Avenir Next Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -.035em;
+  }
+
+  .detail-summary {
+    margin: 10px 0 0;
+    color: #46565f;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .status-line {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 25px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #edf1f2;
+    color: #384951;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .badge.critical { background: #f6e6e3; color: #89352e; }
+  .badge.attention { background: #f7eddc; color: #7f520e; }
+  .badge.stable { background: #e4f0e9; color: #2d6649; }
+
+  .detail-section {
+    padding: 15px 0;
+    border-bottom: 1px solid #dde5e7;
+  }
+
+  .detail-section:last-child { border-bottom: 0; }
+
+  .detail-section h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .stat {
+    min-width: 0;
+    padding: 9px 8px;
+    background: var(--panel);
+    border-radius: 8px;
+  }
+
+  .stat strong {
+    display: block;
+    font-size: 19px;
+    line-height: 1;
+    letter-spacing: -.03em;
+  }
+
+  .stat span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .mini-list {
+    display: grid;
+    gap: 7px;
+  }
+
+  .mini-row {
+    display: grid;
+    grid-template-columns: 9px 1fr auto;
+    align-items: start;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .mini-row .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+    background: var(--route-color, var(--line));
+  }
+
+  .mini-row .meta {
+    color: var(--muted);
+    font-size: 10px;
+    text-align: right;
+  }
+
+  .impact-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .impact-chip {
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 7px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .note {
+    background: #f2f6f7;
+    border-left: 3px solid var(--ink);
+    padding: 10px 11px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #46565f;
+  }
+
+  .selection-hint {
+    display: none;
+  }
+
+  .about-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    visibility: hidden;
+    overflow: hidden;
+  }
+
+  .about-drawer[aria-hidden="false"] {
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .about-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(18,29,34,.28);
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+
+  .about-drawer[aria-hidden="false"] .about-backdrop { opacity: 1; }
+
+  .about-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(440px, 92vw);
+    height: 100%;
+    padding: 24px;
+    background: white;
+    border-left: 1px solid var(--line);
+    box-shadow: -18px 0 40px rgba(15,30,36,.15);
+    transform: translateX(102%);
+    transition: transform .24s ease;
+    overflow: auto;
+  }
+
+  .about-drawer[aria-hidden="false"] .about-panel { transform: translateX(0); }
+
+  .about-panel h2 {
+    margin: 22px 0 12px;
+    font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -.03em;
+  }
+
+  .about-panel p {
+    color: #46565f;
+    font-size: 14px;
+    line-height: 1.65;
+    max-width: 58ch;
+  }
+
+  .about-panel .close {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+  }
+
+  .about-meta {
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .mobile-only { display: none; }
+
+  @media (max-width: 1180px) {
+    .workspace { grid-template-columns: 210px minmax(500px, 1fr) 320px; }
+    .right-rail { padding-inline: 14px; }
+  }
+
+  @media (max-width: 980px) {
+    body { overflow: auto; }
+    .shell { height: auto; min-height: 100vh; }
+    header {
+      position: sticky;
+      top: 0;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      min-height: 76px;
+      padding: 13px 14px;
+    }
+    .title-mark { height: 42px; }
+    .subtitle { display: none; }
+    .workspace {
+      display: grid;
+      min-width: 0;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+    }
+    .left-rail {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      gap: 10px;
+      overflow: visible;
+    }
+    .left-rail .section-copy,
+    .left-rail .key { display: none; }
+    .left-rail .section-title { margin-bottom: 7px; }
+    .left-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+    .layers {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+    .layer-btn {
+      width: auto;
+      flex: 0 0 auto;
+      padding: 7px 10px;
+    }
+    .layer-btn .count { display: none; }
+    .map-zone {
+      min-height: 550px;
+      border-bottom: 1px solid var(--line);
+    }
+    #landscape { min-width: 760px; height: 550px; }
+    .map-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .right-rail {
+      border-left: 0;
+      padding: 18px 16px 26px;
+      min-height: 420px;
+    }
+    .right-rail-inner { max-width: 760px; margin: 0 auto; }
+    .mobile-only { display: inline; }
+    .desktop-only { display: none; }
+  }
+
+  @media (max-width: 620px) {
+    header { grid-template-columns: minmax(0, 1fr) auto; }
+    h1 { font-size: 28px; overflow-wrap: anywhere; }
+    .title-wrap { gap: 10px; }
+    .title-wrap > div { min-width: 0; }
+    .title-mark { width: 7px; }
+    .header-actions .ghost-btn:first-child { display: none; }
+    .ghost-btn { padding: 7px 10px; font-size: 12px; }
+    .left-top { grid-template-columns: 1fr; }
+    .map-zone { min-height: 500px; }
+    #landscape { height: 500px; }
+    .map-toolbar { left: 10px; right: 10px; top: 10px; }
+    .context-chip { display: none; }
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+  }
+
+  @media print {
+    body { overflow: visible; background: white; }
+    .shell { height: auto; min-height: 0; }
+    header { position: static; }
+    .workspace { grid-template-columns: 190px 1fr 290px; }
+    .map-zone { min-height: 620px; }
+    .about-drawer, .header-actions { display: none !important; }
+    .route-line { opacity: .85 !important; }
+    .app-node { opacity: 1 !important; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="title-wrap">
+      <div class="title-mark" aria-hidden="true"></div>
+      <div>
+        <h1>Applicatielandschap</h1>
+        <p class="subtitle">Klik een applicatie aan en zie direct welke gegevensstromen, processen en afhankelijkheden ermee samenhangen.</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="ghost-btn" id="resetBtn" type="button">Reset selectie</button>
+      <button class="ghost-btn" id="aboutBtn" type="button" aria-controls="aboutDrawer" aria-expanded="false">Ontwerpkeuzes</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="left-rail" aria-label="Filters en legenda">
+      <div class="left-top">
+        <div>
+          <h2 class="section-title">Vind een applicatie</h2>
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg>
+            <input class="search" id="searchInput" type="search" placeholder="Zoek op naam of functie" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Gegevensstromen</h2>
+        <p class="section-copy">Zet lijnen aan of uit om één type afhankelijkheid apart te bekijken.</p>
+      </div>
+      <div class="layers" aria-label="Gegevensstromen tonen of verbergen">
+        <button class="layer-btn" type="button" data-route="identity" aria-pressed="true" style="--route-color: var(--violet)">
+          <span class="layer-label"><span class="route-dot"></span>Identiteit & toegang</span><span class="count">3</span>
+        </button>
+        <button class="layer-btn" type="button" data-route="client" aria-pressed="true" style="--route-color: var(--teal)">
+          <span class="layer-label"><span class="route-dot"></span>Cliëntgegevens</span><span class="count">5</span>
+        </button>
+        <button class="layer-btn" type="button" data-route="operation" aria-pressed="true" style="--route-color: var(--blue)">
+          <span class="layer-label"><span class="route-dot"></span>Operationele planning</span><span class="count">4</span>
+        </button>
+        <button class="layer-btn" type="button" data-route="reporting" aria-pressed="true" style="--route-color: var(--amber)">
+          <span class="layer-label"><span class="route-dot"></span>Rapportage & sturing</span><span class="count">4</span>
+        </button>
+      </div>
+
+      <div class="key">
+        <h2 class="section-title">Type systeem</h2>
+        <div class="legend-row"><span class="legend-shape core"></span>Kernapplicatie</div>
+        <div class="legend-row"><span class="legend-shape support"></span>Ondersteunend systeem</div>
+        <div class="legend-row"><span class="legend-shape external"></span>Extern / portaal</div>
+        <p class="section-copy" style="margin-top:12px">Voorbeeldlandschap voor een zorgorganisatie. Namen en relaties zijn fictief maar realistisch opgezet.</p>
+      </div>
+    </aside>
+
+    <section class="map-zone" aria-label="Interactief applicatielandschap">
+      <div class="map-toolbar">
+        <div class="context-chip" id="contextChip"><strong>Geen selectie</strong><span>Klik een systeem om relaties te volgen</span></div>
+        <div class="impact-toggle" aria-label="Impactdiepte">
+          <button class="impact-btn" type="button" data-impact="direct" aria-pressed="true">Direct</button>
+          <button class="impact-btn" type="button" data-impact="chain" aria-pressed="false">Hele keten</button>
+        </div>
+      </div>
+      <div class="map-scroll">
+        <svg id="landscape" viewBox="0 0 1000 650" role="img" aria-label="Netwerkkaart van applicaties en gegevensstromen">
+          <g id="staticFallback" aria-hidden="true">
+            <path d="M283 144 C330 140 330 138 365 137" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <path d="M470 179 C470 225 470 245 470 285" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <path d="M580 333 C630 305 650 250 690 200" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <path d="M580 335 C630 335 650 350 690 357" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <path d="M470 381 C470 425 455 455 440 485" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <path d="M340 527 C300 520 260 515 275 512" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+            <g transform="translate(105 105)"><rect width="178" height="78" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">HRM</text><text x="14" y="49" font-size="18" font-weight="700" fill="#172228">HR &amp; salaris</text><text x="14" y="66" font-size="11" fill="#64747d">Medewerkerbron</text></g>
+            <g transform="translate(365 95)"><rect width="195" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">IAM</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Identiteit &amp; toegang</text><text x="14" y="72" font-size="11" fill="#64747d">Provisioning &amp; SSO</text></g>
+            <g transform="translate(360 285)"><rect width="220" height="96" rx="14" fill="white" stroke="#203039" stroke-width="4.5"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">ECD</text><text x="14" y="67" font-size="18" font-weight="700" fill="#172228">Cliëntdossier</text><text x="14" y="84" font-size="11" fill="#64747d">Zorgregistratie</text></g>
+            <g transform="translate(690 140)"><rect width="190" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="49" height="20" rx="10" fill="#172228"/><text x="37.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">PLAN</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Zorgplanning</text><text x="14" y="72" font-size="11" fill="#64747d">Roosters &amp; routes</text></g>
+            <g transform="translate(690 315)"><rect width="190" height="84" rx="22" fill="white" stroke="#203039" stroke-width="2.3" stroke-dasharray="5 4"/><rect x="13" y="12" width="42" height="20" rx="10" fill="#172228"/><text x="34" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">MED</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Medicatie</text><text x="14" y="72" font-size="11" fill="#64747d">Toedienregistratie</text></g>
+            <g transform="translate(340 485)"><rect width="200" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="44" height="20" rx="10" fill="#172228"/><text x="35" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">DWH</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Datawarehouse</text><text x="14" y="72" font-size="11" fill="#64747d">Gegevensverzameling</text></g>
+            <g transform="translate(85 470)"><rect width="190" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="38" height="20" rx="10" fill="#172228"/><text x="32" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">BI</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Managementinformatie</text><text x="14" y="72" font-size="11" fill="#64747d">Dashboards &amp; KPI’s</text></g>
+            <text x="500" y="625" text-anchor="middle" font-size="11" fill="#64747d">Statische basisweergave. Interactie wordt automatisch geactiveerd wanneer JavaScript beschikbaar is.</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <aside class="right-rail" aria-live="polite" aria-label="Details van geselecteerde applicatie">
+      <div class="right-rail-inner" id="detailPanel"></div>
+    </aside>
+  </main>
+</div>
+
+<div class="about-drawer" id="aboutDrawer" aria-hidden="true">
+  <div class="about-backdrop" id="aboutBackdrop"></div>
+  <section class="about-panel" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <button class="ghost-btn close" id="aboutClose" type="button" aria-label="Sluit ontwerpkeuzes">Sluiten</button>
+    <h2 id="aboutTitle">Waarom dit ontwerp zo werkt</h2>
+    <p>Deze one-pager behandelt een applicatielandschap als een vervoerskaart: applicaties zijn haltes en gekleurde lijnen zijn betekenisvolle gegevensstromen. Daardoor zie je eerst het geheel en kun je daarna één systeem aanklikken om directe of ketenbrede afhankelijkheden te isoleren, zonder door een lange inventaris te hoeven scrollen.</p>
+    <p>De visuele nadruk ligt bewust op de relatiekaart, niet op KPI-kaarten. Filters laten één soort gegevensstroom tegelijk zien; de detailkolom vertaalt de gekozen applicatie vervolgens naar FAB-informatie zoals eigenaar, kritikaliteit, beheerpunten, gekoppelde systemen en mogelijke impact van een wijziging.</p>
+    <div class="about-meta">Demo-inhoud. Ontworpen als generiek patroon voor functioneel applicatiebeheer; alle CSS, JavaScript en voorbeelddata staan in dit ene HTML-bestand.</div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const apps = {
+    hrm: {
+      id: 'hrm', code: 'HRM', name: 'HR & salaris', subtitle: 'Medewerkerbron', type: 'support', status: 'ok',
+      x: 105, y: 105, w: 178, h: 78,
+      summary: 'Bronsysteem voor medewerkers, contracten, teams en organisatorische indeling.',
+      criticality: 'Hoog', owner: 'HR Operations', fab: 'FAB Bedrijfsvoering', users: 'HR + managers',
+      processes: ['Instroom medewerker', 'Functie- en teamwijziging', 'Uitstroom medewerker'],
+      controls: ['Tijdige mutaties richting IAM', 'Eenduidige teamcodes', 'Uitdienst-datum verplicht'],
+      note: 'Een vertraagde HR-mutatie kan doorwerken in toegang, planning en rapportages.'
+    },
+    iam: {
+      id: 'iam', code: 'IAM', name: 'Identiteit & toegang', subtitle: 'Provisioning & SSO', type: 'core', status: 'watch',
+      x: 365, y: 95, w: 195, h: 84,
+      summary: 'Verzorgt accounts, rollen en single sign-on op basis van medewerker- en functiegegevens.',
+      criticality: 'Kritiek', owner: 'IT Security', fab: 'FAB IAM', users: 'Alle medewerkers',
+      processes: ['Joiner-Mover-Leaver', 'Autorisatiewijziging', 'Periodieke toegangscontrole'],
+      controls: ['Rolmapping per functie', 'Mislukte provisioning bewaken', 'Spoedintrekking bij uitdienst'],
+      note: 'IAM is een spil: fouten zijn vaak niet lokaal zichtbaar maar blokkeren toegang in meerdere systemen.'
+    },
+    ecd: {
+      id: 'ecd', code: 'ECD', name: 'Cliëntdossier', subtitle: 'Zorgregistratie', type: 'core', status: 'ok',
+      x: 360, y: 285, w: 220, h: 96,
+      summary: 'Centraal dossier voor cliëntgegevens, zorgafspraken, rapportage en professionele vastlegging.',
+      criticality: 'Kritiek', owner: 'Zorgproces', fab: 'FAB Zorg', users: 'Zorgprofessionals',
+      processes: ['Aanmelding cliënt', 'Zorgverlening', 'Dossiervoering', 'Evaluatie zorgplan'],
+      controls: ['Beschikbaarheid 24/7', 'Autorisaties per rol/team', 'Koppelvlakken na releases testen'],
+      note: 'Een wijziging in cliënt- of teamidentificatie raakt vaak planning, medicatie en BI tegelijk.'
+    },
+    planning: {
+      id: 'planning', code: 'PLAN', name: 'Zorgplanning', subtitle: 'Roosters & routes', type: 'core', status: 'watch',
+      x: 690, y: 140, w: 190, h: 84,
+      summary: 'Plant medewerkers, cliënten en routes en gebruikt gegevens uit HRM en het cliëntdossier.',
+      criticality: 'Kritiek', owner: 'Planning', fab: 'FAB Zorg', users: 'Planners + teams',
+      processes: ['Dagplanning', 'Routeplanning', 'Capaciteitssturing'],
+      controls: ['Synchronisatie medewerkers', 'Cliëntstatus actueel', 'Uitvalscenario beschikbaar'],
+      note: 'Bij integratieproblemen ontstaat snel handwerk en verschil tussen planning en dossier.'
+    },
+    medication: {
+      id: 'medication', code: 'MED', name: 'Medicatie', subtitle: 'Toedienregistratie', type: 'external', status: 'ok',
+      x: 690, y: 315, w: 190, h: 84,
+      summary: 'Extern medicatiesysteem met cliënt- en gebruikerskoppelingen voor voorschrift en toediening.',
+      criticality: 'Kritiek', owner: 'Zorg & apotheek', fab: 'FAB Zorg', users: 'Zorgprofessionals',
+      processes: ['Medicatieoverdracht', 'Toediening', 'Controle en signalering'],
+      controls: ['Cliëntmatching', 'Gebruikerskoppeling', 'Fallback bij storing'],
+      note: 'Koppelproblemen zijn patiëntveiligheidsrelevant en vragen duidelijke escalatie naar leverancier.'
+    },
+    portal: {
+      id: 'portal', code: 'PORT', name: 'Cliëntportaal', subtitle: 'Inzage & communicatie', type: 'external', status: 'watch',
+      x: 690, y: 490, w: 190, h: 84,
+      summary: 'Biedt cliënten en vertegenwoordigers geselecteerde dossierinformatie en berichten.',
+      criticality: 'Middel', owner: 'Cliëntdienstverlening', fab: 'FAB Digitaal', users: 'Cliënten + naasten',
+      processes: ['Dossierinzage', 'Berichten', 'Zelfservice'],
+      controls: ['Toestemming en vertegenwoordiging', 'Publicatieregels', 'Privacychecks'],
+      note: 'Niet alle ECD-informatie mag één-op-één naar het portaal; publicatieregels zijn functioneel beheer.'
+    },
+    dwh: {
+      id: 'dwh', code: 'DWH', name: 'Datawarehouse', subtitle: 'Gegevensverzameling', type: 'support', status: 'risk',
+      x: 340, y: 485, w: 200, h: 84,
+      summary: 'Verzamelt gegevens uit primaire systemen voor analyse, controles en managementinformatie.',
+      criticality: 'Hoog', owner: 'Data & BI', fab: 'FAB BI', users: 'Analisten',
+      processes: ['Dataverwerking', 'Kwaliteitscontrole', 'Historisering'],
+      controls: ['Laadtijden monitoren', 'Definitie van bronvelden', 'Fouten herleidbaar houden'],
+      note: 'Status rood in deze demo: twee bronvelden zijn na een wijziging niet meer consistent gevuld.'
+    },
+    bi: {
+      id: 'bi', code: 'BI', name: 'Managementinformatie', subtitle: 'Dashboards & KPI’s', type: 'support', status: 'watch',
+      x: 85, y: 470, w: 190, h: 84,
+      summary: 'Rapportages voor teams en management op basis van gegevens uit het datawarehouse.',
+      criticality: 'Middel', owner: 'Control', fab: 'FAB BI', users: 'Management + teams',
+      processes: ['Sturing', 'Verantwoording', 'Operationele signalering'],
+      controls: ['KPI-definities vastleggen', 'Bronwijzigingen beoordelen', 'Datakwaliteit zichtbaar maken'],
+      note: 'Een correct dashboard kan toch verkeerd sturen als definities of bronvelden ongemerkt wijzigen.'
+    },
+    finance: {
+      id: 'finance', code: 'FIN', name: 'Financieel', subtitle: 'Facturatie & boeking', type: 'support', status: 'ok',
+      x: 85, y: 285, w: 180, h: 80,
+      summary: 'Ontvangt productie- en cliëntgerelateerde gegevens voor financiële verwerking en controle.',
+      criticality: 'Hoog', owner: 'Finance', fab: 'FAB Bedrijfsvoering', users: 'Finance',
+      processes: ['Facturatie', 'Financiële controle', 'Afsluiting'],
+      controls: ['Volledigheid productie', 'Correcte kostenplaats', 'Herleidbare correcties'],
+      note: 'Financiële impact is vaak vertraagd zichtbaar; daarom horen ketencontroles bij wijzigingen in bronregistratie.'
+    }
+  };
+
+  const links = [
+    { from:'hrm', to:'iam', route:'identity', label:'medewerker + functie' },
+    { from:'iam', to:'ecd', route:'identity', label:'account + rol' },
+    { from:'iam', to:'planning', route:'identity', label:'account + team' },
+    { from:'ecd', to:'planning', route:'client', label:'cliënt + zorgafspraak' },
+    { from:'ecd', to:'medication', route:'client', label:'cliënt + dossiercontext' },
+    { from:'ecd', to:'portal', route:'client', label:'publiceerbare dossierdata' },
+    { from:'ecd', to:'finance', route:'client', label:'productie + cliënt' },
+    { from:'planning', to:'ecd', route:'operation', label:'planningstatus' },
+    { from:'hrm', to:'planning', route:'operation', label:'medewerker + inzetbaarheid' },
+    { from:'planning', to:'dwh', route:'operation', label:'planningrealisatie' },
+    { from:'ecd', to:'dwh', route:'reporting', label:'zorgregistratie' },
+    { from:'finance', to:'dwh', route:'reporting', label:'financiële realisatie' },
+    { from:'hrm', to:'dwh', route:'reporting', label:'formatie + verzuim' },
+    { from:'dwh', to:'bi', route:'reporting', label:'datasets + KPI’s' },
+    { from:'ecd', to:'dwh', route:'client', label:'cliëntdimensie' },
+    { from:'planning', to:'portal', route:'operation', label:'afspraakvenster' }
+  ];
+
+  const routeMeta = {
+    identity: { label: 'Identiteit & toegang', color: 'var(--violet)' },
+    client: { label: 'Cliëntgegevens', color: 'var(--teal)' },
+    operation: { label: 'Operationele planning', color: 'var(--blue)' },
+    reporting: { label: 'Rapportage & sturing', color: 'var(--amber)' }
+  };
+
+  const svg = document.getElementById('landscape');
+  const detailPanel = document.getElementById('detailPanel');
+  const contextChip = document.getElementById('contextChip');
+  const searchInput = document.getElementById('searchInput');
+  const resetBtn = document.getElementById('resetBtn');
+  const aboutBtn = document.getElementById('aboutBtn');
+  const aboutDrawer = document.getElementById('aboutDrawer');
+  const aboutClose = document.getElementById('aboutClose');
+  const aboutBackdrop = document.getElementById('aboutBackdrop');
+
+  let selected = 'ecd';
+  let impactMode = 'direct';
+  const activeRoutes = new Set(Object.keys(routeMeta));
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  }
+
+  function center(app) {
+    return { x: app.x + app.w / 2, y: app.y + app.h / 2 };
+  }
+
+  function edgePoint(from, to) {
+    const a = center(from), b = center(to);
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const angle = Math.atan2(dy, dx);
+    const rx = from.w / 2 + 2;
+    const ry = from.h / 2 + 2;
+    const tx = Math.abs(Math.cos(angle)) < .001 ? Infinity : rx / Math.abs(Math.cos(angle));
+    const ty = Math.abs(Math.sin(angle)) < .001 ? Infinity : ry / Math.abs(Math.sin(angle));
+    const t = Math.min(tx, ty);
+    return { x: a.x + Math.cos(angle) * t, y: a.y + Math.sin(angle) * t };
+  }
+
+  function pathFor(link) {
+    const a = apps[link.from], b = apps[link.to];
+    const p1 = edgePoint(a, b), p2 = edgePoint(b, a);
+    const midX = (p1.x + p2.x) / 2;
+    const midY = (p1.y + p2.y) / 2;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      const bend = Math.min(34, Math.abs(dx) * .12);
+      const s = dy >= 0 ? 1 : -1;
+      return `M ${p1.x} ${p1.y} C ${midX-bend} ${p1.y+s*8}, ${midX+bend} ${p2.y-s*8}, ${p2.x} ${p2.y}`;
+    }
+    const bend = Math.min(34, Math.abs(dy) * .12);
+    const s = dx >= 0 ? 1 : -1;
+    return `M ${p1.x} ${p1.y} C ${p1.x+s*8} ${midY-bend}, ${p2.x-s*8} ${midY+bend}, ${p2.x} ${p2.y}`;
+  }
+
+  function renderMap() {
+    const defs = `
+      <defs>
+        <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#172228" flood-opacity=".12"/></filter>
+        <marker id="arrow-identity" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7656a8"/></marker>
+        <marker id="arrow-client" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#087d78"/></marker>
+        <marker id="arrow-operation" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2d63a8"/></marker>
+        <marker id="arrow-reporting" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b47112"/></marker>
+      </defs>`;
+
+    const lines = links.map((link, index) => `
+      <path class="route-line route-${link.route}" data-index="${index}" data-from="${link.from}" data-to="${link.to}" data-route="${link.route}" d="${pathFor(link)}" marker-end="url(#arrow-${link.route})">
+        <title>${escapeHtml(apps[link.from].name)} → ${escapeHtml(apps[link.to].name)}: ${escapeHtml(link.label)}</title>
+      </path>`).join('');
+
+    const nodes = Object.values(apps).map(app => {
+      const statusClass = app.status === 'risk' ? 'status-risk' : app.status === 'watch' ? 'status-watch' : 'status-ok';
+      const codeW = Math.max(38, 18 + app.code.length * 7);
+      return `
+        <g class="app-node type-${app.type}" data-id="${app.id}" transform="translate(${app.x} ${app.y})" role="button" tabindex="0" aria-label="${escapeHtml(app.name)}: ${escapeHtml(app.subtitle)}">
+          <rect class="halo" x="-8" y="-8" width="${app.w+16}" height="${app.h+16}" rx="18"></rect>
+          <rect class="node-shape" x="0" y="0" width="${app.w}" height="${app.h}"></rect>
+          <rect class="code-pill" x="13" y="12" width="${codeW}" height="20" rx="10"></rect>
+          <text class="node-code" x="${13 + codeW/2}" y="26" text-anchor="middle">${escapeHtml(app.code)}</text>
+          <circle class="status-dot ${statusClass}" cx="${app.w-17}" cy="18" r="6"></circle>
+          <text class="node-title" x="14" y="${app.h-29}">${escapeHtml(app.name)}</text>
+          <text class="node-subtitle" x="14" y="${app.h-12}">${escapeHtml(app.subtitle)}</text>
+        </g>`;
+    }).join('');
+
+    svg.innerHTML = defs + lines + nodes;
+
+    svg.querySelectorAll('.app-node').forEach(node => {
+      node.addEventListener('click', () => selectApp(node.dataset.id));
+      node.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectApp(node.dataset.id);
+        }
+      });
+    });
+  }
+
+  function getDirectRelated(id) {
+    const set = new Set([id]);
+    links.forEach(link => {
+      if (!activeRoutes.has(link.route)) return;
+      if (link.from === id) set.add(link.to);
+      if (link.to === id) set.add(link.from);
+    });
+    return set;
+  }
+
+  function getChainRelated(id) {
+    const visited = new Set([id]);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      links.forEach(link => {
+        if (!activeRoutes.has(link.route)) return;
+        if (visited.has(link.from) && !visited.has(link.to)) { visited.add(link.to); changed = true; }
+        if (visited.has(link.to) && !visited.has(link.from)) { visited.add(link.from); changed = true; }
+      });
+    }
+    return visited;
+  }
+
+  function relatedSet() {
+    if (!selected) return new Set(Object.keys(apps));
+    return impactMode === 'chain' ? getChainRelated(selected) : getDirectRelated(selected);
+  }
+
+  function visibleLinksFor(id) {
+    return links.filter(link => activeRoutes.has(link.route) && (link.from === id || link.to === id));
+  }
+
+  function updateVisualState() {
+    const related = relatedSet();
+    const query = searchInput.value.trim().toLocaleLowerCase('nl');
+
+    svg.querySelectorAll('.route-line').forEach(path => {
+      const routeOn = activeRoutes.has(path.dataset.route);
+      const from = path.dataset.from;
+      const to = path.dataset.to;
+      let relevant = true;
+      if (selected) {
+        relevant = impactMode === 'direct'
+          ? (from === selected || to === selected)
+          : (related.has(from) && related.has(to));
+      }
+      path.style.display = routeOn ? '' : 'none';
+      path.classList.toggle('is-active', Boolean(selected) && relevant);
+      path.classList.toggle('is-muted', Boolean(selected) && !relevant);
+    });
+
+    svg.querySelectorAll('.app-node').forEach(node => {
+      const id = node.dataset.id;
+      const app = apps[id];
+      const matches = !query || `${app.name} ${app.code} ${app.subtitle} ${app.summary}`.toLocaleLowerCase('nl').includes(query);
+      node.classList.toggle('is-search-hidden', !matches);
+      node.classList.toggle('is-selected', id === selected);
+      node.classList.toggle('is-muted', Boolean(selected) && !related.has(id));
+    });
+
+    if (selected) {
+      const app = apps[selected];
+      contextChip.innerHTML = `<strong>${escapeHtml(app.name)}</strong><span>${impactMode === 'direct' ? 'directe relaties' : 'hele keten'} gemarkeerd</span>`;
+    } else {
+      contextChip.innerHTML = '<strong>Geen selectie</strong><span>Klik een systeem om relaties te volgen</span>';
+    }
+  }
+
+  function statusBadge(app) {
+    if (app.status === 'risk') return '<span class="badge critical">Aandacht nodig</span>';
+    if (app.status === 'watch') return '<span class="badge attention">Bewaken</span>';
+    return '<span class="badge stable">Stabiel</span>';
+  }
+
+  function renderDetail(id) {
+    if (!id) {
+      detailPanel.innerHTML = `
+        <div class="detail-header">
+          <p class="detail-kicker">Applicatielandschap</p>
+          <h2 class="detail-title">Kies een systeem</h2>
+          <p class="detail-summary">Selecteer een applicatie op de kaart. De kaart dempt niet-relevante systemen en toont hier de functionele context, eigenaarschap en impact.</p>
+        </div>`;
+      return;
+    }
+
+    const app = apps[id];
+    const directLinks = visibleLinksFor(id);
+    const directIds = [...new Set(directLinks.map(link => link.from === id ? link.to : link.from))];
+    const incoming = directLinks.filter(link => link.to === id).length;
+    const outgoing = directLinks.filter(link => link.from === id).length;
+    const routeKinds = [...new Set(directLinks.map(link => link.route))];
+
+    detailPanel.innerHTML = `
+      <div class="detail-header">
+        <p class="detail-kicker">${escapeHtml(app.code)} · ${escapeHtml(app.subtitle)}</p>
+        <h2 class="detail-title">${escapeHtml(app.name)}</h2>
+        <p class="detail-summary">${escapeHtml(app.summary)}</p>
+        <div class="status-line">
+          ${statusBadge(app)}
+          <span class="badge">Kritikaliteit: ${escapeHtml(app.criticality)}</span>
+        </div>
+      </div>
+
+      <section class="detail-section">
+        <h3>In één oogopslag</h3>
+        <div class="stats">
+          <div class="stat"><strong>${directIds.length}</strong><span>direct gekoppelde systemen</span></div>
+          <div class="stat"><strong>${incoming}</strong><span>inkomende gegevensstromen</span></div>
+          <div class="stat"><strong>${outgoing}</strong><span>uitgaande gegevensstromen</span></div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3>Eigenaarschap</h3>
+        <div class="mini-list">
+          <div class="mini-row"><span class="dot" style="--route-color:var(--ink)"></span><span>Business owner</span><span class="meta">${escapeHtml(app.owner)}</span></div>
+          <div class="mini-row"><span class="dot" style="--route-color:var(--ink)"></span><span>Functioneel beheer</span><span class="meta">${escapeHtml(app.fab)}</span></div>
+          <div class="mini-row"><span class="dot" style="--route-color:var(--ink)"></span><span>Gebruikers</span><span class="meta">${escapeHtml(app.users)}</span></div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3>Directe gegevensstromen</h3>
+        <div class="mini-list">
+          ${directLinks.map(link => {
+            const other = link.from === id ? apps[link.to] : apps[link.from];
+            const direction = link.from === id ? 'naar' : 'van';
+            return `<div class="mini-row" style="--route-color:${routeMeta[link.route].color}"><span class="dot"></span><span><strong>${escapeHtml(other.name)}</strong><br>${escapeHtml(link.label)}</span><span class="meta">${direction}</span></div>`;
+          }).join('') || '<p class="section-copy">Geen zichtbare koppelingen met de huidige filters.</p>'}
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3>Raakt deze processen</h3>
+        <div class="impact-list">${app.processes.map(p => `<span class="impact-chip">${escapeHtml(p)}</span>`).join('')}</div>
+      </section>
+
+      <section class="detail-section">
+        <h3>FAB-controlepunten</h3>
+        <div class="mini-list">
+          ${app.controls.map(c => `<div class="mini-row"><span class="dot" style="--route-color:var(--good)"></span><span>${escapeHtml(c)}</span><span></span></div>`).join('')}
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3>Waarom dit ertoe doet</h3>
+        <div class="note">${escapeHtml(app.note)}</div>
+      </section>`;
+  }
+
+
+  function centerSelectedOnMobile(id) {
+    if (window.matchMedia('(min-width: 981px)').matches || !id) return;
+    const scroller = document.querySelector('.map-scroll');
+    const app = apps[id];
+    if (!scroller || !app) return;
+    const svgWidth = 760;
+    const scale = svgWidth / 1000;
+    const target = (app.x + app.w / 2) * scale - scroller.clientWidth / 2;
+    scroller.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }
+
+  function selectApp(id) {
+    selected = id;
+    renderDetail(id);
+    updateVisualState();
+    centerSelectedOnMobile(id);
+  }
+
+  function resetSelection() {
+    selected = null;
+    searchInput.value = '';
+    renderDetail(null);
+    updateVisualState();
+  }
+
+  document.querySelectorAll('.layer-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const route = button.dataset.route;
+      if (activeRoutes.has(route)) activeRoutes.delete(route); else activeRoutes.add(route);
+      button.setAttribute('aria-pressed', String(activeRoutes.has(route)));
+      renderDetail(selected);
+      updateVisualState();
+    });
+  });
+
+  document.querySelectorAll('.impact-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      impactMode = button.dataset.impact;
+      document.querySelectorAll('.impact-btn').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+      updateVisualState();
+    });
+  });
+
+  searchInput.addEventListener('input', updateVisualState);
+  resetBtn.addEventListener('click', resetSelection);
+
+  function openAbout() {
+    aboutDrawer.setAttribute('aria-hidden', 'false');
+    aboutBtn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => aboutClose.focus(), 30);
+  }
+
+  function closeAbout() {
+    aboutDrawer.setAttribute('aria-hidden', 'true');
+    aboutBtn.setAttribute('aria-expanded', 'false');
+    aboutBtn.focus();
+  }
+
+  aboutBtn.addEventListener('click', openAbout);
+  aboutClose.addEventListener('click', closeAbout);
+  aboutBackdrop.addEventListener('click', closeAbout);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && aboutDrawer.getAttribute('aria-hidden') === 'false') closeAbout();
+  });
+
+  try {
+    renderMap();
+    renderDetail(selected);
+    updateVisualState();
+    requestAnimationFrame(() => centerSelectedOnMobile(selected));
+  } catch (error) {
+    console.error('Applicatielandschap kon niet interactief worden opgebouwd:', error);
+    contextChip.innerHTML = '<strong>Basisweergave actief</strong><span>De interactieve laag kon niet worden geladen</span>';
+  }
+})();
+</script>
+<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welke processen en systemen raakt een wijziging of uitval?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren, ICT en leveranciers bij impactanalyse en overdracht. <strong>Uitkomst:</strong> geraakte processen, afhankelijkheden, controlepunten en verantwoordelijke rollen in het bestaande dossier. Behouden als basisconcept; geen live storingsmonitor.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetisch applicatie- en afhankelijkhedenmodel, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen. Een beheerde proces-/applicatieregistratie (bijvoorbeeld Saar) moet de bron zijn. FAB onderhoudt functionele afspraken; proceseigenaren bepalen zorgimpact, ICT/leverancier de technische uitvoering en de bevoegde beslisser accepteert risico. Geldigheid: demonstratie, niet lokaal gevalideerd.</p>
+  <nav aria-label="Landschapsviews"><a href="fab-proces-applicatie-map.html">Proces en registraties</a> · <a href="fab-ketenkaart.html">Ketencontroles</a> · <a href="fab-autorisatielandschap.html">Toegang</a> · <a href="incident-onepager.html#continuity">Incident en continuïteit</a></nav>
+  <p>De statussen zijn fictieve aandachtssignalen, geen uitgevoerde controles. Leg bij echte controles bron, versie, peildatum, beoordelaar en uitkomst vast. Onderscheid hinder, zorguitval, privacy en financiële gevolgen; gebruik bij zorguitval het goedgekeurde lokale noodplan. Externe platformen vallen niet vanzelf onder FAB-beheer.</p>
+  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie eerst aanwijzen; herzie bij wijziging van proces, applicatie of koppeling. Bewaar acties in de afgesproken registratie, geen tweede administratie. Deel alleen synthetische informatie; ook systeem- en contactoverzichten kunnen vertrouwelijk zijn. Vergelijk met de bestaande inventaris op juiste afhankelijkheden en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

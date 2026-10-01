@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Ketenkaart — van cliëntmutatie naar verwerking</title>
+<style>
+:root {
+  --paper: #edf4f7;
+  --surface: #ffffff;
+  --ink: #203747;
+  --muted: #526775;
+  --accent: #006c70;
+  --danger: #a33453;
+  --rule: #bfd0d9;
+  --accent-tint: #d9edec;
+  --danger-tint: #f8e7ed;
+  --body: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+  --display: "Avenir Next Condensed", "Avenir Next", "Arial Narrow", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+button:focus-visible { position: relative; z-index: 4; }
+[hidden] { display: none !important; }
+a { color: var(--accent); text-underline-offset: 4px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2 { font-family: var(--display); }
+h1 { font-size: clamp(38px, 4.2vw, 60px); line-height: 1.05; letter-spacing: -.025em; font-weight: 700; }
+h2 { font-size: 30px; line-height: 1.15; font-weight: 650; }
+h3 { font-size: 17px; line-height: 1.4; }
+p { max-width: 72ch; }
+.skip { position: fixed; top: -100px; left: 16px; padding: 12px; background: white; z-index: 20; }
+.skip:focus { top: 16px; }
+.skip:not(:focus) { clip-path: inset(50%); }
+.page { max-width: 1560px; padding: 32px 44px 20px; margin: auto; }
+.mast { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
+.mast p { margin-top: 12px; max-width: 56ch; font-size: 16px; color: var(--muted); }
+.case { flex: 0 0 250px; border-left: 3px solid var(--rule); padding: 4px 0 4px 20px; }
+.case strong { display: block; font-size: 16px; }
+.case span { display: block; color: var(--muted); font-size: 13px; margin-top: 5px; }
+.toolbar { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 24px 0 20px; }
+.control { display: flex; align-items: center; gap: 12px; }
+.control-label { font-size: 14px; font-weight: 600; }
+.segment { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--rule); border-radius: 8px; }
+.segment button { border: 0; border-radius: 5px; background: transparent; padding: 8px 16px; min-height: 42px; font-size: 14px; }
+.segment button[aria-pressed="true"] { background: var(--ink); color: white; }
+select { min-height: 44px; border: 1px solid var(--rule); border-radius: 5px; padding: 8px 32px 8px 12px; background: var(--surface); max-width: 100%; }
+.quiet-button { border: 0; background: transparent; padding: 10px 2px; min-height: 44px; text-decoration: underline; text-underline-offset: 5px; font-size: 14px; }
+.toolbar > .quiet-button { margin-left: auto; }
+.chain-board { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 24px; gap: 16px; border-bottom: 1px solid var(--rule); }
+.board-head h2 { font: 600 17px/1.4 var(--body); }
+.board-head p { color: var(--muted); font-size: 13px; }
+.stage { position: relative; aspect-ratio: 1320 / 492; margin: 0 12px; }
+.diagram { display: block; width: 100%; height: 100%; }
+.diagram-mobile { display: none; }
+.wire { fill: none; stroke: var(--muted); stroke-width: 3; marker-end: url(#keten-arrow); }
+.wire.related { stroke: var(--accent); stroke-width: 4; marker-end: url(#keten-arrow-accent); }
+.wire.blocked { stroke: var(--danger); stroke-dasharray: 7 6; marker-end: url(#keten-arrow-danger); }
+.wire.dim { opacity: .18; }
+.port { fill: var(--paper); stroke: var(--muted); stroke-width: 2; }
+.node, .handoff {
+  position: absolute;
+  left: calc(var(--x) / 1320 * 100%);
+  top: calc(var(--y) / 492 * 100%);
+  width: calc(var(--w) / 1320 * 100%);
+  height: calc(var(--h) / 492 * 100%);
+}
+.node { text-align: left; border: 1.5px solid var(--muted); border-radius: 7px; padding: 12px 14px; background: var(--surface); display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+.node strong { font: 650 clamp(17px, 1.55vw, 24px)/1.15 var(--display); }
+.node .node-role { color: var(--muted); font-size: clamp(11px, .9vw, 13px); }
+.node .node-state { font-size: clamp(11px, .9vw, 13px); color: var(--accent); margin-top: 5px; }
+.node.store { background: #e2ebf0; border-radius: 7px 7px 18px 18px; }
+.node.source { border-left: 5px solid var(--ink); }
+.node[aria-pressed="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+.node[aria-pressed="true"] .node-role, .node[aria-pressed="true"] .node-state { color: white; }
+.node.related:not([aria-pressed="true"]) { border-color: var(--accent); border-width: 2px; }
+.node.is-blocked:not([aria-pressed="true"]) { border-color: var(--danger); }
+.node.is-blocked .node-state { color: var(--danger); }
+.node.is-blocked[aria-pressed="true"] { background: var(--danger); border-color: var(--danger); }
+.node.is-blocked[aria-pressed="true"] .node-state { color: white; }
+.node.dim { border-color: var(--rule); background: var(--paper); }
+.node.dim .node-state { color: var(--muted); }
+.handoff { min-height: 36px; padding: 3px 4px; border: 1px solid transparent; border-radius: 5px; background: var(--paper); color: var(--muted); font-size: clamp(11px, .95vw, 14px); font-weight: 600; }
+.handoff[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-tint); color: var(--accent); }
+.handoff.is-blocked { color: var(--danger); background: var(--danger-tint); }
+.node:focus-visible, .handoff:focus-visible { position: absolute; }
+.handoff.dim { color: var(--muted); background: var(--paper); }
+.diagram-mobile .wire { marker-end: url(#keten-mobile-arrow); }
+.diagram-mobile .wire.related { marker-end: url(#keten-mobile-arrow-accent); }
+.diagram-mobile .wire.blocked { marker-end: url(#keten-mobile-arrow-danger); }
+.selection-jump { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.board-foot { padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-top: 1px solid var(--rule); font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 20px; color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 8px; }
+.legend i { width: 24px; border-top: 3px solid var(--accent); }
+.legend .blocked-key { border-color: var(--danger); border-top-style: dashed; }
+.legend .muted-key { border-color: var(--muted); }
+#pathText { font-weight: 600; }
+.route-summary { padding: 18px 0 22px; display: flex; align-items: baseline; gap: 20px; }
+.route-summary strong { min-width: 140px; font-size: 14px; }
+.route-summary p { color: var(--muted); font-size: 14px; }
+.route-summary.failure strong { color: var(--danger); }
+.inspector { display: grid; grid-template-columns: minmax(250px, .78fr) minmax(0, 1.65fr); gap: 32px; border-top: 2px solid var(--ink); padding-top: 22px; }
+.selection-head { padding: 2px 0 16px; }
+.selection-kind { display: inline-block; margin-bottom: 10px; color: var(--accent); font-size: 14px; }
+.selection-head p { color: var(--muted); margin-top: 12px; font-size: 14px; max-width: 45ch; }
+.owner { margin-top: 18px; display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+.owner span { color: var(--muted); }
+.detail-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 18px; }
+.detail-tabs button { border: 0; border-bottom: 3px solid transparent; background: transparent; padding: 0 2px 12px; min-height: 44px; color: var(--muted); font-size: 14px; }
+.detail-tabs button[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 650; }
+.detail-panel { min-height: 174px; }
+.detail-panel p { font-size: 14px; }
+.detail-panel h3 { margin-bottom: 10px; }
+.facts { margin: 0; display: grid; grid-template-columns: 135px 1fr; gap: 8px 18px; font-size: 14px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; max-width: 64ch; overflow-wrap: anywhere; }
+.payload { margin-top: 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+.payload code { font: 12px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace; background: #e2ebf0; padding: 5px 8px; border-radius: 3px; }
+.detail-list { margin: 8px 0 0; padding-left: 20px; font-size: 14px; }
+.detail-list li + li { margin-top: 8px; }
+.evidence { background: var(--surface); border-left: 3px solid var(--accent); padding: 16px 18px; margin-top: 14px; }
+.evidence strong { font-size: 14px; }
+.evidence p { color: var(--muted); margin-top: 6px; }
+.evidence code { display: block; font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 12px; }
+.evidence.failure { border-left-color: var(--danger); }
+.copy-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
+.copy-button { background: white; border: 1px solid var(--rule); padding: 9px 14px; border-radius: 5px; font-size: 13px; min-height: 44px; }
+#copyStatus { font-size: 13px; color: var(--muted); }
+#copyFallback { width: 100%; min-height: 150px; font: 13px/1.5 var(--body); padding: 12px; margin-top: 8px; }
+.about { margin-top: 28px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.about summary { cursor: pointer; min-height: 44px; padding: 8px 0; font-size: 14px; }
+.about p { color: var(--muted); margin: 8px 0; font-size: 13px; }
+footer { margin-top: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+.nojs { padding: 14px; border: 1px solid var(--rule); margin: 16px 0; }
+@media (min-width: 1600px) { .node strong { font-size: 24px; } }
+@media (max-width: 1280px) and (min-width: 1181px) {
+  .page { padding: 28px 24px 20px; }
+  .node { padding: 8px; }
+  .node strong { font-size: 17px; }
+  .node .node-role, .node .node-state { font-size: 11px; }
+  .handoff { font-size: 11px; }
+}
+@media (max-width: 1180px) {
+  .page { padding: 24px 16px 20px; }
+  .mast { flex-direction: column; gap: 18px; }
+  .case { flex-basis: auto; padding-left: 12px; }
+  .case span { display: inline; margin-right: 12px; }
+  .toolbar { gap: 12px; padding: 20px 0 16px; align-items: flex-start; }
+  .control { flex-wrap: wrap; gap: 8px; }
+  .toolbar > .quiet-button { margin-left: 0; }
+  .board-head { padding: 16px; flex-direction: column; gap: 4px; }
+  .stage { aspect-ratio: 400 / 1088; width: 100%; max-width: 500px; margin: auto; }
+  .diagram-desktop { display: none; }
+  .diagram-mobile { display: block; }
+  .node, .handoff { left: calc(var(--mx) / 400 * 100%); top: calc(var(--my) / 1088 * 100%); width: calc(var(--mw) / 400 * 100%); height: calc(var(--mh) / 1088 * 100%); }
+  .node { padding: 8px 10px; }
+  .node strong { font-size: clamp(16px, 4.8vw, 22px); }
+  .node .node-role, .node .node-state { font-size: clamp(11px, 3.1vw, 13px); line-height: 1.3; }
+  .handoff { font-size: 12px; min-height: 36px; }
+  .board-foot { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .legend { gap: 12px; font-size: 12px; }
+  .route-summary { flex-direction: column; gap: 6px; padding-bottom: 20px; }
+  .inspector { grid-template-columns: 1fr; gap: 4px; }
+  .selection-head p { max-width: 65ch; }
+  .detail-tabs { gap: 20px; }
+  .facts { grid-template-columns: 105px 1fr; gap: 10px; font-size: 13px; }
+  .selection-jump { display: flex; align-items: center; position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 10; background: var(--accent); color: white; border: 2px solid white; border-radius: 6px; padding: 12px 16px; min-height: 48px; font-size: 14px; text-decoration: none; }
+  .selection-jump span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  body:has(.selection-jump:not([hidden])) { padding-bottom: 80px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  body { background: white; font-size: 11px; }
+  .page { padding: 0; max-width: none; }
+  .mast { flex-direction: row; gap: 24px; }
+  .mast h1 { font-size: 30px; }
+  .mast p { margin-top: 6px; font-size: 11px; }
+  .case { flex: 0 0 210px; }
+  .case strong { font-size: 12px; }
+  .case span { display: block; font-size: 10px; }
+  .toolbar, .copy-row, .about, .skip, .selection-jump { display: none !important; }
+  .chain-board { margin-top: 12px; break-inside: avoid; }
+  .board-head, .board-foot { flex-direction: row; align-items: center; padding: 6px 12px; gap: 12px; font-size: 10px; }
+  .board-head h2 { font-size: 14px; }
+  .board-head p, .legend { font-size: 10px; }
+  .legend { gap: 12px; }
+  .node.dim, .handoff.dim, .wire.dim { opacity: 1; }
+  .node { padding: 8px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .node strong { font-size: 16px; }
+  .node .node-role, .node .node-state { font-size: 10px; }
+  .handoff { font-size: 10px; min-height: 0; }
+  .stage { aspect-ratio: 1320 / 400; max-width: none; width: auto; margin: 0 12px; overflow: hidden; }
+  .diagram-desktop { display: block; height: auto; transform: translateY(-8.1300813%); }
+  .diagram-mobile { display: none; }
+  .node, .handoff { left: calc(var(--x) / 1320 * 100%); top: calc((var(--y) - 40) / 400 * 100%); width: calc(var(--w) / 1320 * 100%); height: calc(var(--h) / 400 * 100%); }
+  .route-summary { flex-direction: row; padding: 10px 0 14px; }
+  .route-summary strong, .route-summary p { font-size: 11px; }
+  .inspector { grid-template-columns: .8fr 1.6fr; gap: 24px; padding-top: 14px; break-inside: avoid; }
+  .selection-head { padding-bottom: 0; }
+  .selection-head h2 { font-size: 22px; }
+  .selection-kind, .selection-head p, .owner { font-size: 10px; margin-top: 6px; }
+  .selection-kind { margin-top: 0; margin-bottom: 6px; }
+  .detail-tabs { display: none; }
+  .detail-panel { min-height: 0; }
+  .detail-panel p, .facts { font-size: 11px; }
+  .payload code { font-size: 10px; }
+  footer { margin-top: 12px; font-size: 10px; }
+}
+.review-context th,.review-context td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid currentColor; }
+.review-context p { margin:14px 0; }
+</style>
+</head>
+<body>
+<a class="skip" href="#inspector">Naar de ketendetails</a>
+<main class="page">
+  <header class="mast">
+    <div>
+      <h1>Ketenkaart</h1>
+      <p>Een wijziging in het cliëntdossier stopt niet bij het ECD. Volg de overdrachten en zie waar de verwerking verdergaat, of juist vastloopt.</p>
+    </div>
+    <div class="case">
+      <strong>Cliënt krijgt een ander zorgteam</strong>
+      <span>Voorbeeldbericht MUT-2026-1042</span>
+      <span>Fictieve casus voor functioneel beheer</span>
+    </div>
+  </header>
+  <noscript><p class="nojs">JavaScript staat uit. Je ziet de volledige voorbeeldketen en de basisuitleg. Zet JavaScript aan om onderdelen te selecteren en de afwijzingscasus te bekijken.</p></noscript>
+  <div class="toolbar" aria-label="Keten verkennen">
+    <div class="control">
+      <span class="control-label" id="scenarioLabel">Voorbeeld</span>
+      <div class="segment" role="group" aria-labelledby="scenarioLabel">
+        <button type="button" data-scenario="normal" aria-pressed="true" disabled>Normale stroom</button>
+        <button type="button" data-scenario="failure" aria-pressed="false" disabled>Onbekend team</button>
+      </div>
+    </div>
+    <div class="control">
+      <label class="control-label" for="routeSelect">Volg naar</label>
+      <select id="routeSelect" disabled>
+        <option value="all">Alle afnemers</option>
+        <option value="finance">Financieel</option>
+        <option value="bi">BI-rapportage</option>
+      </select>
+    </div>
+    <button type="button" class="quiet-button" id="resetButton" disabled>Herstel overzicht</button>
+  </div>
+  <section class="chain-board" aria-labelledby="boardTitle">
+    <div class="board-head">
+      <h2 id="boardTitle">Van registratie naar gebruik</h2>
+      <p>Selecteer een systeem of een overdracht naast de lijn.</p>
+    </div>
+    <div class="stage">
+      <svg class="diagram diagram-desktop" viewBox="0 0 1320 492" role="img" aria-labelledby="keten-title keten-desc">
+        <title id="keten-title">Cliëntmutatie van ECD naar financiën en BI</title>
+        <desc id="keten-desc">Het ECD verstuurt een mutatie naar de koppelservice; na controle gaat die naar financiën en het datawarehouse, dat de BI-rapportage voedt.</desc>
+        <defs>
+          <marker id="keten-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#526775"/></marker>
+          <marker id="keten-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#006c70"/></marker>
+          <marker id="keten-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#a33453"/></marker>
+        </defs>
+        <path class="wire" data-wire="send" d="M200 264 H280"/>
+        <path class="wire" data-wire="validate" d="M440 264 H520"/>
+        <path class="wire" data-wire="book" d="M680 240 H728 Q736 240 736 232 V156 Q736 148 744 148 H800"/>
+        <path class="wire" data-wire="load" d="M680 288 H728 Q736 288 736 296 V372 Q736 380 744 380 H800"/>
+        <path class="wire" data-wire="report" d="M980 380 H1100"/>
+        <circle class="port" cx="200" cy="264" r="5"/><circle class="port" cx="440" cy="264" r="5"/>
+        <circle class="port" cx="680" cy="240" r="5"/><circle class="port" cx="680" cy="288" r="5"/><circle class="port" cx="980" cy="380" r="5"/>
+      </svg>
+      <svg class="diagram diagram-mobile" viewBox="0 0 400 1088" role="img" aria-labelledby="keten-mobile-title keten-mobile-desc">
+        <title id="keten-mobile-title">Cliëntmutatie van ECD naar financiën en BI</title>
+        <desc id="keten-mobile-desc">Na ontvangst controleert de koppelservice de cliëntmutatie; de goedgekeurde gegevens gaan naar financiën en het datawarehouse en daarna naar BI.</desc>
+        <defs>
+          <marker id="keten-mobile-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#526775"/></marker>
+          <marker id="keten-mobile-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#006c70"/></marker>
+          <marker id="keten-mobile-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#a33453"/></marker>
+        </defs>
+        <path class="wire" data-wire="send" d="M200 160 V216"/>
+        <path class="wire" data-wire="validate" d="M200 344 V400"/>
+        <path class="wire" data-wire="book" d="M144 528 V600 Q144 608 136 608 H112 Q104 608 104 616 V656"/>
+        <path class="wire" data-wire="load" d="M256 528 V600 Q256 608 264 608 H288 Q296 608 296 616 V656"/>
+        <path class="wire" data-wire="report" d="M296 784 V944"/>
+      </svg>
+      <button type="button" class="node source" data-node="ecd" aria-pressed="false" aria-controls="inspector" style="--x:40;--y:212;--w:160;--h:104;--mx:80;--my:32;--mw:240;--mh:128" disabled><span class="node-role">Registratie</span><strong>Cliëntdossier</strong><span class="node-state">Mutatie vastgelegd</span></button>
+      <button type="button" class="node" data-node="receive" aria-pressed="false" aria-controls="inspector" style="--x:280;--y:212;--w:160;--h:104;--mx:80;--my:216;--mw:240;--mh:128" disabled><span class="node-role">Koppelservice</span><strong>Ontvangst</strong><span class="node-state">Bericht ontvangen</span></button>
+      <button type="button" class="node" data-node="check" aria-pressed="false" aria-controls="inspector" style="--x:520;--y:212;--w:160;--h:104;--mx:80;--my:400;--mw:240;--mh:128" disabled><span class="node-role">Koppelservice</span><strong>Controle</strong><span class="node-state">Team herkend</span></button>
+      <button type="button" class="node" data-node="finance" aria-pressed="false" aria-controls="inspector" style="--x:800;--y:96;--w:180;--h:104;--mx:24;--my:656;--mw:160;--mh:128" disabled><span class="node-role">Financiële verwerking</span><strong>Financieel</strong><span class="node-state">Mutatie verwerkt</span></button>
+      <button type="button" class="node store" data-node="dwh" aria-pressed="false" aria-controls="inspector" style="--x:800;--y:328;--w:180;--h:104;--mx:216;--my:656;--mw:160;--mh:128" disabled><span class="node-role">Gegevensopslag</span><strong>Datawarehouse</strong><span class="node-state">Mutatie geladen</span></button>
+      <button type="button" class="node" data-node="bi" aria-pressed="false" aria-controls="inspector" style="--x:1100;--y:328;--w:160;--h:104;--mx:216;--my:944;--mw:160;--mh:128" disabled><span class="node-role">Rapportage</span><strong>BI-rapportage</strong><span class="node-state">Dataset vernieuwd</span></button>
+      <button type="button" class="handoff" data-edge="send" aria-pressed="false" aria-controls="inspector" style="--x:204;--y:208;--w:72;--h:36;--mx:212;--my:168;--mw:124;--mh:36" disabled>Mutatie</button>
+      <button type="button" class="handoff" data-edge="validate" aria-pressed="false" aria-controls="inspector" style="--x:440;--y:208;--w:80;--h:36;--mx:212;--my:352;--mw:124;--mh:36" disabled>Controle</button>
+      <button type="button" class="handoff" data-edge="book" aria-pressed="false" aria-controls="inspector" style="--x:696;--y:104;--w:100;--h:36;--mx:16;--my:536;--mw:112;--mh:36" disabled>Boeking</button>
+      <button type="button" class="handoff" data-edge="load" aria-pressed="false" aria-controls="inspector" style="--x:696;--y:404;--w:100;--h:36;--mx:264;--my:536;--mw:120;--mh:36" disabled>Dataset</button>
+      <button type="button" class="handoff" data-edge="report" aria-pressed="false" aria-controls="inspector" style="--x:992;--y:324;--w:96;--h:36;--mx:64;--my:840;--mw:220;--mh:36" disabled>Laadset</button>
+    </div>
+    <div class="board-foot">
+      <div class="legend" aria-label="Legenda"><span><i class="muted-key"></i>Overdracht</span><span><i></i>Gevolgd pad</span><span><i class="blocked-key"></i>Niet verwerkt</span></div>
+      <p id="pathText">Hele keten zichtbaar</p>
+    </div>
+  </section>
+  <div class="route-summary" id="routeSummary" role="status">
+    <strong id="summaryTitle">Bericht verwerkt</strong>
+    <p id="summaryText">De teamcode is herkend. Financiën en het datawarehouse ontvangen de mutatie; BI gebruikt de vernieuwde dataset na de volgende verversing.</p>
+  </div>
+  <p class="sr-only" id="selectionStatus" role="status"></p>
+  <a class="selection-jump" id="selectionJump" href="#inspector" hidden><span id="jumpText">Bekijk ketendetails</span></a>
+  <section class="inspector" id="inspector" aria-labelledby="selectionTitle" tabindex="-1">
+    <div class="selection-head">
+      <span class="selection-kind" id="selectionKind">De volledige keten</span>
+      <h2 id="selectionTitle">Eén mutatie, twee afnemers</h2>
+      <p id="selectionIntro">Dezelfde teamwijziging voedt de financiële verwerking en rapportage. Elke overdracht heeft een eigen controle en eigenaar. Selecteer een onderdeel om die afspraken te bekijken.</p>
+      <div class="owner"><span>Regie</span><strong id="selectionOwner">FAB Zorg &amp; Integratiebeheer</strong></div>
+    </div>
+    <div>
+      <div class="detail-tabs" role="tablist" aria-label="Ketendetails">
+        <button type="button" id="tab-data" role="tab" data-tab="data" aria-selected="true" aria-controls="panel-data" tabindex="0" disabled>Gegevens</button>
+        <button type="button" id="tab-care" role="tab" data-tab="care" aria-selected="false" aria-controls="panel-care" tabindex="-1" disabled>Beheer &amp; herstel</button>
+        <button type="button" id="tab-proof" role="tab" data-tab="proof" aria-selected="false" aria-controls="panel-proof" tabindex="-1" disabled>Bewijs</button>
+      </div>
+      <div class="detail-panel" id="panel-data" role="tabpanel" aria-labelledby="tab-data" tabindex="0">
+        <dl class="facts"><dt>Wat verandert</dt><dd>Het zorgteam van een fictieve cliënt, per ingangsdatum.</dd><dt>Route</dt><dd>ECD → koppelservice → financiën en datawarehouse → BI.</dd><dt>Let op</dt><dd>Ontvangst, verwerking en rapportageverversing zijn drie verschillende bevestigingen.</dd></dl>
+        <div class="payload"><code>clientId</code><code>teamCode</code><code>effectiveDate</code><code>messageId</code></div>
+      </div>
+      <div class="detail-panel" id="panel-care" role="tabpanel" aria-labelledby="tab-care" tabindex="0" hidden></div>
+      <div class="detail-panel" id="panel-proof" role="tabpanel" aria-labelledby="tab-proof" tabindex="0" hidden></div>
+      <div class="copy-row"><button type="button" class="copy-button" id="copyButton" disabled>Kopieer ketensamenvatting</button><span id="copyStatus" role="status"></span></div>
+      <textarea id="copyFallback" aria-label="Ketensamenvatting om handmatig te kopiëren" readonly hidden></textarea>
+    </div>
+  </section>
+  <details class="about">
+    <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
+    <p>De keten is een schakelbord: systemen zijn onderdelen, lijnen zijn gerichte overdrachten en elke aansluiting heeft een eigen verantwoordelijkheid. Ontvangst en controle zijn twee functies van dezelfde koppelservice, geen twee aparte applicaties. De kaart toont een vereenvoudigde integratie, geen volledige infrastructuur.</p>
+    <p>Alle systemen, teamcodes, berichtnummers, tijden en bewijsfragmenten zijn fictief. Er worden geen cliëntgegevens opgehaald of verstuurd. De afwijzingscasus houdt de laatst verwerkte stand bij de afnemers intact; een gestippelde lijn betekent dat deze mutatie daar niet is verwerkt, niet dat het hele systeem uitstaat.</p>
+    <p>De selectie licht alle routes door het gekozen onderdeel uit, of alleen de gekozen afnemer. Na een correctie moet beheer de mutatie gecontroleerd opnieuw aanbieden en bevestigingen vergelijken. De demo voert geen herstelactie uit.</p>
+  </details>
+  <footer><span>FAB Ketenkaart — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span></footer>
+</main>
+<script>
+(() => {
+  const nodes = {
+    ecd: { name: 'Cliëntdossier', kind: 'Bronsysteem', owner: 'FAB Zorg', intro: 'Een zorgteamwijziging ontstaat in het ECD. Het dossier blijft de bron; afnemers krijgen alleen de afgesproken mutatievelden.', data: [['Invoer', 'Teamwijziging door een bevoegde medewerker.'], ['Uitvoer', 'Cliëntsleutel, teamcode, ingangsdatum en berichtnummer.'], ['Controle', 'De cliëntsleutel blijft gelijk; alleen de teamtoewijzing wijzigt.']], care: ['Controleer de teamtoewijzing en ingangsdatum in het dossier.', 'Corrigeer een fout in de bron. Wijzig niet afzonderlijk dezelfde gegevens bij iedere afnemer.', 'Laat Integratiebeheer na correctie een gecontroleerde herverwerking uitvoeren.'], proof: ['Mutatiehistorie ECD', 'De wijzigingshistorie verbindt de bronregistratie met het uitgaande bericht.'], log: '08:42:00  teamwijziging vastgelegd\nmessageId: MUT-2026-1042\nclientId: DEMO-017' },
+    receive: { name: 'Ontvangst', kind: 'Functie van de koppelservice', owner: 'Integratiebeheer', intro: 'De koppelservice neemt het bericht aan en registreert het berichtnummer. Een ontvangstbevestiging zegt nog niets over inhoudelijke verwerking.', data: [['Invoer', 'Een mutatiebericht uit het ECD.'], ['Uitvoer', 'Een geregistreerd bericht voor inhoudelijke controle.'], ['Controle', 'Berichtformaat, unieke berichtsleutel en verplichte velden.']], care: ['Zoek het berichtnummer in het ontvangstlog.', 'Controleer of het bericht al is aangeboden om dubbele verwerking te voorkomen.', 'Bij uitblijvende ontvangst: controleer de koppeling en lever berichtnummer en tijdstip mee bij escalatie.'], proof: ['Ontvangstlog koppelservice', 'Een technische bevestiging bewijst alleen dat het bericht is aangenomen.'], log: '08:42:01  ontvangst bevestigd\nmessageId: MUT-2026-1042\nstatus: ACCEPTED' },
+    check: { name: 'Controle & vertaling', kind: 'Functie van de koppelservice', owner: 'Integratiebeheer + FAB Zorg', intro: 'De koppelservice controleert of de teamcode bekend is en vertaalt die naar de afgesproken codes voor de afnemers.', data: [['Invoer', 'Cliëntmutatie met teamcode ZT-014.'], ['Uitvoer', 'Gecontroleerde mutatie met kostenplaats KPL-230 en teamdimensie TEAM-014.'], ['Controle', 'De teamcode bestaat en is geldig op de ingangsdatum.']], care: ['Vergelijk teamcode en ingangsdatum met de afgesproken vertaaltabel.', 'Laat FAB Zorg de betekenis van de code bevestigen; Integratiebeheer bewaakt de vertaling.', 'Bied pas na correctie opnieuw aan en controleer beide afnemers.'], proof: ['Vertaaltabel teams, versie 3.2', 'De afspraak koppelt één broncode aan een financiële code en een rapportagedimensie.'], log: '08:42:02  controle geslaagd\nteamCode: ZT-014\ncostCenter: KPL-230\nteamKey: TEAM-014' },
+    finance: { name: 'Financieel', kind: 'Afnemend systeem', owner: 'FAB Bedrijfsvoering', intro: 'De financiële applicatie gebruikt de teamwijziging om de juiste kostenplaats bij de cliënttoewijzing te registreren. Deze mutatie is geen factuur of betaling.', data: [['Invoer', 'Cliëntsleutel, kostenplaats en ingangsdatum.'], ['Uitvoer', 'Een bijgewerkte financiële toewijzing met verwerkingsbevestiging.'], ['Controle', 'De kostenplaats bestaat en de mutatie is niet al verwerkt.']], care: ['Vergelijk de ingangsdatum en kostenplaats met de goedgekeurde bronmutatie.', 'Gebruik de verwerkingsbevestiging, niet alleen de ontvangststatus van de koppeling.', 'Controleer bij herverwerking dat er geen dubbele toewijzing ontstaat.'], proof: ['Verwerkingslog financiële applicatie', 'De bevestiging verbindt de financiële toewijzing met hetzelfde berichtnummer.'], log: '08:42:04  toewijzing bijgewerkt\nmessageId: MUT-2026-1042\ncostCenter: KPL-230\nstatus: APPLIED' },
+    dwh: { name: 'Datawarehouse', kind: 'Afnemer en gegevensopslag', owner: 'Data & BI-beheer', intro: 'Het datawarehouse bewaart de teamtoewijzing met een ingangsdatum. Daarmee blijft rapportage over eerdere perioden herleidbaar.', data: [['Invoer', 'Cliëntsleutel, teamdimensie en ingangsdatum.'], ['Uitvoer', 'Een bijgewerkte, gedateerde toewijzing voor rapportage.'], ['Controle', 'De teamdimensie bestaat; eerdere toewijzingen blijven bewaard.']], care: ['Controleer laadlog en geldigheidsdatum van de nieuwe toewijzing.', 'Vergelijk afgewezen en verwerkte aantallen met de aangeboden berichten.', 'Controleer na herstel eerst de laadset en daarna de BI-verversing.'], proof: ['Laadlog cliënt-teamdimensie', 'De laadset bevat de berichtsleutel en de ingangsdatum van de toewijzing.'], log: '08:45:00  dimensie bijgewerkt\nmessageId: MUT-2026-1042\nteamKey: TEAM-014\nstatus: LOADED' },
+    bi: { name: 'BI-rapportage', kind: 'Gebruiker van de dataset', owner: 'FAB BI + rapportage-eigenaar', intro: 'De rapportage gebruikt de teamtoewijzing uit het datawarehouse. Een geslaagde verversing is niet vanzelf bewijs dat deze ene mutatie is meegenomen.', data: [['Invoer', 'Een gecontroleerde dataset uit het datawarehouse.'], ['Uitvoer', 'Rapportage waarin de cliënt vanaf de ingangsdatum bij het nieuwe team hoort.'], ['Controle', 'Laadset, verversmoment en peildatum sluiten op elkaar aan.']], care: ['Controleer de laatste verversing en de bijbehorende laadset.', 'Vergelijk de cliënttoewijzing op dezelfde peildatum met het ECD.', 'Maak een ontbrekende mutatie zichtbaar aan de rapportage-eigenaar; een technisch geslaagde verversing kan oude gegevens tonen.'], proof: ['Datasetverversing en aansluitcontrole', 'Pas de combinatie van laadlog en inhoudelijke vergelijking toont dat de mutatie in de rapportage zit.'], log: '09:00:00  dataset vernieuwd\nloadSet: DWH-2026-1042\ncheck: DEMO-017 / TEAM-014\nstatus: RECONCILED' }
+  };
+  const edges = {
+    send: { from: 'ecd', to: 'receive', name: 'Cliëntmutatie versturen', owner: 'FAB Zorg + Integratiebeheer', intro: 'De bron biedt één mutatiebericht aan. Een vaste berichtsleutel maakt de overdracht en eventuele herverwerking herleidbaar.', transport: 'Gebeurtenisgestuurd via een afgesproken API; fictieve integratieafspraak.', fields: ['clientId', 'teamCode', 'effectiveDate', 'messageId'], care: ['Leg berichtnummer en aanbiedtijd vast.', 'Controleer de ontvangstbevestiging bij de koppelservice.', 'Bij een time-out: verifieer eerst ontvangst voordat je opnieuw aanbiedt.'], proof: 'Uitgaand bericht en ontvangstlog', log: '08:42:00  ECD biedt MUT-2026-1042 aan\n08:42:01  koppelservice bevestigt ontvangst' },
+    validate: { from: 'receive', to: 'check', name: 'Teamcode controleren', owner: 'Integratiebeheer + FAB Zorg', intro: 'Het ontvangen bericht gaat naar de inhoudelijke controle. De teamcode moet bestaan voordat de mutatie naar afnemers mag.', transport: 'Interne verwerking binnen de koppelservice.', fields: ['teamCode', 'effectiveDate', 'mappingVersion'], care: ['Vergelijk de broncode met de actuele vertaaltabel.', 'Een onbekende code stopt deze mutatie voor beide afnemers.', 'Herstel de broncode of de bevestigde mapping; leg vast wie de correctie goedkeurt.'], proof: 'Controleresultaat en vertaaltabel', log: '08:42:02  ZT-014 herkend\nmappingVersion: 3.2\nresult: VALID' },
+    book: { from: 'check', to: 'finance', name: 'Financiële toewijzing bijwerken', owner: 'Integratiebeheer + FAB Bedrijfsvoering', intro: 'De gevalideerde teamcode wordt vertaald naar een kostenplaats. De financiële applicatie bevestigt de verwerking afzonderlijk.', transport: 'API-overdracht na geslaagde controle.', fields: ['clientId', 'costCenter', 'effectiveDate', 'messageId'], care: ['Controleer de kostenplaats en ingangsdatum.', 'Vraag bij een ontbrekende bevestiging de status op bij de afnemer.', 'Herhaal alleen met dezelfde herleidbare berichtsleutel en controle op dubbele verwerking.'], proof: 'Financiële verwerkingsbevestiging', log: '08:42:04  MUT-2026-1042 verwerkt\ncostCenter: KPL-230\nresult: APPLIED' },
+    load: { from: 'check', to: 'dwh', name: 'Teamtoewijzing laden', owner: 'Integratiebeheer + Data & BI-beheer', intro: 'De goedgekeurde mutatie gaat naar de volgende laadset. Het datawarehouse registreert de toewijzing met een ingangsdatum.', transport: 'Incrementele laadset; elke vijf minuten in deze demo.', fields: ['clientId', 'teamKey', 'effectiveDate', 'messageId'], care: ['Controleer welke laadset het bericht bevat.', 'Vergelijk aangeboden, afgewezen en geladen berichten.', 'Bevestig de inhoudelijke verwerking voordat je de BI-uitkomst beoordeelt.'], proof: 'Laadset DWH-2026-1042', log: '08:45:00  MUT-2026-1042 geladen\nteamKey: TEAM-014\nloadSet: DWH-2026-1042' },
+    report: { from: 'dwh', to: 'bi', name: 'Rapportagedataset verversen', owner: 'Data & BI-beheer + FAB BI', intro: 'BI haalt de bijgewerkte toewijzing op uit het datawarehouse. De rapportage volgt dus niet direct het oorspronkelijke ECD-bericht.', transport: 'Geplande datasetverversing; elk uur in deze demo.', fields: ['clientId', 'teamKey', 'validFrom', 'loadSet'], care: ['Controleer of de verversing na de relevante laadset plaatsvond.', 'Vergelijk de toewijzing op dezelfde peildatum.', 'Bij afwijzing in de keten blijft de vorige stand staan, ook als de verversing technisch slaagt.'], proof: 'Ververshistorie en inhoudelijke vergelijking', log: '09:00:00  loadSet DWH-2026-1042 ingelezen\ncheck: DEMO-017 hoort bij TEAM-014' }
+  };
+  const routes = { finance: ['send', 'validate', 'book'], bi: ['send', 'validate', 'load', 'report'] };
+  let scenario = 'normal';
+  let route = 'all';
+  let selection = null;
+  let copyVersion = 0;
+  const $ = id => document.getElementById(id);
+  const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+  const normalStates = { ecd: 'Mutatie vastgelegd', receive: 'Bericht ontvangen', check: 'Team herkend', finance: 'Mutatie verwerkt', dwh: 'Mutatie geladen', bi: 'Dataset vernieuwd' };
+  const failureStates = { ecd: 'Onbekende teamcode', receive: 'Bericht ontvangen', check: 'Mutatie afgewezen', finance: 'Vorige stand blijft', dwh: 'Vorige stand blijft', bi: 'Mutatie ontbreekt' };
+  const blockedEdges = new Set(['book', 'load', 'report']);
+
+  function selectedPaths() {
+    const candidates = route === 'all' ? Object.values(routes) : [routes[route]];
+    if (!selection) return new Set(candidates.flat());
+    return new Set(candidates.filter(path => selection.type === 'edge' ? path.includes(selection.id) : path.some(id => edges[id].from === selection.id || edges[id].to === selection.id)).flat());
+  }
+
+  function updateMap() {
+    const path = selectedPaths();
+    const relatedNodes = new Set([...path].flatMap(id => [edges[id].from, edges[id].to]));
+    document.querySelectorAll('[data-wire]').forEach(el => {
+      const id = el.dataset.wire;
+      const mobile = el.closest('svg').classList.contains('diagram-mobile');
+      el.classList.toggle('related', path.has(id) && (selection !== null || route !== 'all'));
+      el.classList.toggle('blocked', scenario === 'failure' && blockedEdges.has(id));
+      el.classList.toggle('dim', !path.has(id));
+      const marker = scenario === 'failure' && blockedEdges.has(id) ? 'danger' : path.has(id) && (selection !== null || route !== 'all') ? 'accent' : '';
+      el.style.markerEnd = `url(#keten-${mobile ? 'mobile-' : ''}arrow${marker ? '-' + marker : ''})`;
+    });
+    document.querySelectorAll('[data-node]').forEach(el => {
+      const id = el.dataset.node;
+      el.setAttribute('aria-pressed', String(selection?.type === 'node' && selection.id === id));
+      el.classList.toggle('related', relatedNodes.has(id) && (selection !== null || route !== 'all'));
+      el.classList.toggle('dim', !relatedNodes.has(id));
+      el.classList.toggle('is-blocked', scenario === 'failure' && id === 'check');
+      el.querySelector('.node-state').textContent = (scenario === 'failure' ? failureStates : normalStates)[id];
+    });
+    document.querySelectorAll('[data-edge]').forEach(el => {
+      el.setAttribute('aria-pressed', String(selection?.type === 'edge' && selection.id === el.dataset.edge));
+      el.classList.toggle('dim', !path.has(el.dataset.edge));
+      el.classList.toggle('is-blocked', scenario === 'failure' && (blockedEdges.has(el.dataset.edge) || el.dataset.edge === 'validate'));
+    });
+    document.querySelectorAll('[data-scenario]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.scenario === scenario)));
+    $('routeSummary').classList.toggle('failure', scenario === 'failure');
+    $('summaryTitle').textContent = scenario === 'failure' ? 'Ontvangen, niet verwerkt' : 'Bericht verwerkt';
+    $('summaryText').textContent = scenario === 'failure' ? 'Teamcode ZT-099 ontbreekt in de vertaaltabel. De controle stopt deze mutatie voor beide afnemers. Financiën en BI houden de vorige stand; de rest van hun verwerking kan doorgaan.' : 'De teamcode is herkend. Financiën en het datawarehouse ontvangen de mutatie; BI gebruikt de vernieuwde dataset na de volgende verversing.';
+    $('pathText').textContent = route !== 'all' ? `Pad naar ${route === 'finance' ? 'Financieel' : 'BI-rapportage'}` : selection ? 'Alle routes door deze selectie' : 'Hele keten zichtbaar';
+    $('keten-desc').textContent = scenario === 'failure' ? 'De koppelservice ontvangt de mutatie, maar wijst de onbekende teamcode af; deze mutatie bereikt financiën, het datawarehouse en BI niet.' : 'Het ECD verstuurt een mutatie naar de koppelservice; na controle gaat die naar financiën en het datawarehouse, dat de BI-rapportage voedt.';
+    $('keten-mobile-desc').textContent = $('keten-desc').textContent;
+  }
+
+  function currentDetails() {
+    if (!selection) return {
+      name: 'Eén mutatie, twee afnemers', kind: 'De volledige keten', owner: 'FAB Zorg & Integratiebeheer', intro: 'Dezelfde teamwijziging voedt de financiële verwerking en rapportage. Elke overdracht heeft een eigen controle en eigenaar. Selecteer een onderdeel om die afspraken te bekijken.',
+      data: [['Wat verandert', 'Het zorgteam van een fictieve cliënt, per ingangsdatum.'], ['Route', 'ECD → koppelservice → financiën en datawarehouse → BI.'], ['Let op', 'Ontvangst, verwerking en rapportageverversing zijn drie verschillende bevestigingen.']],
+      fields: ['clientId', 'teamCode', 'effectiveDate', 'messageId'], care: ['Begin bij de bron en volg hetzelfde berichtnummer door de keten.', 'Bevestig inhoudelijke verwerking bij beide afnemers.', 'Vergelijk de rapportage pas na de bijbehorende laadset en verversing.'], proof: ['Bewijsspoor van bron tot rapportage', 'Dit zijn fictieve fragmenten om het verband tussen controles te laten zien, geen echte bewijsstukken.'], log: '08:42  ECD-mutatie\n08:42  ontvangst en controle\n08:42  financiële verwerking\n08:45  laadset datawarehouse\n09:00  BI-verversing'
+    };
+    if (selection.type === 'node') {
+      const fields = { finance: edges.book.fields, dwh: edges.load.fields, bi: edges.report.fields, check: ['teamCode', 'costCenter', 'teamKey', 'mappingVersion'] };
+      return { ...nodes[selection.id], fields: fields[selection.id] || edges.send.fields };
+    }
+    const e = edges[selection.id];
+    return { ...e, kind: 'Overdracht', data: [['Van / naar', `${nodes[e.from].name} → ${nodes[e.to].name}`], ['Verwerking', e.transport], ['Traceerbaarheid', 'Berichtsleutel MUT-2026-1042; cliëntsleutel DEMO-017.']], proof: [e.proof, 'Vergelijk dezelfde berichtsleutel of laadset aan beide kanten van deze overdracht.'] };
+  }
+
+  function failureDetail() {
+    if (!selection || selection.id === 'check' || selection.id === 'validate') return ['De controle wijst teamcode ZT-099 af. Er is geen geldige vertaling naar kostenplaats en teamdimensie.', 'Controleer met FAB Zorg of de broncode klopt. Corrigeer de bron of de bevestigde mapping. Laat Integratiebeheer daarna gecontroleerd herverwerken en beide afnemers controleren.', '08:42:02  MUT-2026-1042 afgewezen\nteamCode: ZT-099\nreason: UNKNOWN_TEAM\nforwarded: false'];
+    if (selection.id === 'ecd') return ['Het ECD heeft teamcode ZT-099 vastgelegd, maar die is nog niet bekend in de vertaaltabel.', 'Controleer of dit een invoerfout of een nieuw, geldig team is. Laat de inhoudelijk eigenaar de correctie bevestigen.', '08:42:00  teamCode: ZT-099\nmessageId: MUT-2026-1042\nstatus: SENT'];
+    if (selection.id === 'receive' || selection.id === 'send') return ['De ontvangst is geslaagd. De fout ontstaat pas bij de inhoudelijke controle, niet tijdens het versturen.', 'Gebruik dezelfde berichtsleutel om het afwijzingslog te vinden. Opnieuw versturen zonder codecorrectie lost deze afwijzing niet op.', '08:42:01  MUT-2026-1042 ontvangen\nstatus: ACCEPTED\nverwerking: zie controleresultaat'];
+    return ['Deze mutatie is niet doorgegeven. De afnemer blijft voor deze toewijzing op de laatst verwerkte stand; andere berichten kunnen wel doorgaan.', 'Controleer na correctie de herverwerking, de ontvangst bij deze afnemer en de uiteindelijke inhoud. Voor BI hoort daar ook een verversing na de nieuwe laadset bij.', selection.id === 'bi' || selection.id === 'report' ? '09:00:00  datasetverversing geslaagd\nMUT-2026-1042: ontbreekt in laadset\ntoewijzing: vorige stand' : 'MUT-2026-1042: niet aangeboden\noorzaak: afgewezen bij controle\ntoewijzing: vorige stand'];
+  }
+
+  function renderDetails() {
+    const d = currentDetails();
+    $('selectionKind').textContent = d.kind;
+    $('selectionTitle').textContent = d.name;
+    $('selectionIntro').textContent = d.intro;
+    $('selectionOwner').textContent = d.owner;
+    $('selectionStatus').textContent = selection ? `Geselecteerd: ${d.name}. Details staan onder de keten.` : '';
+    $('selectionJump').hidden = !selection;
+    $('jumpText').textContent = `Bekijk details: ${d.name}`;
+    const failure = scenario === 'failure' ? failureDetail() : null;
+    const data = failure && selection?.type === 'node' && selection.id === 'check' ? [['Invoer', 'Cliëntmutatie met onbekende teamcode ZT-099.'], ['Uitvoer', 'Geen mutatie naar de afnemers; afwijzing met reden UNKNOWN_TEAM.'], ['Controle', 'De vertaaltabel bevat geen geldige vertaling voor deze teamcode.']] : d.data;
+    const facts = data.map(([label, value]) => `<dt>${escape(label)}</dt><dd>${escape(value)}</dd>`).join('');
+    $('panel-data').innerHTML = `<dl class="facts">${facts}</dl><div class="payload">${d.fields.map(field => `<code>${escape(field)}</code>`).join('')}</div>${failure ? `<div class="evidence failure"><strong>In dit foutvoorbeeld</strong><p>${escape(failure[0])}</p></div>` : ''}`;
+    $('panel-care').innerHTML = `<h3>${failure ? 'Herstel begint bij de code' : 'Controleer de overdracht, niet alleen het systeem'}</h3>${failure ? `<p>${escape(failure[1])}</p>` : ''}<ul class="detail-list">${d.care.map(text => `<li>${escape(text)}</li>`).join('')}</ul>`;
+    $('panel-proof').innerHTML = `<h3>${failure ? 'Afwijzing en gevolgen' : escape(d.proof[0])}</h3><p>${escape(d.proof[1])}</p><div class="evidence${failure ? ' failure' : ''}"><strong>Fictief bewijsfragment</strong><code>${escape(failure ? failure[2] : d.log)}</code></div>`;
+    clearCopy();
+  }
+
+  function clearCopy() {
+    copyVersion++;
+    $('copyStatus').textContent = '';
+    $('copyFallback').hidden = true;
+  }
+
+  function select(type, id) {
+    const otherBranch = route === 'finance' && ['dwh', 'bi', 'load', 'report'].includes(id) || route === 'bi' && ['finance', 'book'].includes(id);
+    if (otherBranch) { route = 'all'; $('routeSelect').value = 'all'; }
+    selection = { type, id };
+    updateMap();
+    renderDetails();
+  }
+
+  function setTab(tab, focus = false) {
+    document.querySelectorAll('[data-tab]').forEach(button => {
+      const selected = button.dataset.tab === tab;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      $('panel-' + button.dataset.tab).hidden = !selected;
+      if (selected && focus) button.focus();
+    });
+  }
+
+  document.querySelectorAll('[data-node]').forEach(button => button.addEventListener('click', () => select('node', button.dataset.node)));
+  document.querySelectorAll('[data-edge]').forEach(button => button.addEventListener('click', () => select('edge', button.dataset.edge)));
+  document.querySelectorAll('[data-scenario]').forEach(button => button.addEventListener('click', () => { scenario = button.dataset.scenario; updateMap(); renderDetails(); }));
+  $('routeSelect').addEventListener('change', event => {
+    route = event.target.value;
+    if (selection && selectedPaths().size === 0) selection = null;
+    updateMap(); renderDetails();
+  });
+  $('resetButton').addEventListener('click', () => {
+    scenario = 'normal'; route = 'all'; selection = null;
+    $('routeSelect').value = 'all';
+    setTab('data'); updateMap(); renderDetails();
+  });
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    button.addEventListener('click', () => setTab(button.dataset.tab));
+    button.addEventListener('keydown', event => {
+      const tabs = ['data', 'care', 'proof'];
+      let index = tabs.indexOf(button.dataset.tab);
+      if (event.key === 'ArrowRight') index = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') index = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === 'Home') index = 0;
+      else if (event.key === 'End') index = tabs.length - 1;
+      else return;
+      event.preventDefault(); setTab(tabs[index], true);
+    });
+  });
+  $('copyButton').addEventListener('click', async () => {
+    const d = currentDetails();
+    const token = ++copyVersion;
+    const text = `FAB Ketenkaart — fictieve demo v3\nBron: synthetische mutatie en controlefragmenten; revisie 2026-10-01; export ${new Date().toISOString()}\nGeen echt beoordeeld bewijs; bronhouder en bevoegde acceptatie lokaal vaststellen.\nCasus: cliënt krijgt een ander zorgteam\nBericht: MUT-2026-1042\nVoorbeeld: ${scenario === 'failure' ? 'Onbekend team ZT-099' : 'Normale stroom ZT-014'}\nRoute: ${$('pathText').textContent}\nSelectie: ${d.name}\nEigenaar: ${d.owner}\n${$('summaryText').textContent}\n${scenario === 'failure' ? failureDetail()[1] : d.care.join('\n')}`;
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      if (token === copyVersion) { $('copyFallback').hidden = true; $('copyStatus').textContent = 'Ketensamenvatting gekopieerd.'; }
+    } catch {
+      if (token !== copyVersion) return;
+      $('copyStatus').textContent = 'Automatisch kopiëren lukt niet. Selecteer de tekst hieronder en kopieer die.';
+      $('copyFallback').hidden = false;
+      $('copyFallback').value = text;
+      $('copyFallback').focus(); $('copyFallback').select();
+    }
+  });
+  document.querySelectorAll('button:disabled, select:disabled').forEach(el => el.disabled = false);
+  updateMap(); renderDetails();
+})();
+</script>
+<section class="review-context" aria-label="Beheerkaart en gegevenskwaliteit" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Een ketenafwijking herleiden en veilig overdragen</h2>
+  <p><strong>Hoofdvraag:</strong> waar bleef de mutatie steken en wie controleert de volgende stap? <strong>Gebruiker:</strong> FAB en Integratiebeheer, bij meldingen en wijzigingen. <strong>Uitkomst:</strong> een escalatiepakket met berichtreferentie, bron-, ontvangst-, verwerkings- en aansluitcontrole; herstel uitsluitend via het bevoegde proces.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische ketencasus, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen; FAB bewaakt functionele afspraken, Integratiebeheer de uitvoering, gegevens- en rapportage-eigenaren de betekenis en acceptatie. Geldigheid: demonstratie, niet lokaal gevalideerd of live gemeten. De logfragmenten zijn geen echt gecontroleerd bewijs. Leg echte bron, versie, controledatum, beoordelaar en uitkomst in de melding vast; gebruik geen cliëntgegevens of volledige logs in deze deelbare HTML.</p>
+  <nav aria-label="Ketenviews"><a href="incident-onepager.html">Incident en continuïteit</a> · <a href="fab-rapportage-lineage.html">Rapportageherkomst</a> · <a href="fab-proces-applicatie-map.html">Proces en registraties</a></nav>
+  <section id="data-quality" aria-labelledby="qualityTitle">
+    <h3 id="qualityTitle">Gegevenskwaliteit: overdrachten naar een woonzorglocatie</h3>
+    <p><strong>DQ-DEMO-LOC-02, gerelateerd aan CHG-DEMO-LOC-02:</strong> 120 synthetische overdrachtsberichten aangeboden op 2 november 2026 tussen 08:00 en 09:00 Europe/Amsterdam; aansluitcontrole op 09:15. Dit zijn vaste illustraties, geen gemeten kwaliteitsscore. De populatie telt berichten, niet unieke cliënten. De kwaliteitsregels en termijnen vragen lokale goedkeuring.</p>
+    <div style="overflow-x:auto" tabindex="0" role="region" aria-label="Gegevenskwaliteitstabel"><table style="width:100%;border-collapse:collapse"><caption>Kwaliteitsregel, gecontroleerde populatie, afwijking en veilige herstelroute</caption><thead><tr><th scope="col">Regel / bronveld / populatie</th><th scope="col">Illustratieve afwijking / gevolg</th><th scope="col">Eigenaar / herstel en controle</th></tr></thead><tbody>
+      <tr><td>DQ-01 · locationCode bestaat en is geldig op effectiveDate. Alle 120 berichten; mapping demo 0.2.</td><td>3 berichten met onbekende locatiecode; ontvangend dossier mist de overdracht. Zorgimpact door proceseigenaar te beoordelen.</td><td>Gegevenseigenaar cliëntadministratie bevestigt bron/mapping; FAB onderzoekt; Integratiebeheer herverwerkt pas na goedkeuring met dezelfde berichtsleutel. Controleer inhoudelijke ontvangst en verwerking.</td></tr>
+      <tr><td>DQ-02 · transferId is uniek per overdracht. 120 berichten vergelijken op sleutel én bronhistorie.</td><td>2 herhaalde sleutels; 118 verschillende sleutels. Geen bewijs van dubbele zorg of twee extra cliënten. Mogelijk dubbele registratie bij afnemer.</td><td>Integratiebeheer controleert herhaalgedrag; proceseigenaar beoordeelt gevolgen. Niet blind opnieuw aanbieden of records verwijderen; verifieer één inhoudelijke verwerking per sleutel.</td></tr>
+      <tr><td>DQ-03 · verwerking bevestigd binnen 15 minuten na sentAt (demotermijn). Alle 120 aangeboden berichten op peildatum 09:15.</td><td>5 berichten zonder tijdige processedAt-bevestiging. Afwijkingen kunnen overlappen met DQ-01/02; aantallen niet optellen tot één kwaliteitspercentage.</td><td>FAB en ontvangende applicatiebeheerder controleren tijdzone, ontvangst en eindverwerking; leverancier via bestaande contactroute. Na herstel bron en afnemer op dezelfde peildatum vergelijken.</td></tr>
+    </tbody></table></div>
+    <p><strong>Vervolgstap:</strong> registreer per regel gecontroleerde populatie, mappingversie, bronreferentie, datum, beoordelaar, uitkomst en herstelactie in de bestaande melding of kwaliteitsregistratie. De illustraties zijn niet uitgevoerd, gecontroleerd of geaccepteerd. Bij zorguitval start de afgesproken continuïteitsroute direct; wacht niet op volledige oorzaakanalyse.</p>
+  </section>
+  <p><strong>Onderhoud:</strong> herzie bij koppeling-, mapping- of proceswijziging; benut bestaande logs en dossiers, geen tweede administratie. Selecteer de view pas met bronhouder en concrete vervolgactie. Vergelijk met de huidige koppeldocumentatie op juiste eigenaar, gemiste controles en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

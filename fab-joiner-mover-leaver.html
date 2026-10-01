@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Joiner-Mover-Leaver — wie krijgt wanneer toegang, en wanneer verdwijnt die?</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --paper: #e1eee7;
+  --surface: #f8fcf9;
+  --ink: #0e2a22;
+  --muted: #476258;
+  --jade: #12805c;
+  --jade-deep: #0b4f3a;
+  --jade-tint: #c3e1d2;
+  --rule: #a9c8b9;
+  --late: #e0a21a;
+  --over: #c8402a;
+  --display: Optima, Candara, "Segoe UI", sans-serif;
+  --body: Optima, Candara, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 var(--body); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+[hidden] { display: none !important; }
+h1, h2, h3, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+.skip { position: fixed; top: -100px; left: 16px; padding: 12px; background: white; z-index: 20; }
+.skip:focus { top: 16px; }
+.page { max-width: 1520px; margin: auto; padding: 34px 44px 26px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 22px 48px; margin-bottom: 26px; }
+h1 { font: 800 clamp(34px, 4.4vw, 60px)/1.05 var(--display); letter-spacing: -.015em; max-width: 18ch; }
+.top p { max-width: 50ch; color: var(--muted); font-size: 17px; }
+.who { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--surface); margin-bottom: 18px; }
+.who button { border: 0; background: transparent; text-align: left; padding: 14px 26px; min-height: 64px; border-right: 2px solid var(--ink); }
+.who button:last-child { border-right: 0; }
+.who b { display: block; font: 800 20px/1.2 var(--display); }
+.who span { font-size: 14px; color: var(--muted); }
+.who button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.who button[aria-pressed="true"] span { color: #bfe0d1; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; margin-bottom: 14px; }
+.seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 8px 16px; min-height: 44px; font-size: 15px; }
+.seg button + button { border-left: 2px solid var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--jade); color: #fff; font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--muted); margin-left: auto; align-items: center; }
+.legend i { display: inline-block; width: 22px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+.sw-auto { background: var(--jade); } .sw-man { background: repeating-linear-gradient(135deg, var(--jade) 0 4px, #5fb597 4px 8px); }
+.sw-late { background: var(--late); } .sw-over { background: var(--over); }
+.roll-wrap { overflow-x: auto; background: var(--surface); border: 2px solid var(--ink); border-radius: 6px; }
+.roll { min-width: 980px; --n: 36; }
+.row { display: grid; grid-template-columns: 230px minmax(0, 1fr) 210px; align-items: stretch; border-bottom: 1px solid var(--rule); }
+.row:last-child { border-bottom: 0; }
+.row.head { background: var(--jade-tint); border-bottom: 2px solid var(--ink); }
+.rowbtn { display: contents; }
+.name { padding: 9px 16px; text-align: left; border: 0; background: transparent; border-right: 1px solid var(--rule); }
+.name b { display: block; font-size: 15.5px; line-height: 1.25; }
+.name small { color: var(--muted); font-size: 13px; }
+.row.sel .name, .row.sel .state { background: #e9f5ee; }
+.row.sel .name { box-shadow: inset 5px 0 0 var(--jade); }
+.cells { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); align-items: stretch; padding: 9px 0; }
+.c { height: 22px; align-self: center; position: relative; border: 0; padding: 0; background: transparent; }
+.c::before { content: ""; position: absolute; inset: 0; background: transparent; }
+.c.on::before { background: var(--jade); }
+.c.on.man::before { background: repeating-linear-gradient(135deg, var(--jade) 0 4px, #5fb597 4px 8px); }
+.c.late::before { background: var(--late); }
+.c.over::before { background: var(--over); }
+.c.zero { box-shadow: -2px 0 0 var(--ink); }
+.c.now::after { content: ""; position: absolute; top: -9px; bottom: -9px; left: 0; right: 0; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); background: rgba(14, 42, 34, .1); pointer-events: none; }
+.cells.axis { padding: 6px 0; }
+.axis .c { height: 36px; font-size: 12px; text-align: center; color: var(--muted); line-height: 1.2; }
+.axis .c::before { display: none; }
+.axis .c b { display: block; color: var(--ink); font-size: 13px; }
+.axis .c.now::after { top: 0; bottom: 0; }
+.state { padding: 9px 14px; font-size: 14px; line-height: 1.35; display: flex; align-items: center; border-left: 1px solid var(--rule); }
+.state.ok { color: var(--muted); }
+.state.late { color: #7a5200; font-weight: 700; }
+.state.over { color: var(--over); font-weight: 700; }
+.head .name, .head .state { font-weight: 700; font-size: 14px; align-items: center; display: flex; }
+.scrub { display: grid; grid-template-columns: 230px minmax(0, 1fr) 210px; align-items: center; padding: 14px 0; border-top: 2px solid var(--ink); background: var(--surface); }
+.scrub label { padding: 0 16px; font-weight: 700; font-size: 15px; }
+.scrub input[type=range] { width: 100%; accent-color: var(--jade); height: 32px; margin: 0; }
+.scrub output { padding: 0 14px; font: 700 15px/1.3 var(--display); }
+.panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; margin-top: 26px; }
+.panel { border-top: 4px solid var(--ink); padding-top: 14px; }
+.panel h2 { font: 800 24px/1.2 var(--display); margin-bottom: 8px; }
+.panel p { font-size: 15.5px; max-width: 62ch; }
+.panel dl { display: grid; grid-template-columns: 130px 1fr; gap: 6px 14px; margin: 14px 0 0; font-size: 15px; }
+.panel dt { color: var(--muted); }
+.panel dd { margin: 0; }
+.now-list { margin-top: 12px; display: grid; gap: 6px; }
+.now-list li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+.tag { flex: 0 0 auto; font-size: 12.5px; font-weight: 700; padding: 1px 9px; border-radius: 999px; background: var(--jade-tint); color: var(--jade-deep); }
+.tag.late { background: #fbe7b6; color: #6d4a00; }
+.tag.over { background: #f6d1c8; color: #8a2615; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; border-radius: 8px; padding: 9px 18px; min-height: 44px; font-weight: 700; margin-top: 16px; }
+.btn:hover { background: var(--jade-deep); }
+#status { margin-left: 12px; font-size: 14px; color: var(--muted); }
+footer { padding: 26px 0 6px; font-size: 13.5px; color: var(--muted); max-width: 90ch; }
+@media (max-width: 900px) {
+  .page { padding: 20px 14px; }
+  .who { border-radius: 14px; grid-template-columns: 1fr; }
+  .who button { border-right: 0; border-bottom: 2px solid var(--ink); }
+  .who button:last-child { border-bottom: 0; }
+  .panels { grid-template-columns: 1fr; }
+  .legend { margin-left: 0; }
+}
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff; font-size: 11px; }
+  .page { padding: 0; max-width: none; }
+  .skip, .controls .seg, .scrub, .btn, #status, footer, .who button[aria-pressed="false"] { display: none; }
+  .who { grid-template-columns: 1fr; border-radius: 6px; margin-bottom: 8px; }
+  h1 { font-size: 26px; }
+  .top { margin-bottom: 8px; }
+  .roll-wrap { overflow: visible; }
+  .roll { min-width: 0; }
+  .row { grid-template-columns: 170px minmax(0, 1fr) 170px; }
+  .name, .state { padding: 4px 8px; font-size: 11px; }
+  .cells { padding: 4px 0; } .c { height: 14px; }
+  .panels { margin-top: 10px; gap: 14px; }
+  .panel h2 { font-size: 16px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+.panel { min-width: 0; }
+.panel dt, .panel dd, .now-list li span { overflow-wrap: anywhere; }
+.now-list li span:last-child { min-width: 0; }
+@media (max-width: 900px) { .panels { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .panel dl { grid-template-columns: 1fr; gap: 3px; } .panel dd { margin-bottom: 8px; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#panels">Naar details</a>
+<div class="page">
+  <header class="top">
+    <h1>Wie krijgt wanneer toegang, en wanneer verdwijnt die weer?</h1>
+    <p>Eén medewerker, drie momenten. Vergelijk modelafspraken met gesimuleerde gebeurtenissen. Apparatuurbezit, fysieke toegang en applicatierechten zijn afzonderlijke controles; lokale termijnen zijn nog niet vastgesteld.</p>
+  </header>
+  <p>Bron: synthetische HR-, IAM- en applicatiegebeurtenissen, demo v2. Dit is geen feitelijke toegangscontrole. Dagintervallen zijn inclusief: de laatste actieve dag staat in de balk, stoppen gebeurt aan het begin van de volgende dag. HR-registratie toont het dienstverband, geen verwijdering van het HR-dossier.</p>
+
+  <div class="who" role="group" aria-label="Kies een situatie" id="who"></div>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Weergave">
+      <button type="button" id="v-plan" aria-pressed="true">Modelafspraak (demo)</button>
+      <button type="button" id="v-real" aria-pressed="false">Gesimuleerd verloop</button>
+    </div>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw-auto"></i>automatisch</span>
+      <span><i class="sw-man"></i>handmatig door beheer</span>
+      <span><i class="sw-late"></i>te laat</span>
+      <span><i class="sw-over"></i>te lang actief</span>
+    </div>
+  </div>
+
+  <div class="roll-wrap">
+    <div class="roll" id="roll"></div>
+    <div class="scrub">
+      <label for="day" id="daylabel">Dag</label>
+      <input type="range" id="day" step="1" aria-describedby="dayout">
+      <output id="dayout" for="day"></output>
+    </div>
+  </div>
+
+  <section class="panels" id="panels" aria-live="polite">
+    <div class="panel" id="nowpanel"></div>
+    <div class="panel" id="rowpanel"></div>
+  </section>
+  <footer>Personen, systemen en afwijkingen zijn fictief. De balken tonen of toegang actief is op één dag, niet hoeveel rechten iemand heeft. Controleer in de eigen omgeving wie de rechten daadwerkelijk toekent.</footer>
+</div>
+
+<script>
+const OPEN = 99, FROM = -99;
+const S = {
+  joiner: {
+    tab: 'Komt binnen', sub: 'Eerste werkdag', min: -14, max: 14, date: '2026-11-02', zero: 'Eerste werkdag',
+    title: 'Fatma, verpleegkundige wijkteam Noord',
+    story: 'Fatma start op maandag 2 november. HR legt twee weken eerder het dienstverband vast; daarna moeten account, mail, planning en dossier klaarstaan.',
+    rows: [
+      { n: 'HR-dossier', how: 'auto', owner: 'HR', plan: [-14, OPEN], act: [-14, OPEN], note: 'Dienstverband vastgelegd, bron voor alle volgende stappen.', cp: 'Controleer dat teamcode en startdatum zijn ingevuld.' },
+      { n: 'Account', how: 'auto', owner: 'IAM', plan: [-5, OPEN], act: [-5, OPEN], note: 'Wordt automatisch aangemaakt door de HR-trigger.', cp: 'Een ontbrekende teamcode blokkeert de trigger zonder melding.' },
+      { n: 'E-mail', how: 'auto', owner: 'IAM', plan: [-3, OPEN], act: [-3, OPEN], note: 'Mailbox volgt het account.', cp: 'Geen afwijkingen bekend.' },
+      { n: 'Laptop en toegangspas', how: 'manual', owner: 'Servicedesk', plan: [-2, OPEN], act: [1, OPEN], note: 'Servicedesk levert op basis van een ticket van de leidinggevende.', cp: 'Laat de HR-trigger automatisch een ticket aanmaken.', slip: 'Ticket pas op dag 0 aangemaakt; levering op dag 1.' },
+      { n: 'Roosterportaal', how: 'auto', owner: 'FAB', plan: [-1, OPEN], act: [-1, OPEN], note: 'Medewerker verschijnt na de nachtelijke synchronisatie.', cp: 'Een nieuwe teamcode moet vooraf in de opzoeklijst staan.' },
+      { n: 'ECD, rol verpleegkundige', how: 'manual', owner: 'FAB', plan: [-1, OPEN], act: [3, OPEN], note: 'Rol wordt na aanvraag door de leidinggevende toegekend.', cp: 'Controleer de eerste werkdag of de rol aanwezig is.', slip: 'Aanvraag kwam pas op dag 2 binnen; rol toegekend op dag 3.' },
+      { n: 'Opleidingsportaal', how: 'auto', owner: 'Opleiding', plan: [0, OPEN], act: [0, OPEN], note: 'Verplichte introductie staat vanaf dag 0 open.', cp: 'Geen afwijkingen bekend.' }
+    ]
+  },
+  mover: {
+    tab: 'Gaat verhuizen', sub: 'Eerste dag in nieuw team', min: -14, max: 21, date: '2026-12-01', zero: 'Eerste dag nieuw team',
+    title: 'Joost, wijkverpleegkundige van team Noord naar Zuid',
+    story: 'Joost wisselt op dinsdag 1 december van wijkteam. Rechten voor Noord moeten stoppen op dag 0, rechten voor Zuid beginnen op dag 0.',
+    rows: [
+      { n: 'Account', how: 'auto', owner: 'IAM', plan: [FROM, OPEN], act: [FROM, OPEN], note: 'Blijft ongewijzigd; alleen de rechten verschuiven.', cp: 'Geen afwijkingen bekend.' },
+      { n: 'HR: team Zuid', how: 'auto', owner: 'HR', plan: [-7, OPEN], act: [-7, OPEN], note: 'Nieuwe teamcode vastgelegd, bron voor de rest.', cp: 'Controleer dat de oude teamcode een einddatum heeft.' },
+      { n: 'Roosterportaal, team Noord', how: 'auto', owner: 'FAB', plan: [FROM, 0], act: [FROM, 5], note: 'Planning Noord eindigt automatisch bij de wissel.', cp: 'Open diensten van Noord moeten vóór dag 0 zijn herplaatst.', slip: 'Synchronisatie draaide pas op dag 5 de nieuwe teamcode door.' },
+      { n: 'Roosterportaal, team Zuid', how: 'auto', owner: 'FAB', plan: [0, OPEN], act: [0, OPEN], note: 'Planning Zuid begint bij de wissel.', cp: 'Geen afwijkingen bekend.' },
+      { n: 'ECD, rol team Noord', how: 'manual', owner: 'FAB', plan: [FROM, 0], act: [FROM, OPEN], note: 'Dossiers van Noord worden via de teamrol ingezien.', cp: 'Laat bij een teamwissel de oude rol automatisch vervallen.', slip: 'Nooit ingetrokken: Joost ziet nog steeds dossiers van team Noord.' },
+      { n: 'ECD, rol team Zuid', how: 'manual', owner: 'FAB', plan: [0, OPEN], act: [2, OPEN], note: 'Nieuwe teamrol na aanvraag door de leidinggevende.', cp: 'Controleer op dag 0 of de rol aanwezig is.', slip: 'Rol twee dagen te laat toegekend.' },
+      { n: 'Gedeelde mailbox Noord', how: 'manual', owner: 'Servicedesk', plan: [FROM, 0], act: [FROM, 16], note: 'Teammailbox waarop Joost gemachtigd was.', cp: 'Neem de mailboxmachtiging op in het wisselticket.', slip: 'Machtiging pas na 16 dagen ingetrokken.' }
+    ]
+  },
+  leaver: {
+    tab: 'Gaat weg', sub: 'Laatste werkdag', min: -14, max: 21, date: '2027-01-29', zero: 'Laatste werkdag',
+    title: 'Anke, planner, laatste werkdag vrijdag 29 januari',
+    story: 'Anke vertrekt na haar laatste werkdag. Alle toegang moet binnen één dag vervallen; apparatuur komt binnen vijf dagen terug.',
+    rows: [
+      { n: 'HR-dossier', how: 'auto', owner: 'HR', plan: [FROM, 0], act: [FROM, 0], note: 'Einddatum van het dienstverband is de trigger.', cp: 'Controleer dat de einddatum een week eerder is ingevuld.' },
+      { n: 'Account', how: 'auto', owner: 'IAM', plan: [FROM, 1], act: [FROM, 1], note: 'Wordt automatisch uitgeschakeld op de einddatum plus één dag.', cp: 'Geen afwijkingen bekend.' },
+      { n: 'E-mail', how: 'auto', owner: 'IAM', plan: [FROM, 1], act: [FROM, 1], note: 'Mailbox volgt het account; een afwezigheidsbericht blijft dertig dagen.', cp: 'Geen afwijkingen bekend.' },
+      { n: 'Roosterportaal', how: 'auto', owner: 'FAB', plan: [FROM, 1], act: [FROM, 19], note: 'Planningsaccount staat los van het hoofdaccount.', cp: 'Koppel het portaal aan de uitdienstmelding van HR.', slip: 'Eigen login bleef actief tot de maandelijkse opschoning op dag 19.' },
+      { n: 'ECD, planner', how: 'manual', owner: 'FAB', plan: [FROM, 0], act: [FROM, OPEN], note: 'Rol wordt na melding door de leidinggevende ingetrokken.', cp: 'Laat HR de intrekking automatisch aanvragen.', slip: 'Geen aanvraag gedaan; account en rol nog actief.' },
+      { n: 'Laptop in bezit', kind: 'apparatuur', how: 'manual', owner: 'Servicedesk', plan: [FROM, 5], act: [FROM, 9], note: 'Apparatuurbezit staat los van account- en fysieke toegang. In deze demo mag de laptop tot dag 5 in bezit blijven.', cp: 'Leg inlevering vast; bepaal apart wanneer digitale toegang en sessies moeten stoppen.', slip: 'Laptop pas op dag 9 ingeleverd.' },
+      { n: 'Toegangspas actief', kind: 'fysieke toegang', how: 'manual', owner: 'Facilitair beheer', plan: [FROM, 0], act: [FROM, 9], note: 'Fysieke toegang hoort volgens deze demo-afspraak vanaf de dag na de laatste werkdag gestopt te zijn.', cp: 'Controleer blokkering in het passysteem los van het terugbrengen van de laptop; de bevoegde rol stelt het eindmoment vast.', slip: 'Pas bleef actief tot dag 9; apart herstel en controle nodig.' },
+      { n: 'Gedeelde teamschijf', how: 'auto', owner: 'IAM', plan: [FROM, 0], act: [FROM, 0], note: 'Groepslidmaatschap vervalt met het account.', cp: 'Geen afwijkingen bekend.' }
+    ]
+  }
+};
+const META = { version: 'demo v2', source: 'Synthetische HR-trigger, IAM- en applicatiegebeurtenissen', review: 'Lokale termijnen en goedkeuring niet vastgesteld' };
+S.joiner.rows.splice(3, 1,
+  { n: 'Laptop in bezit', kind: 'apparatuur', how: 'manual', owner: 'Servicedesk', plan: [-2, OPEN], act: [1, OPEN], note: 'Apparatuurlevering apart van fysieke en digitale toegang.', cp: 'Leg levering en bezit vast; controleer login afzonderlijk.', slip: 'Laptop geleverd op dag 1.' },
+  { n: 'Toegangspas actief', kind: 'fysieke toegang', how: 'manual', owner: 'Facilitair beheer', plan: [0, OPEN], act: [0, OPEN], note: 'Fysieke toegang vanaf eerste werkdag volgens deze demo-afspraak.', cp: 'Laat de bevoegde rol locatie-/deurenscope en startmoment vaststellen.' }
+);
+Object.entries(S).forEach(([key, s]) => s.rows.forEach(r => {
+  if (key === 'mover' && r.n.includes('Noord')) r.plan[1] = -1;
+  if (key === 'leaver' && ['Account','E-mail','Roosterportaal'].includes(r.n)) { r.plan[1] = 0; if (r.act[1] === 1) r.act[1] = 0; }
+  r.kind ||= r.n.startsWith('HR') ? 'HR-registratie, geen toegangsrecht' : 'applicatietoegang';
+  r.scope = r.kind === 'apparatuur' ? 'Apparaatbezit; geen digitale toegang' : r.kind === 'fysieke toegang' ? 'Locatie-/deurenscope lokaal vaststellen' : r.n.includes('Noord') ? 'Alleen team Noord; cliëntscope apart controleren' : r.n.includes('Zuid') ? 'Alleen team Zuid; cliëntscope apart controleren' : 'Team-/cliëntscope of accountfunctie lokaal vaststellen';
+  r.approval = 'Bevoegde proces-/autorisatieverantwoordelijke moet noodzakelijkheid en termijnen goedkeuren; uitvoerder is niet automatisch beslisser';
+  r.check = `Synthetische gebeurtenisreeks rond ${s.date}, ${META.version}; geen bevoegde feitelijke controle uitgevoerd. Test login, sessies, scope en intrekking apart.`;
+}));
+const $ = s => document.querySelector(s);
+let key = 'joiner', real = false, day = 0, selRow = 0;
+const cur = () => S[key];
+const fmt = (d, o) => { const x = new Date(cur().date + 'T12:00:00'); x.setDate(x.getDate() + d); return x.toLocaleDateString('nl-NL', o || { day: 'numeric', month: 'short' }); };
+const sgn = d => d > 0 ? '+' + d : d < 0 ? '−' + Math.abs(d) : '0';
+const iv = (r, d, p) => d >= r[p][0] && d <= r[p][1];
+const cell = (r, d) => {
+  const plan = iv(r, d, 'plan'), act = real ? iv(r, d, 'act') : plan;
+  return plan && act ? 'on' : act ? 'over' : plan ? 'late' : 'off';
+};
+function rowState(r) {
+  if (!real) return { cls: 'ok', txt: r.how === 'auto' ? 'Automatisch' : 'Handmatig' };
+  const p = r.plan, a = r.act;
+  if (a[1] > p[1]) return { cls: 'over', txt: a[1] === OPEN ? 'Niet ingetrokken' : `${a[1] - p[1]} dagen te lang actief` };
+  if (a[0] > p[0]) return { cls: 'late', txt: `${a[0] - p[0]} ${a[0] - p[0] === 1 ? 'dag' : 'dagen'} te laat` };
+  return { cls: 'ok', txt: 'Op tijd' };
+}
+function build() {
+  const s = cur(), n = s.max - s.min + 1;
+  $('#who').innerHTML = Object.entries(S).map(([k, v]) => `<button type="button" data-k="${k}" aria-pressed="${k === key}"><b>${v.tab}</b><span>${v.sub}</span></button>`).join('');
+  const roll = $('#roll'); roll.style.setProperty('--n', n);
+  const axis = Array.from({ length: n }, (_, i) => { const d = s.min + i; const show = d % 7 === 0; return `<div class="c${d === 0 ? ' zero' : ''}" data-d="${d}">${show ? `<b>${sgn(d)}</b>${fmt(d)}` : ''}</div>`; }).join('');
+  roll.innerHTML = `<div class="row head"><div class="name">${s.zero}: ${fmt(0, { day: 'numeric', month: 'long' })}</div><div class="cells axis">${axis}</div><div class="state">${real ? 'Afwijking' : 'Aanpak'}</div></div>` +
+    s.rows.map((r, i) => {
+      const cs = Array.from({ length: n }, (_, k) => { const d = s.min + k; const c = cell(r, d); return `<div class="c ${c}${c === 'on' && r.how === 'manual' ? ' man' : ''}${d === 0 ? ' zero' : ''}" data-d="${d}"></div>`; }).join('');
+      const st = rowState(r);
+      return `<div class="row" data-i="${i}"><button type="button" class="name" data-i="${i}" aria-pressed="${i === selRow}"><b>${r.n}</b><small>${r.owner}</small></button><div class="cells" data-i="${i}">${cs}</div><div class="state ${st.cls}">${st.txt}</div></div>`;
+    }).join('');
+  const inp = $('#day'); inp.min = s.min; inp.max = s.max; inp.value = day = Math.min(Math.max(day, s.min), s.max);
+  $('#v-plan').setAttribute('aria-pressed', !real); $('#v-real').setAttribute('aria-pressed', real);
+  update();
+}
+function update() {
+  const s = cur();
+  document.querySelectorAll('.c.now').forEach(c => c.classList.remove('now'));
+  document.querySelectorAll(`.c[data-d="${day}"]`).forEach(c => c.classList.add('now'));
+  document.querySelectorAll('.row[data-i]').forEach(r => { r.classList.toggle('sel', +r.dataset.i === selRow); r.querySelector('.name').setAttribute('aria-pressed', +r.dataset.i === selRow); });
+  const label = day === 0 ? s.zero.toLowerCase() : `dag ${sgn(day)}`;
+  $('#dayout').textContent = `${fmt(day, { weekday: 'short', day: 'numeric', month: 'short' })} (${label})`;
+  $('#daylabel').textContent = 'Dag ' + sgn(day);
+  $('#day').setAttribute('aria-valuetext', $('#dayout').textContent);
+  const cs = s.rows.map(r => ({ r, c: cell(r, day) }));
+  const on = cs.filter(x => x.c === 'on'), late = cs.filter(x => x.c === 'late'), over = cs.filter(x => x.c === 'over');
+  const li = (x, t, cls) => `<li><span class="tag ${cls}">${t}</span><span>${x.r.n}${real && x.r.slip && cls ? ` — ${x.r.slip}` : ''}</span></li>`;
+  const planned = cs.filter(x => iv(x.r, day, 'plan')).length;
+  $('#nowpanel').innerHTML = `<h2>${s.title}</h2><p>${s.story}</p>
+    <p style="margin-top:12px"><b>Op ${fmt(day, { day: 'numeric', month: 'long' })}:</b> ${on.length + over.length} van ${s.rows.length} registratie-, toegangs- of bezitsafspraken actief in ${real ? 'het gesimuleerde verloop' : 'het model'}; ${planned} horen volgens deze demo actief te zijn${real ? `. ${late.length} te laat, ${over.length} te lang.` : '.'} Dit is geen verklaring van feitelijke toegangsrechten.</p>
+    <ul class="now-list">${late.map(x => li(x, 'te laat', 'late')).join('')}${over.map(x => li(x, 'te lang', 'over')).join('')}${on.map(x => li(x, x.r.how === 'auto' ? 'actief' : 'actief, handmatig', '')).join('')}</ul>`;
+  const r = s.rows[selRow], st = rowState(r);
+  $('#rowpanel').innerHTML = `<h2>${r.n}</h2><p>${r.note}</p>
+    <dl><dt>Categorie</dt><dd>${r.kind}</dd><dt>Uitvoering (demo)</dt><dd>${r.how === 'auto' ? 'Automatische voorbeeldstap; trigger en resultaat apart controleren' : 'Handmatige voorbeeldstap na bevoegde goedkeuring'}</dd>
+    <dt>Uitvoerder</dt><dd>${r.owner}</dd><dt>Scope</dt><dd>${r.scope}</dd><dt>Noodzakelijkheid / goedkeuring</dt><dd>${r.approval}</dd>
+    <dt>Modelafspraak</dt><dd>${span(r.plan)}</dd><dt>Gesimuleerd feitelijk</dt><dd>${span(r.act)}${r.slip ? `. ${r.slip}` : ''}</dd>
+    <dt>Bewijs / controle</dt><dd>${r.check}</dd><dt>Controlepunt</dt><dd>${r.cp}</dd><dt>Lokale toets</dt><dd>Tijdelijke medewerkers, meerdere teamrollen en externe portalen toetsen waar relevant. FAB beheert niet vanzelf het achterliggende platform.</dd></dl>
+    <button class="btn" id="copy" type="button">Kopieer controlelijst</button><span id="status" role="status"></span>`;
+}
+const span = p => `${p[0] === FROM ? 'al actief' : 'vanaf begin dag ' + sgn(p[0])} ${p[1] === OPEN ? 'zonder getoond eindmoment; lokaal herbeoordelen' : 'tot en met dag ' + sgn(p[1]) + ', stopt aan begin dag ' + sgn(p[1] + 1)}`;
+function list() {
+  const s = cur();
+  return [`Controlelijst — fictieve ${META.version}: ${s.title}`, `Bron: ${META.source}; revisie 2026-10-01; export ${new Date().toISOString()}`, META.review, `${s.zero}: ${fmt(0, { day: 'numeric', month: 'long', year: 'numeric' })}`, 'Inclusieve dagintervallen: laatste actieve dag getoond, stoppen aan begin volgende dag. Geen feitelijke toegangsverklaring.', '',
+    ...s.rows.map(r => `- ${r.n} [${r.kind}]; uitvoerder ${r.owner}; model ${span(r.plan)}; gesimuleerd feitelijk ${span(r.act)}; scope ${r.scope}; goedkeuring ${r.approval}; bewijs ${r.check}; controle ${r.cp}${r.slip ? '; afwijking ' + r.slip : ''}`)].join('\n');
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button'), c = e.target.closest('.c[data-d]');
+  if (b && b.dataset.k) { key = b.dataset.k; selRow = 0; day = 0; build(); }
+  else if (b && b.id === 'v-plan') { real = false; build(); }
+  else if (b && b.id === 'v-real') { real = true; build(); }
+  else if (b && b.classList.contains('name')) { selRow = +b.dataset.i; update(); }
+  else if (b && b.id === 'copy') {
+    const st = $('#status'), t = list();
+    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(t); st.textContent = 'Gekopieerd.'; }
+    catch { const a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); try { document.execCommand('copy'); st.textContent = 'Gekopieerd.'; } catch { st.textContent = 'Kopiëren lukt niet. Selecteer de tekst handmatig.'; } a.remove(); }
+  } else if (c) {
+    day = +c.dataset.d; const rw = c.closest('.cells[data-i]'); if (rw) selRow = +rw.dataset.i;
+    $('#day').value = day; update();
+  }
+});
+$('#day').addEventListener('input', e => { day = +e.target.value; update(); });
+build();
+</script>
+<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welke toegang is te laat beschikbaar of te lang actief?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB met HR, IAM en rol-/proceseigenaren bij instroom, teamwisseling en vertrek. <strong>Uitkomst:</strong> controles en goedgekeurde uitzonderingen per HR-trigger → IAM → applicatie, inclusief scope en afzonderlijke eindmomenten voor apparatuur, fysieke toegang en applicatierechten.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische gebeurtenissen en modeltermijnen, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. HR beheert de personeelsbron, de bevoegde roleigenaar keurt rechten goed, IAM/applicatiebeheer voert uit; FAB controleert en bewaakt opvolging. Geldigheid: demonstratie, geen feitelijke controle of lokaal vastgesteld overgangsbeleid.</p>
+  <nav aria-label="JML-views"><a href="fab-autorisatielandschap.html">Model en feitelijke toegang vergelijken</a> · <a href="fab-releaseatelier.html#test-coverage">Negatieve autorisatietests</a></nav>
+  <p>Een tijdvak bewijst geen feitelijke scope of intrekking. Leg bron, versie, controledatum, beoordelaar en uitkomst vast; onbekend is niet groen. Toets tijdelijke medewerkers, meerdere teamrollen en externe portalen waar relevant. Ontbrekende toegang kan zorgondersteuning stilleggen; te ruime toegang kan privacy schaden. Geen automatische verbreding zonder begrensde, bevoegde goedkeuring.</p>
+  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie vooraf aanwijzen; herzie bij HR-, rol- of proceswijziging. Leg echte acties in de bestaande IAM-/autorisatieregistratie vast, geen tweede administratie. Gebruik geen echte account- of cliëntgegevens in deze HTML. Vergelijk met de huidige JML-checklist op juiste eindmomenten en gemiste toegang. Technische werking bewijst geen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

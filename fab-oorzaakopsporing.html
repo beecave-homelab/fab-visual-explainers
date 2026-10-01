@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Oorzaakopsporing — onderzoek hypothesen met bewijs</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --paper: #fbfbf6;
+  --grid: #d3deee;
+  --ink: #1d2b84;
+  --ink-soft: #4b5799;
+  --red: #d11f48;
+  --mark: #fff06a;
+  --ok: #1d2b84;
+  --display: "American Typewriter", "Courier New", Courier, serif;
+  --body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); font: 16px/1.5 var(--body); background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; background-position: -1px -1px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+[hidden] { display: none !important; }
+h1, h2, h3, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+.skip { position: fixed; top: -100px; left: 16px; padding: 12px; background: white; z-index: 20; }
+.skip:focus { top: 16px; }
+.page { max-width: 1540px; margin: auto; padding: 34px 44px 26px; }
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 40px; align-items: start; margin-bottom: 26px; }
+h1 { font: 700 clamp(34px, 4.6vw, 62px)/1.06 var(--display); letter-spacing: -.02em; max-width: 16ch; background: var(--paper); display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 8px 0 0; }
+.top .lead { margin-top: 16px; max-width: 54ch; background: var(--paper); padding: 4px 8px 4px 0; font-size: 17px; display: inline-block; }
+.dossier { background: #fff; border: 2px solid var(--ink); padding: 16px 20px 18px; transform: rotate(.6deg); box-shadow: 4px 4px 0 var(--ink); }
+.dossier b { font: 700 18px/1.3 var(--display); display: block; margin-bottom: 6px; }
+.dossier p { font-size: 15px; }
+.dossier dl { display: grid; grid-template-columns: 90px 1fr; gap: 3px 10px; margin: 10px 0 0; font-size: 14px; }
+.dossier dt { color: var(--ink-soft); } .dossier dd { margin: 0; }
+.sheet-wrap { overflow-x: auto; background: #fff; border: 2px solid var(--ink); }
+table.sheet { border-collapse: collapse; width: 100%; min-width: 1020px; table-layout: fixed; }
+.sheet th, .sheet td { border: 1px solid var(--ink-soft); padding: 0; vertical-align: top; }
+.sheet thead th { border-bottom: 2px solid var(--ink); background: #fff; vertical-align: bottom; }
+.sheet thead th:first-child { width: 360px; padding: 14px 18px; text-align: left; font: 400 14px/1.45 var(--body); color: var(--ink-soft); vertical-align: middle; }
+.sheet thead th.h { padding: 12px 10px 12px; text-align: left; font: 700 14px/1.3 var(--display); }
+.h .st { display: block; font: 400 12.5px/1.3 var(--body); margin-top: 5px; color: var(--ink-soft); }
+.h.out { color: #8c93bb; text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; background: #f4f4f4; }
+.h.out .st { text-decoration: none; color: var(--red); display: block; }
+.h.win { background: var(--mark); }
+.h.win .st { color: var(--ink); font-weight: 700; }
+.sheet tbody th { text-align: left; padding: 12px 18px 14px; font-weight: 400; background: #fff; }
+.q { font-weight: 700; font-size: 15.5px; line-height: 1.35; }
+.meta { font-size: 13px; color: var(--ink-soft); margin: 3px 0 9px; }
+.ans { display: flex; gap: 6px; }
+.ans button { border: 2px solid var(--ink); background: #fff; border-radius: 3px; padding: 4px 16px; min-height: 38px; font-weight: 700; font-size: 14.5px; }
+.ans button:hover { background: #eef0fb; }
+.ans button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+tr.next th, tr.next td { background: var(--mark); }
+tr.next .q::after { content: "  Volgende check"; font: 700 12px/1 var(--body); background: var(--ink); color: #fff; padding: 2px 7px; border-radius: 2px; margin-left: 6px; white-space: nowrap; }
+tr.done th { background: #f3f4fb; }
+.sheet td { text-align: center; vertical-align: middle; height: 84px; }
+.sheet td.out { background: #f4f4f4; }
+.sheet td.out .split, .sheet td.out .mk { opacity: .35; }
+.split { display: inline-block; position: relative; width: 34px; height: 34px; border: 2px solid var(--ink); background: #fff; }
+.split i { position: absolute; inset: 0; }
+.split .a { clip-path: polygon(0 0, 100% 0, 0 100%); }
+.split .b { clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.split .k { background: var(--ink); }
+.split::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-soft) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)); }
+.mk { font: 700 30px/1 var(--display); }
+.mk.ok { color: var(--ok); } .mk.no { color: var(--red); }
+.reading { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; margin-top: 26px; align-items: start; }
+.card { background: #fff; border: 2px solid var(--ink); padding: 18px 22px 22px; }
+.card h2 { font: 700 24px/1.2 var(--display); margin-bottom: 10px; }
+.card p { max-width: 64ch; font-size: 16px; }
+.card h3 { font: 700 15px/1.3 var(--display); margin: 16px 0 6px; padding-top: 12px; border-top: 1px dashed var(--ink-soft); }
+.win-box { background: var(--mark); padding: 10px 14px; margin-top: 12px; font-weight: 700; }
+.warn-box { background: #ffe3e8; border-left: 4px solid var(--red); padding: 10px 14px; margin-top: 12px; }
+.rem li { padding: 6px 0; border-bottom: 1px dotted var(--ink-soft); font-size: 15.5px; }
+.rem li b { font-family: var(--display); }
+.tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 18px; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; padding: 8px 16px; min-height: 42px; font-weight: 700; border-radius: 3px; }
+.btn.ghost { background: #fff; color: var(--ink); }
+.btn:disabled { opacity: .4; cursor: default; }
+#status { font-size: 14px; color: var(--ink-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 12px 4px 0; font-size: 14px; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; background: var(--paper); padding: 2px 6px; }
+.legend .split { width: 22px; height: 22px; border-width: 1.5px; }
+footer { padding: 24px 0 6px; font-size: 13.5px; max-width: 90ch; }
+footer span { background: var(--paper); }
+@media (max-width: 1100px) { .top, .reading { grid-template-columns: 1fr; } .dossier { transform: none; } }
+@media (max-width: 700px) { .page { padding: 18px 12px; } }
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff; font-size: 11px; }
+  .page { padding: 0; max-width: none; }
+  .skip, .tools, .ans button[aria-pressed="false"], footer, .legend { display: none; }
+  .top { grid-template-columns: 1fr 320px; margin-bottom: 8px; gap: 20px; }
+  h1 { font-size: 28px; } .dossier { transform: none; box-shadow: none; padding: 8px 12px; }
+  .sheet-wrap { overflow: visible; } table.sheet { min-width: 0; }
+  .sheet thead th:first-child { width: 250px; padding: 6px 10px; }
+  .sheet tbody th { padding: 5px 10px; } .sheet td { height: 44px; }
+  .meta { margin-bottom: 3px; } .reading { margin-top: 10px; gap: 14px; } .card { padding: 8px 12px; }
+  .card h2 { font-size: 16px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+.ans { flex-wrap: wrap; }
+input, select { font: inherit; color: inherit; max-width: 100%; border: 1px solid var(--ink-soft); background: #fff; padding: 5px; }
+.meta input { width: 100%; }
+.card form label { display: grid; gap: 4px; margin-top: 8px; }
+.card form input, .card form select { width: 100%; }
+@media print { .ans button, #assessment button { display: none; } .card, .sheet tr { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#reading">Naar de stand van zaken</a>
+<div class="page">
+  <header class="top">
+    <div>
+      <h1>Onderzoek hypothesen met bewijs</h1><br>
+      <p class="lead">Antwoorden geven aanwijzingen, geen automatische uitsluitingen. Leg bron, controledatum en beoordelaar vast. Bevestig een hypothese vóór een herstelactie; meerdere oorzaken kunnen tegelijk spelen.</p>
+    </div>
+    <aside class="dossier" aria-label="Melding">
+      <b>Diensten van volgende week ontbreken</b>
+      <p>Verpleegkundigen zien in het fictieve roosterportaal alleen deze week.</p>
+      <dl><dt>Melding</dt><dd>INC-26-4471, maandag 2 november 2026</dd><dt>Omvang</dt><dd>Vier teams, 38 medewerkers</dd><dt>Zorgimpact</dt><dd>Nog te beoordelen door de proceseigenaar. Bij uitval: volg het goedgekeurde lokale continuïteitsplan; deze demo geeft geen noodprotocol.</dd><dt>Bron</dt><dd>Synthetische melding, demo v2, revisie 1 oktober 2026</dd></dl>
+    </aside>
+  </header>
+
+  <section class="reading" id="reading" style="margin:0 0 26px" aria-live="polite">
+    <div class="card" id="verdict"></div>
+    <div class="card" id="rest"></div>
+  </section>
+  <div class="sheet-wrap"><table class="sheet" id="sheet"></table></div>
+  <div class="legend" aria-label="Legenda">
+    <span><b class="mk" style="font-size:20px">+</b>aanwijzing voor nader onderzoek</span>
+    <span><b class="mk" style="font-size:20px">?</b>onbekend of geen aanwijzing; niet uitgesloten</span>
+  </div>
+
+  <footer><span>Fictieve demo, geen diagnose of herstelbevoegdheid. Een expliciete beoordeling geldt alleen voor het genoemde bewijs en moment. Wijzigingen in antwoorden of bewijs maken eerdere beoordelingen ongeldig. Invoer blijft in deze browsersessie; leg bevindingen vast in de melding. Gebruik geen echte cliëntgegevens of volledige logs.</span></footer>
+</div>
+
+<script>
+const H = [
+  { id: 'A', t: 'Nachtelijke synchronisatie mislukt', now: 'Controleer taaklog, berichtreferenties en eindverwerking. Herverwerken mag pas na akkoord en controle op dubbele verwerking.', who: 'FAB met integratiebeheer en leverancier' },
+  { id: 'B', t: 'Onbekende teamcode', now: 'Vergelijk de afgewezen code met de goedgekeurde mapping en geldigheidsdatum. Laat een correctie en eventuele herverwerking afzonderlijk goedkeuren.', who: 'FAB met ketenbeheer' },
+  { id: 'C', t: 'Rol of recht ontbreekt', now: 'Toets feitelijke toegang en team-/cliëntscope aan het goedgekeurde rechtenmodel. Een vergelijking met een collega is geen toestemming om diens rechten over te nemen.', who: 'FAB met IAM en autorisatieverantwoordelijke' },
+  { id: 'D', t: 'Fout door release 2026.4', now: 'Reproduceer de afwijking in een veilige omgeving en laat de leverancier het verband met de release bevestigen. Gebruik alleen een goedgekeurde workaround.', who: 'Releasemanager met leverancier' },
+  { id: 'E', t: 'Storing bij de leverancier', now: 'Controleer actuele status én de getroffen dienst met de leverancier. Geen storingsmelding betekent niet dat er geen storing is. Volg bij zorgimpact het lokale continuïteitsplan.', who: 'Leveranciersmanager met proceseigenaar' },
+  { id: 'F', t: 'Probleem in browser of apparaat', now: 'Vergelijk dezelfde handeling en hetzelfde account op een ander ondersteund apparaat. Leg het reproduceerbare verschil vast voordat instellingen worden gewijzigd.', who: 'Servicedesk' },
+  { id: 'G', t: 'Rooster nog niet gepubliceerd', now: 'Laat Planning de publicatiestatus en het bereik controleren. Publiceren volgt pas na de afgesproken controle en goedkeuring.', who: 'Planning' }
+];
+const C = [
+  { id: 'c1', q: 'Heeft ook een collega uit hetzelfde team het probleem?', min: 2, who: 'Teamleider', y: 'ABCDEG', n: 'CF', tip: 'Een gedeelde verkeerde rol blijft mogelijk. Vergelijk ook scope en feitelijke toekenning.' },
+  { id: 'c2', q: 'Is de synchronisatie van vannacht technisch geslaagd?', min: 3, who: 'FAB', y: 'BCDEFG', n: 'AE', tip: 'Technisch geslaagd bewijst niet dat elk bericht inhoudelijk is verwerkt.' },
+  { id: 'c3', q: 'Meldt de leverancier een storing?', min: 1, who: 'FAB', y: 'E', n: '', tip: 'Een ontbrekende statusmelding sluit een storing niet uit; controleer actualiteit en dienst.' },
+  { id: 'c4', q: 'Staat het rooster gepubliceerd in de planning?', min: 2, who: 'Planner', y: 'ABCDEF', n: 'G', tip: 'Controleer het juiste team en tijdvak; publicatie bewijst geen beschikbaarheid voor ieder account.' },
+  { id: 'c5', q: 'Gaat het alleen om teams met een nieuwe teamcode?', min: 2, who: 'FAB', y: 'BC', n: 'ADEFG', tip: 'Een nieuwe teamcode kan ook toegang of een koppeling raken.' },
+  { id: 'c6', q: 'Verdwijnt het probleem in een privévenster of op een ander apparaat?', min: 3, who: 'Servicedesk', y: 'F', n: 'ABCDEG', tip: 'Gebruik hetzelfde account en dezelfde handeling; dit is een aanwijzing, geen uitsluiting.' },
+  { id: 'c7', q: 'Heeft het account dezelfde modelrol als een collega die het wel ziet?', min: 4, who: 'FAB', y: '', n: 'C', tip: 'Dezelfde rolnaam kan andere scope, tijdelijke rechten of effectieve toegang hebben.' },
+  { id: 'c8', q: 'Begon het probleem na de release van 28 oktober?', min: 1, who: 'Releasemanager', y: 'BD', n: 'ACEFG', tip: 'Een tijdsverband alleen toont geen oorzaak aan; meerdere oorzaken kunnen samen voorkomen.' }
+];
+const $ = s => document.querySelector(s);
+const escape = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const labels = { y: 'Ja', n: 'Nee', u: 'Onbekend / niet gecontroleerd' };
+let ans = {}, hist = [], evidence = {}, assessments = {}, selected = 'A';
+function state() {
+  const signals = Object.fromEntries(H.map(h => [h.id, C.filter(c => ans[c.id] && ans[c.id] !== 'u' && c[ans[c.id]].includes(h.id))]));
+  return { signals, next: C.filter(c => !ans[c.id]).sort((a, b) => a.min - b.min)[0] };
+}
+const tools = () => `<div class="tools"><button class="btn ghost" id="undo" type="button" ${hist.length ? '' : 'disabled'}>Laatste antwoord ongedaan maken</button><button class="btn ghost" id="reset" type="button">Opnieuw beginnen</button><button class="btn" id="copy" type="button">Kopieer opsporingsnotitie</button><span id="status" role="status"></span></div>`;
+function render() {
+  const { signals, next } = state();
+  $('#sheet').innerHTML = `<thead><tr><th scope="col">Antwoorden geven aanwijzingen. Geen hypothese valt automatisch af.</th>${H.map(h => `<th scope="col" class="h">${h.t}<span class="st">${assessments[h.id] ? assessments[h.id].result : 'Niet bevestigd'} · ${signals[h.id].length} aanwijzingen</span></th>`).join('')}</tr></thead><tbody>${C.map(c => {
+    const a = ans[c.id], ev = evidence[c.id] || {};
+    return `<tr class="${next?.id === c.id ? 'next' : ''}"><th scope="row"><div class="q">${c.q}</div><div class="meta">Ongeveer ${c.min} minuten, door ${c.who}. ${c.tip}</div><div class="ans" role="group" aria-label="Antwoord op: ${c.q}">${Object.entries(labels).map(([key, label]) => `<button type="button" data-c="${c.id}" data-a="${key}" aria-pressed="${a === key}">${label}</button>`).join('')}</div><div class="meta"><label>Bewijsbron / versie <input data-e="${c.id}" data-field="source" value="${escape(ev.source)}" maxlength="240"></label><br><label>Controledatum <input type="date" data-e="${c.id}" data-field="date" value="${escape(ev.date)}"></label><br><label>Beoordelaar <input data-e="${c.id}" data-field="reviewer" value="${escape(ev.reviewer)}" maxlength="120"></label></div></th>${H.map(h => `<td><span class="mk" title="${a && a !== 'u' && c[a].includes(h.id) ? 'Aanwijzing voor nader onderzoek' : 'Geen uitsluiting of bevestiging'}">${a && a !== 'u' && c[a].includes(h.id) ? '+' : '?'}</span></td>`).join('')}</tr>`;
+  }).join('')}</tbody>`;
+  const h = H.find(x => x.id === selected), assessment = assessments[selected];
+  $('#verdict').innerHTML = `<h2>Zeven hypothesen blijven in beeld</h2><p>Meerdere oorzaken kunnen tegelijk spelen. Ook de laatste hypothese moet met bewijs worden bevestigd; het raster bewijst geen diagnose.</p>${next ? `<div class="win-box">Volgende check: ${next.q}</div>` : '<div class="warn-box">Alle checks bekeken. Onderzoek onbekende uitkomsten en voeg zo nodig nieuwe hypothesen toe.</div>'}<h3>${h.t}</h3><p>${h.now}</p><h3>Verantwoordelijke controle</h3><p>${h.who}</p><form id="assessment"><h3>Expliciete beoordeling van deze hypothese</h3><p>Gebruik alleen synthetische referenties. Uitkomsten blijven in deze browsersessie en moeten in de melding worden vastgelegd.</p><label>Uitkomst <select name="result"><option>Niet bevestigd</option><option>Bevestigd met bewijs</option><option>Uitgesloten met bewijs</option></select></label><br><label>Bewijsbron / versie <input name="source" required maxlength="240"></label><br><label>Controledatum <input name="date" type="date" required></label><br><label>Beoordelaar <input name="reviewer" required maxlength="120"></label><br><button class="btn" type="submit">Leg beoordeling vast</button></form>${assessment ? `<div class="warn-box">${escape(assessment.result)} — ${escape(assessment.source)}, ${escape(assessment.date)}, ${escape(assessment.reviewer)}. Dit is geen toestemming voor een herstelactie.</div>` : ''}${tools()}`;
+  $('#rest').innerHTML = `<h2>Hypothesen en aanwijzingen</h2><ul class="rem">${H.map(h => `<li><button type="button" class="btn ghost" data-h="${h.id}" aria-pressed="${selected === h.id}">${h.t}</button><br>${signals[h.id].length} aanwijzingen; ${escape(assessments[h.id]?.result || 'niet bevestigd')}</li>`).join('')}</ul><p>Geen aanwijzing is geen bewijs van afwezigheid. Bij zorgimpact volgt de goedgekeurde lokale noodwerkwijze, niet een automatisch hersteladvies.</p>`;
+}
+function note() {
+  return ['Opsporingsnotitie — fictieve demo v2, INC-26-4471', 'Bron: synthetische melding en hypothesen; revisie 2026-10-01', `Exportdatum: ${new Date().toISOString()}`, 'Geen automatische uitsluitingen. Meerdere oorzaken mogelijk. Geen toestemming voor herstel.', '', ...C.map(c => {
+    const e = evidence[c.id] || {};
+    return `- ${c.q} ${labels[ans[c.id]] || labels.u}; bron/versie: ${e.source || 'ontbreekt'}; controledatum: ${e.date || 'onbekend'}; beoordelaar: ${e.reviewer || 'onbekend'}`;
+  }), '', ...H.map(h => { const a = assessments[h.id]; return `${h.t}: ${a ? `${a.result}; bron/versie ${a.source}; datum ${a.date}; beoordelaar ${a.reviewer}` : 'Niet bevestigd'}`; })].join('\n');
+}
+document.addEventListener('input', e => {
+  if (e.target.dataset.e) {
+    const id = e.target.dataset.e; evidence[id] ||= {}; evidence[id][e.target.dataset.field] = e.target.value;
+    if (Object.keys(assessments).length) {
+      assessments = {};
+      document.querySelectorAll('.h .st').forEach((el, n) => el.textContent = `Niet bevestigd · ${state().signals[H[n].id].length} aanwijzingen`);
+      $('#status').textContent = 'Bewijs gewijzigd: eerdere beoordelingen zijn ongeldig. Selecteer een hypothese opnieuw.';
+      $('#verdict .warn-box')?.remove();
+      $('#rest').querySelectorAll('.rem li').forEach((el, n) => { el.lastChild.textContent = `${state().signals[H[n].id].length} aanwijzingen; niet bevestigd`; });
+    }
+  }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'assessment') return;
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  if (![data.source, data.date, data.reviewer].every(v => v.trim())) return;
+  assessments[selected] = data; render();
+});
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.c) {
+    const id = b.dataset.c;
+    if (ans[id] === b.dataset.a) { delete ans[id]; hist = hist.filter(x => x !== id); } else { if (!ans[id]) hist.push(id); ans[id] = b.dataset.a; }
+    assessments = {}; render(); document.querySelector(`button[data-c="${id}"][data-a="${b.dataset.a}"]`)?.focus({ preventScroll: true });
+  } else if (b.dataset.h) { selected = b.dataset.h; render(); }
+  else if (b.id === 'undo') { delete ans[hist.pop()]; assessments = {}; render(); }
+  else if (b.id === 'reset') { ans = {}; hist = []; evidence = {}; assessments = {}; selected = 'A'; render(); }
+  else if (b.id === 'copy') {
+    const text = note();
+    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(text); $('#status').textContent = 'Gekopieerd.'; }
+    catch { let a = $('#manualCopy'); if (!a) { a = document.createElement('textarea'); a.id = 'manualCopy'; a.readOnly = true; a.setAttribute('aria-label', 'Opsporingsnotitie om handmatig te kopiëren'); a.style.width = '100%'; a.rows = 8; $('#verdict').append(a); } a.value = text; a.focus(); a.select(); $('#status').textContent = 'Automatisch kopiëren lukt niet. Kopieer de geselecteerde notitie handmatig.'; }
+  }
+});
+render();
+</script>
+<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welke hypothese onderzoeken we, en wat is met bewijs bevestigd?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB met ICT/leverancier en proceseigenaar tijdens incidentanalyse. <strong>Uitkomst:</strong> gedateerde controles, bewijs, onzekerheden en veilige volgende onderzoekstap in de bestaande melding INC-26-4471. Een resterende hypothese is geen diagnose of toestemming voor herstel.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische melding en hypothesen, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. FAB onderzoekt en adviseert; bevoegde uitvoerders herstellen; proceseigenaar beoordeelt zorgimpact en hervatting. Geldigheid: demonstratie, niet lokaal gevalideerd. Onbekend blijft onbekend; meerdere oorzaken kunnen tegelijk spelen.</p>
+  <nav aria-label="Diagnoseviews"><a href="incident-onepager.html#continuity">Incidentingang en directe continuïteitsroute</a> · <a href="fab-serviceradar.html">Analyseperspectieven</a> · <a href="fab-ketenkaart.html">Ketencontrole</a></nav>
+  <p>Leg bron, versie, controledatum, beoordelaar en uitkomst in de melding vast. Wijzigingen in bewijs vragen herbeoordeling; een antwoordknop voert geen controle uit. Geen leveranciermelding sluit een storing niet uit. Rechten vergelijken geeft geen toestemming om toegang over te nemen. Bij zorguitval start het goedgekeurde continuïteitsproces naast de analyse.</p>
+  <p><strong>Onderhoud en toelating:</strong> wijs eerst bronhouder en concrete vervolgactie aan; herzie bij kennis-, proces- of systeemwijziging. Alleen synthetische referenties invoeren, geen cliëntgegevens of volledige logs. Invoer verdwijnt bij herladen; echte bevindingen blijven in de melding, geen tweede administratie. Vergelijk met de huidige diagnosechecklist op onterechte uitsluitingen en onderhoudslast. Gebruikerswaarde is nog niet bewezen.</p>
+</section>
+</body>
+</html>

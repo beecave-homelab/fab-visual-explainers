@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Beheerbaarheid Scan</title>
+<style>
+  :root {
+    --ink: #15232a;
+    --muted: #5c6c73;
+    --paper: #edf3f5;
+    --surface: #f9fbfc;
+    --line: #c8d5da;
+    --blue: #205b73;
+    --blue-soft: #dceaf0;
+    --ready: #25806d;
+    --attention: #976219;
+    --blocker: #b94e4c;
+    --unknown: #7a8a91;
+    --shadow: 0 18px 48px rgba(27, 53, 63, .10);
+    --radius: 18px;
+    --display: "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+    --body: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(32,91,115,.09), transparent 28rem),
+      linear-gradient(180deg, #f6f9fa 0, var(--paper) 45%, #e8eff1 100%);
+    color: var(--ink);
+    font-family: var(--body);
+  }
+
+  button, input { font: inherit; }
+  button { color: inherit; }
+  button:focus-visible, [tabindex]:focus-visible, details summary:focus-visible {
+    outline: 3px solid rgba(32,91,115,.35);
+    outline-offset: 3px;
+  }
+
+  .page {
+    width: min(1500px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 40px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 22px;
+  }
+
+  .heading { max-width: 840px; }
+  .context {
+    margin: 0 0 8px;
+    color: var(--blue);
+    font-size: .9rem;
+    font-weight: 700;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(2.7rem, 6vw, 5.4rem);
+    line-height: .92;
+    letter-spacing: -.055em;
+    font-weight: 700;
+    max-width: 12ch;
+  }
+  .lede {
+    max-width: 70ch;
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .btn {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.72);
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: #9fb4bc; background: white; }
+  .btn.primary { background: var(--ink); color: white; border-color: var(--ink); }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(500px, 1.15fr) minmax(420px, .85fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .panel {
+    background: rgba(249,251,252,.92);
+    border: 1px solid rgba(135,158,167,.38);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .overview {
+    min-height: 700px;
+    padding: 26px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+  }
+
+  .overview-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: start;
+  }
+  .overview h2, .detail h2 { margin: 0; font-size: 1.3rem; }
+  .overview p, .detail p { color: var(--muted); line-height: 1.55; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px 12px;
+    color: var(--muted);
+    font-size: .82rem;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--unknown); }
+  .dot.ready { background: var(--ready); }
+  .dot.attention { background: var(--attention); }
+  .dot.blocker { background: var(--blocker); }
+
+  .ring-wrap {
+    display: grid;
+    place-items: center;
+    min-height: 470px;
+    padding: 12px 0;
+  }
+  .ring-stage {
+    width: min(100%, 560px);
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .ring-stage svg { width: 100%; height: 100%; overflow: visible; }
+  .segment {
+    cursor: pointer;
+    transition: opacity .15s ease, filter .15s ease, transform .15s ease;
+    transform-origin: 50% 50%;
+  }
+  .segment:hover, .segment[aria-current="true"] {
+    filter: drop-shadow(0 6px 12px rgba(23,51,61,.18));
+  }
+  .segment[aria-current="true"] { transform: scale(1.018); }
+  .segment path { stroke: var(--surface); stroke-width: 5; }
+  .segment text {
+    font-family: var(--body);
+    font-weight: 750;
+    font-size: 15px;
+    fill: var(--ink);
+    pointer-events: none;
+  }
+  .segment .small { font-size: 12px; font-weight: 600; fill: var(--muted); }
+
+  .ring-center {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: 43%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    background: #fdfefe;
+    border: 1px solid var(--line);
+    box-shadow: inset 0 0 0 10px rgba(220,234,240,.45), 0 12px 30px rgba(24,55,66,.10);
+    padding: 25px;
+  }
+  .ring-center .kicker { font-weight: 700; color: var(--blue); font-size: .82rem; }
+  .ring-center strong {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--display);
+    font-size: clamp(2.3rem, 5vw, 4.2rem);
+    line-height: 1;
+    letter-spacing: -.055em;
+  }
+  .ring-center .center-status { margin-top: 8px; font-size: .88rem; color: var(--muted); line-height: 1.35; }
+
+  .summary-strip {
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .summary-cell { min-width: 0; }
+  .summary-cell b { display: block; font-family: var(--display); font-size: 1.75rem; letter-spacing: -.03em; }
+  .summary-cell span { color: var(--muted); font-size: .82rem; }
+
+  .detail {
+    min-height: 700px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+  }
+  .detail-head { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .detail-titleline { display: flex; align-items: center; gap: 10px; }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 999px;
+    padding: 7px 10px;
+    font-size: .8rem;
+    font-weight: 750;
+    background: var(--blue-soft);
+  }
+  .status-pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .status-pill.ready { color: var(--ready); background: rgba(37,128,109,.12); }
+  .status-pill.attention { color: #946016; background: rgba(189,124,31,.13); }
+  .status-pill.blocker { color: var(--blocker); background: rgba(185,78,76,.12); }
+
+  .checks { display: grid; gap: 10px; margin-top: 18px; }
+  .check {
+    display: grid;
+    grid-template-columns: 34px minmax(0,1fr) auto;
+    gap: 12px;
+    align-items: start;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255,255,255,.68);
+    cursor: pointer;
+  }
+  .check:hover { background: #fff; }
+  .check.active { border-color: #88a9b7; box-shadow: 0 0 0 3px rgba(32,91,115,.08); }
+  .state-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: white; font-weight: 800; font-size: .82rem;
+    background: var(--unknown);
+  }
+  .state-icon.ready { background: var(--ready); }
+  .state-icon.attention { background: var(--attention); }
+  .state-icon.blocker { background: var(--blocker); }
+  .check-title { font-weight: 750; line-height: 1.35; }
+  .check-note { margin-top: 3px; color: var(--muted); font-size: .86rem; line-height: 1.45; }
+  .evidence { color: var(--blue); font-size: .78rem; font-weight: 700; white-space: nowrap; padding-top: 4px; }
+
+  .inspector {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .inspector-grid { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: end; }
+  .inspector h3 { margin: 0 0 6px; font-size: 1rem; }
+  .inspector p { margin: 0; font-size: .88rem; }
+  .state-buttons { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+  .state-btn {
+    border: 1px solid var(--line);
+    background: white;
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .state-btn[aria-pressed="true"] { color: white; border-color: transparent; }
+  .state-btn[data-state="ready"][aria-pressed="true"] { background: var(--ready); }
+  .state-btn[data-state="attention"][aria-pressed="true"] { background: var(--attention); }
+  .state-btn[data-state="blocker"][aria-pressed="true"] { background: var(--blocker); }
+
+  .note-box {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-left: 4px solid var(--blue);
+    background: rgba(220,234,240,.42);
+    border-radius: 0 10px 10px 0;
+    color: var(--muted);
+    font-size: .88rem;
+    line-height: 1.5;
+  }
+
+  .about {
+    margin-top: 18px;
+    border: 1px solid rgba(135,158,167,.38);
+    background: rgba(249,251,252,.72);
+    border-radius: var(--radius);
+    padding: 0 20px;
+  }
+  .about summary { cursor: pointer; padding: 15px 0; font-weight: 750; }
+  .about .copy { padding: 0 0 17px; max-width: 90ch; color: var(--muted); line-height: 1.6; }
+  .about .copy p { margin: 0 0 10px; }
+
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 24px;
+    transform: translateX(-50%) translateY(14px);
+    background: var(--ink); color: white;
+    padding: 11px 15px; border-radius: 999px;
+    opacity: 0; pointer-events: none;
+    transition: .18s ease;
+    box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    font-size: .86rem; font-weight: 700;
+    z-index: 20;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 1040px) {
+    .workspace { grid-template-columns: 1fr; }
+    .overview, .detail { min-height: auto; }
+    .detail { min-height: 620px; }
+  }
+
+  @media (max-width: 720px) {
+    .page { width: min(100% - 20px, 1500px); padding-top: 18px; }
+    .topbar { display: block; }
+    .actions { justify-content: flex-start; margin-top: 18px; }
+    h1 { font-size: clamp(2.6rem, 14vw, 4.4rem); }
+    .overview, .detail { padding: 18px; border-radius: 14px; }
+    .overview-head { display: block; }
+    .legend { justify-content: flex-start; margin-top: 12px; }
+    .ring-wrap { min-height: 360px; }
+    .segment text { font-size: 12px; }
+    .segment .small { font-size: 10px; }
+    .ring-center { width: 45%; padding: 16px; }
+    .ring-center .kicker { font-size: .72rem; }
+    .ring-center .center-status { font-size: .76rem; }
+    .summary-strip { grid-template-columns: repeat(2, 1fr); }
+    .check { grid-template-columns: 32px 1fr; }
+    .evidence { grid-column: 2; padding-top: 0; }
+    .inspector-grid { grid-template-columns: 1fr; }
+    .state-buttons { justify-content: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+
+  @media print {
+    body { background: white; }
+    .page { width: 100%; padding: 0; }
+    .actions, .inspector, .toast { display: none !important; }
+    .panel, .about { box-shadow: none; break-inside: avoid; background: white; }
+    .workspace { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .overview, .detail { min-height: 0; }
+  }
+  #checkAssessment { display:grid; gap:10px; margin-top:18px; }
+  #checkAssessment label { display:grid; gap:4px; }
+  #checkAssessment input, #checkAssessment select, #copyFallback { width:100%; min-width:0; font:inherit; }
+  .state-icon.unknown, .status-pill.unknown { background:var(--paper); color:var(--muted); }
+  .state-btn[data-state="unknown"][aria-pressed="true"] { background:var(--muted);color:white; }
+  .inspector-grid { grid-template-columns:minmax(0,1fr); }
+  .state-buttons { justify-content:flex-start; }
+  .review-context a { color:inherit; text-underline-offset:3px; }
+  .summary-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  @media(max-width:760px) { .summary-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="topbar">
+    <div class="heading">
+      <p class="context">Beheerbaarheid Scan · voorbeeldcasus cliëntportaalrelease</p>
+      <h1>Kan FAB dit morgen beheren?</h1>
+      <p class="lede">Klik op een deel van de beheerring om te zien wat nog ontbreekt. De scan beoordeelt niet of de oplossing technisch “af” is, maar of functioneel beheer voldoende grip heeft op configuratie, testen, monitoring, ondersteuning en borging.</p>
+    </div>
+    <div class="actions" aria-label="Acties">
+      <button class="btn" id="resetBtn" type="button">Herstel voorbeeld</button>
+      <button class="btn primary" id="copyBtn" type="button">Kopieer samenvatting</button>
+    </div>
+  </header>
+
+  <section class="workspace" aria-label="Beheerbaarheid Scan">
+    <article class="panel overview">
+      <div class="overview-head">
+        <div>
+          <h2>Beheerring</h2>
+          <p>Kies een domein. De kleur volgt automatisch uit de onderliggende controles.</p>
+        </div>
+        <div class="legend" aria-label="Legenda">
+          <span><i class="dot ready"></i>Geaccepteerd</span>
+          <span><i class="dot" style="background:var(--unknown)"></i>Niet getoetst</span>
+          <span><i class="dot attention"></i>Aandacht</span>
+          <span><i class="dot blocker"></i>Blocker</span>
+        </div>
+      </div>
+
+      <div class="ring-wrap">
+        <div class="ring-stage">
+          <svg id="ring" viewBox="0 0 600 600" role="list" aria-label="Klikbare domeinen van de beheerbaarheidsscan">
+<g class="segment" role="button" tabindex="0" aria-label="Configureren: Blocker" aria-current="true" data-id="config">
+      <path d="M 307.539 30.105 A 270 270 0 0 1 554.356 209.428 L 465.802 240.961 A 176 176 0 0 0 304.914 124.069 Z" fill="#b94e4c" fill-opacity="1"></path>
+      <text x="430.49" y="116.40" text-anchor="middle"><tspan x="430.49" dy="0" fill="#ffffff">Configureren</tspan><tspan x="430.49" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
+    </g>
+<g class="segment" role="button" tabindex="0" aria-label="Testen: Aandacht" aria-current="false" data-id="test">
+      <path d="M 559.015 223.768 A 270 270 0 0 1 464.739 513.918 L 407.386 439.443 A 176 176 0 0 0 468.839 250.308 Z" fill="#bd7c1f" fill-opacity=".84"></path>
+      <text x="511.13" y="364.60" text-anchor="middle"><tspan x="511.13" dy="0" fill="#ffffff">Testen</tspan><tspan x="511.13" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
+    </g>
+<g class="segment" role="button" tabindex="0" aria-label="Monitoren: Aandacht" aria-current="false" data-id="monitor">
+      <path d="M 452.541 522.781 A 270 270 0 0 1 147.459 522.781 L 200.566 445.220 A 176 176 0 0 0 399.434 445.220 Z" fill="#bd7c1f" fill-opacity=".84"></path>
+      <text x="300.00" y="518.00" text-anchor="middle"><tspan x="300.00" dy="0" fill="#ffffff">Monitoren</tspan><tspan x="300.00" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
+    </g>
+<g class="segment" role="button" tabindex="0" aria-label="Ondersteunen: Gereed" aria-current="false" data-id="support">
+      <path d="M 135.261 513.918 A 270 270 0 0 1 40.985 223.768 L 131.161 250.308 A 176 176 0 0 0 192.614 439.443 Z" fill="#25806d" fill-opacity=".84"></path>
+      <text x="88.87" y="364.60" text-anchor="middle"><tspan x="88.87" dy="0" fill="#ffffff">Support</tspan><tspan x="88.87" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Gereed</tspan></text>
+    </g>
+<g class="segment" role="button" tabindex="0" aria-label="Borgen: Blocker" aria-current="false" data-id="assure">
+      <path d="M 45.644 209.428 A 270 270 0 0 1 292.461 30.105 L 295.086 124.069 A 176 176 0 0 0 134.198 240.961 Z" fill="#b94e4c" fill-opacity=".84"></path>
+      <text x="169.51" y="116.40" text-anchor="middle"><tspan x="169.51" dy="0" fill="#ffffff">Borgen</tspan><tspan x="169.51" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
+    </g>
+</svg>
+          <div class="ring-center" aria-live="polite">
+            <div>
+              <div class="kicker">Overdrachtsbeeld</div>
+              <strong id="score">0/15</strong>
+              <div class="center-status" id="centerStatus">Overdracht nog niet verantwoord: er zijn blockers.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-strip" aria-label="Samenvatting">
+        <div class="summary-cell"><b id="readyCount">0</b><span>geaccepteerd</span></div>
+        <div class="summary-cell"><b id="attentionCount">5</b><span>aandacht</span></div>
+        <div class="summary-cell"><b id="blockerCount">2</b><span>blockers</span></div>
+        <div class="summary-cell"><b id="unknownCount">8</b><span>niet getoetst</span></div>
+        <div class="summary-cell"><b id="evidenceCount">0</b><span>beoordeeld akkoord</span></div>
+      </div>
+    </article>
+
+    <aside class="panel detail" aria-live="polite">
+      <div class="detail-head">
+        <div class="detail-titleline">
+          <h2 id="domainTitle">Configureren</h2>
+          <span class="status-pill blocker" id="domainStatus">Blocker</span>
+        </div>
+        <p id="domainIntro">Kan FAB de functionele inrichting begrijpen, wijzigen en gecontroleerd terugzetten?</p>
+      </div>
+
+      <div class="checks" id="checks">
+        <div class="check active" tabindex="0" role="button" aria-label="Beheerbare instellingen zijn beschreven. Status Gereed."><div class="state-icon ready" aria-hidden="true">✓</div><div><div class="check-title">Beheerbare instellingen zijn beschreven</div><div class="check-note">Inclusief doel, eigenaar en effect van een wijziging.</div></div><div class="evidence">Config-register</div></div>
+        <div class="check" tabindex="0" role="button" aria-label="Veilige standaardwaarden zijn afgesproken. Status Aandacht."><div class="state-icon attention" aria-hidden="true">!</div><div><div class="check-title">Veilige standaardwaarden zijn afgesproken</div><div class="check-note">FAB weet welke instelling als basis geldt en wanneer daarvan mag worden afgeweken.</div></div><div class="evidence">Werkinstructie</div></div>
+        <div class="check" tabindex="0" role="button" aria-label="Herstelpad voor foutieve configuratie is bekend. Status Blocker."><div class="state-icon blocker" aria-hidden="true">×</div><div><div class="check-title">Herstelpad voor foutieve configuratie is bekend</div><div class="check-note">Terugzetten, rollback of herstelactie is praktisch uitvoerbaar.</div></div><div class="evidence">Nog ontbrekend</div></div>
+      </div>
+
+      <div class="inspector" id="inspector">
+        <div class="inspector-grid">
+          <div>
+            <h3 id="checkInspectorTitle">Beheerbare instellingen zijn beschreven</h3>
+            <p id="checkInspectorText">Bewijs: Config-register. Inclusief doel, eigenaar en effect van een wijziging.</p>
+          </div>
+          <div class="state-buttons" aria-label="Status wijzigen">
+            <button class="state-btn" type="button" data-state="ready" aria-pressed="false">Geaccepteerd</button>
+            <button class="state-btn" type="button" data-state="attention" aria-pressed="false">Aandacht</button>
+            <button class="state-btn" type="button" data-state="blocker" aria-pressed="false">Blocker</button>
+            <button class="state-btn" type="button" data-state="unknown" aria-pressed="true">Niet getoetst</button>
+          </div>
+        </div>
+        <form id="checkAssessment">
+          <p>Beoordeling simuleren — alleen synthetische referenties. Een bronlabel is geen beoordeeld bewijs. Wijziging van de beoordeling maakt eerder akkoord ongeldig.</p>
+          <label>Fase <select name="stage"><option>voorgenomen</option><option>uitgevoerd</option><option>gecontroleerd</option><option>geaccepteerd</option></select></label>
+          <label>Bron <input name="source" maxlength="240"></label>
+          <label>Versie <input name="version" maxlength="80"></label>
+          <label>Controledatum <input name="date" type="date"></label>
+          <label>Bevoegde beoordelaar <input name="reviewer" maxlength="120"></label>
+          <label>Uitkomst <select name="outcome"><option value="onbekend">Niet getoetst</option><option value="akkoord">Akkoord</option><option value="afgekeurd">Afgekeurd</option></select></label>
+          <button type="submit">Bewaar beoordeling</button>
+          <p id="assessmentStatus" role="status"></p>
+        </form>
+      </div>
+
+      <div class="note-box" id="domainNote">Voor livegang hoeft niet iedere instelling dagelijks gebruikt te worden. Wel moet duidelijk zijn welke configuratie beheerbaar is, wie eigenaar is en hoe wijzigingen worden vastgelegd.</div>
+    </aside>
+  </section>
+
+  <details class="about">
+    <summary>Over deze visual</summary>
+    <div class="copy">
+      <p>De interface is opgebouwd als een beheerring, omdat beheerbaarheid geen lineair projectstapje is maar een samenhangend geheel. De vijf domeinen blijven tegelijk zichtbaar; een klik zoomt in zonder het overzicht kwijt te raken.</p>
+      <p>De kleuren zijn functioneel en spaarzaam gebruikt: groen betekent geaccepteerd bewijs in de simulatie, grijs niet getoetst, amber vraagt aandacht en rood blokkeert beheer. Groen is geen formeel overdrachtsbesluit. De rest van de pagina blijft bewust rustig, zodat de relatie tussen totaalbeeld, onderliggende controle en bewijs centraal staat.</p>
+    </div>
+  </details>
+  <textarea id="copyFallback" aria-label="Overdrachtssamenvatting om handmatig te kopiëren" readonly hidden style="width:100%;min-height:12rem"></textarea>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const INITIAL = [
+  {
+    id: 'config', label: 'Configureren', short: 'Instellingen',
+    intro: 'Kan FAB de functionele inrichting begrijpen, wijzigen en gecontroleerd terugzetten?',
+    note: 'Voor livegang hoeft niet iedere instelling dagelijks gebruikt te worden. Wel moet duidelijk zijn welke configuratie beheerbaar is, wie eigenaar is en hoe wijzigingen worden vastgelegd.',
+    checks: [
+      { id:'cfg1', title:'Beheerbare instellingen zijn beschreven', note:'Inclusief doel, eigenaar, afhankelijkheden, wijzigingshistorie en effect van een wijziging.', evidence:'Config-register', state:'ready' },
+      { id:'cfg2', title:'Veilige standaardwaarden zijn afgesproken', note:'FAB weet welke instelling als basis geldt en wanneer daarvan mag worden afgeweken.', evidence:'Werkinstructie', state:'attention' },
+      { id:'cfg3', title:'Herstelpad voor foutieve configuratie is bekend', note:'Terugzetten, rollback of herstelactie is praktisch uitvoerbaar.', evidence:'Nog ontbrekend', state:'blocker' }
+    ]
+  },
+  {
+    id: 'test', label: 'Testen', short: 'Controles',
+    intro: 'Kan FAB na wijzigingen aantonen dat de belangrijkste gebruikers- en beheerfuncties nog werken?',
+    note: 'De scan kijkt niet naar volledige testdekking. Het gaat om een compact beheersetje waarmee FAB na configuratie, release of incident zelfstandig kan controleren of de dienst functioneel gezond is.',
+    checks: [
+      { id:'tst1', title:'Kritieke gebruikersscenario’s zijn reproduceerbaar', note:'De minimale set happy-flow controles is vastgelegd.', evidence:'Regressieset', state:'ready' },
+      { id:'tst2', title:'Beheerhandelingen hebben eigen controles', note:'Bijvoorbeeld rollen wijzigen, parameters aanpassen en foutafhandeling beoordelen.', evidence:'Testset FAB', state:'ready' },
+      { id:'tst3', title:'Testdata en testaccounts zijn beschikbaar', note:'FAB kan controles uitvoeren zonder productiegegevens of noodgrepen.', evidence:'Testaccount', state:'attention' }
+    ]
+  },
+  {
+    id: 'monitor', label: 'Monitoren', short: 'Signalen',
+    intro: 'Kan FAB tijdig zien dat een functioneel proces of koppeling niet meer goed loopt?',
+    note: 'Technische uptime alleen is onvoldoende. De relevante vraag is welke signalen aantonen dat het proces voor gebruikers nog werkt, en wie reageert wanneer dat niet zo is.',
+    checks: [
+      { id:'mon1', title:'Functionele verstoringssignalen zijn benoemd', note:'Bijvoorbeeld uitblijvende berichten, mislukte batches of afwijkende aantallen.', evidence:'Signalenlijst', state:'ready' },
+      { id:'mon2', title:'Meldingen komen bij de juiste beheerrol terecht', note:'Route, prioriteit en opvolging zijn herkenbaar voor FAB.', evidence:'Routering', state:'attention' },
+      { id:'mon3', title:'Ketenfouten zijn herleidbaar tot bron of koppeling', note:'Er is genoeg informatie om gericht te escaleren.', evidence:'Logging-afspraak', state:'attention' }
+    ]
+  },
+  {
+    id: 'support', label: 'Ondersteunen', short: 'Hulp & incident', ring: 'Support',
+    intro: 'Kan FAB een melding aannemen, analyseren, oplossen of gericht doorzetten?',
+    note: 'Een dienst is pas beheerbaar als meldingen niet afhankelijk zijn van projectkennis of één specialist. Diagnosevragen, bekende fouten en escalatiepaden moeten bruikbaar zijn in de dagelijkse praktijk.',
+    checks: [
+      { id:'sup1', title:'Eerste diagnosevragen zijn uitgewerkt', note:'FAB kan snel bepalen of de oorzaak bij gebruiker, inrichting, data of keten ligt.', evidence:'Diagnosekaart', state:'ready' },
+      { id:'sup2', title:'Escalatiepad en leverancierscontact zijn actueel', note:'Inclusief wat meegeleverd moet worden bij een escalatie.', evidence:'Supportmatrix', state:'ready' },
+      { id:'sup3', title:'Bekende fouten en workarounds zijn beschikbaar', note:'Tijdelijke oplossingen hebben toepassingsvoorwaarden, risico, eigenaar en herbeoordelingsdatum; alleen lokaal goedgekeurde werkwijzen gebruiken.', evidence:'Known errors', state:'ready' }
+    ]
+  },
+  {
+    id: 'assure', label: 'Borgen', short: 'Eigenaarschap',
+    intro: 'Blijft de beheerkennis bruikbaar nadat projectteam en leveranciersconsultants zijn vertrokken?',
+    note: 'Borging maakt van een eenmalige overdracht een beheerbare situatie. Denk aan eigenaarschap, vindbaarheid van kennis en duidelijke afspraken over toekomstige wijzigingen.',
+    checks: [
+      { id:'bor1', title:'Functioneel eigenaarschap is expliciet', note:'Besluiten over inrichting, risico’s en prioriteit hebben een herkenbare eigenaar.', evidence:'RACI', state:'ready' },
+      { id:'bor2', title:'Beheerkennis heeft één vindbare plek', note:'Handleidingen, afspraken en bewijsmateriaal zijn niet verspreid over projectmappen.', evidence:'Beheerpagina', state:'attention' },
+      { id:'bor3', title:'Openstaande overdrachtspunten hebben eigenaar en datum', note:'Restpunten verdwijnen niet in een generieke actielijst zonder opvolging.', evidence:'Actielijst', state:'blocker' }
+    ]
+  }
+];
+
+INITIAL.flatMap(d => d.checks).forEach(c => {
+  if (c.state === 'ready') c.state = 'unknown';
+  c.assessment = { stage:'voorgenomen', source:'', version:'', date:'', reviewer:'', outcome:'onbekend' };
+});
+let data = structuredClone(INITIAL);
+let activeDomainId = data[0].id;
+let activeCheckId = data[0].checks[0].id;
+let copyVersion = 0;
+function clearCopy() {
+  copyVersion++;
+  document.getElementById('copyFallback').hidden = true;
+}
+
+const colors = {
+  ready: getComputedStyle(document.documentElement).getPropertyValue('--ready').trim(),
+  attention: getComputedStyle(document.documentElement).getPropertyValue('--attention').trim(),
+  blocker: getComputedStyle(document.documentElement).getPropertyValue('--blocker').trim(),
+  unknown: getComputedStyle(document.documentElement).getPropertyValue('--unknown').trim()
+};
+
+function polar(cx, cy, r, deg) {
+  const rad = (deg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+function donutPath(cx, cy, ro, ri, a0, a1) {
+  const p1 = polar(cx, cy, ro, a0), p2 = polar(cx, cy, ro, a1);
+  const p3 = polar(cx, cy, ri, a1), p4 = polar(cx, cy, ri, a0);
+  const large = a1 - a0 > 180 ? 1 : 0;
+  return `M ${p1.x} ${p1.y} A ${ro} ${ro} 0 ${large} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${ri} ${ri} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
+}
+function domainState(domain) {
+  if (domain.checks.some(c => c.state === 'blocker')) return 'blocker';
+  if (domain.checks.some(c => c.state === 'unknown')) return 'unknown';
+  if (domain.checks.some(c => c.state === 'attention')) return 'attention';
+  return 'ready';
+}
+function stateLabel(state) {
+  return ({ready:'Geaccepteerd', attention:'Aandacht', blocker:'Blocker', unknown:'Niet getoetst'})[state];
+}
+function overallState() {
+  return domainState({checks:data.flatMap(d => d.checks)});
+}
+function accepted(c) {
+  const a = c.assessment;
+  return c.state === 'ready' && a.stage === 'geaccepteerd' && a.outcome === 'akkoord' && ['source','version','date','reviewer'].every(k => a[k].trim());
+}
+
+function renderRing() {
+  const svg = document.getElementById('ring');
+  svg.innerHTML = '';
+  const n = data.length, gap = 3.2, slice = 360 / n;
+  data.forEach((d, i) => {
+    const a0 = i * slice + gap/2;
+    const a1 = (i+1) * slice - gap/2;
+    const mid = (a0+a1)/2;
+    const state = domainState(d);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('segment');
+    g.setAttribute('role','button');
+    g.setAttribute('tabindex','0');
+    g.setAttribute('aria-label', `${d.label}: ${stateLabel(state)}`);
+    g.setAttribute('aria-current', d.id === activeDomainId ? 'true' : 'false');
+    g.dataset.id = d.id;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', donutPath(300,300,270,176,a0,a1));
+    path.setAttribute('fill', colors[state]);
+    path.setAttribute('fill-opacity', d.id === activeDomainId ? '1' : '.84');
+    g.appendChild(path);
+
+    const tpos = polar(300,300,222,mid);
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',tpos.x); text.setAttribute('y',tpos.y-4); text.setAttribute('text-anchor','middle');
+    const name = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+    name.textContent = d.ring || d.label;
+    name.setAttribute('x',tpos.x);
+    name.setAttribute('dy','0');
+    name.setAttribute('fill','#ffffff');
+    const sub = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+    sub.textContent = stateLabel(state);
+    sub.setAttribute('x',tpos.x); sub.setAttribute('dy','18'); sub.setAttribute('class','small'); sub.setAttribute('fill','#ffffff');
+    sub.setAttribute('fill-opacity','.84');
+    text.append(name,sub); g.appendChild(text);
+
+    g.addEventListener('click', () => selectDomain(d.id));
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectDomain(d.id); }});
+    svg.appendChild(g);
+  });
+}
+
+function renderSummary() {
+  const checks = data.flatMap(d=>d.checks);
+  const counts = { ready:0, attention:0, blocker:0, unknown:0 };
+  checks.forEach(c=>counts[c.state]++);
+  document.getElementById('readyCount').textContent = counts.ready;
+  document.getElementById('attentionCount').textContent = counts.attention;
+  document.getElementById('blockerCount').textContent = counts.blocker;
+  document.getElementById('unknownCount').textContent = counts.unknown;
+  document.getElementById('evidenceCount').textContent = checks.filter(accepted).length;
+  document.getElementById('score').textContent = `${counts.ready}/${checks.length}`;
+  const o = overallState();
+  document.getElementById('centerStatus').textContent = o === 'blocker'
+    ? 'Overdracht nog niet verantwoord: er zijn blockers.'
+    : o === 'unknown'
+      ? 'Overdracht niet aangetoond: controles ontbreken.'
+      : o === 'attention'
+        ? 'Er zijn nog beheerpunten open; geen automatisch overdrachtsakkoord.'
+        : 'Alle controles in deze simulatie geaccepteerd; formeel overdrachtsbesluit niet vastgelegd.';
+}
+
+function renderDetail() {
+  const d = data.find(x=>x.id===activeDomainId);
+  if (!d) return;
+  const ds = domainState(d);
+  document.getElementById('domainTitle').textContent = d.label;
+  const pill = document.getElementById('domainStatus');
+  pill.textContent = stateLabel(ds); pill.className = `status-pill ${ds}`;
+  document.getElementById('domainIntro').textContent = d.intro;
+  document.getElementById('domainNote').textContent = d.note;
+
+  const checksEl = document.getElementById('checks');
+  checksEl.innerHTML='';
+  d.checks.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = `check${c.id===activeCheckId?' active':''}`;
+    row.tabIndex = 0; row.setAttribute('role','button');
+    row.setAttribute('aria-label', `${c.title}. Status ${stateLabel(c.state)}.`);
+    const symbol = c.state === 'ready' ? '✓' : c.state === 'attention' ? '!' : c.state === 'unknown' ? '?' : '×';
+    row.innerHTML = `<div class="state-icon ${c.state}" aria-hidden="true">${symbol}</div>
+      <div><div class="check-title">${c.title}</div><div class="check-note">${c.note}</div></div>
+      <div class="evidence">${c.evidence}</div>`;
+    row.addEventListener('click',()=>selectCheck(c.id));
+    row.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCheck(c.id);}});
+    checksEl.appendChild(row);
+  });
+  renderInspector();
+}
+
+function renderInspector() {
+  const d = data.find(x=>x.id===activeDomainId);
+  let c = d.checks.find(x=>x.id===activeCheckId);
+  if (!c) { c=d.checks[0]; activeCheckId=c.id; }
+  document.getElementById('checkInspectorTitle').textContent = c.title;
+  document.getElementById('checkInspectorText').textContent = `Verwachte bronreferentie (fictief): ${c.evidence}. ${c.note}`;
+  const form = document.getElementById('checkAssessment');
+  Object.entries(c.assessment).forEach(([key,value]) => { form.elements[key].value = value; });
+  document.getElementById('assessmentStatus').textContent = accepted(c) ? 'Geaccepteerd in deze simulatie; geen formeel overdrachtsbesluit.' : 'Geen geaccepteerde controle aangetoond.';
+  document.querySelectorAll('.state-btn').forEach(btn=>btn.setAttribute('aria-pressed', String(btn.dataset.state===c.state)));
+}
+
+function selectDomain(id) {
+  activeDomainId=id;
+  const d=data.find(x=>x.id===id);
+  activeCheckId=d.checks[0].id;
+  renderAll();
+}
+function selectCheck(id) { activeCheckId=id; renderDetail(); }
+function setState(state) {
+  const d=data.find(x=>x.id===activeDomainId);
+  const c=d.checks.find(x=>x.id===activeCheckId);
+  if (!c) return;
+  const form = document.getElementById('checkAssessment');
+  const a = Object.fromEntries(new FormData(form));
+  if (a.outcome === 'afgekeurd') { state = 'blocker'; a.stage = 'gecontroleerd'; }
+  if (state === 'ready' && (a.stage !== 'geaccepteerd' || a.outcome !== 'akkoord' || !['source','version','date','reviewer'].every(k => a[k].trim()))) {
+    document.getElementById('assessmentStatus').textContent = 'Niet geaccepteerd: bron, versie, controledatum, bevoegde beoordelaar, akkoord en geaccepteerde fase zijn nodig.';
+    return;
+  }
+  if (state !== 'ready' && a.stage === 'geaccepteerd') a.stage = 'gecontroleerd';
+  c.assessment = a;
+  c.state=state;
+  renderAll();
+  showToast(`Status gewijzigd naar ${stateLabel(state)}`);
+}
+function renderAll(){ clearCopy(); renderRing(); renderSummary(); renderDetail(); }
+
+function buildSummaryText() {
+  const lines=['Beheerbaarheid Scan – cliëntportaalrelease (synthetische demo v3)', 'Bron: demo-checklist; revisie 2026-10-01; export ' + new Date().toISOString(), 'FAB adviseert; bevoegde proces-/dienst-eigenaar accepteert overdracht en restrisico. Formeel besluit niet vastgelegd. Invoer verdwijnt bij herladen.',''];
+  data.forEach(d=>{
+    lines.push(`${d.label}: ${stateLabel(domainState(d))}`);
+    d.checks.forEach(c => { const a=c.assessment; lines.push(`- ${stateLabel(c.state)}: ${c.title}; fase ${a.stage}; bron ${a.source || 'ontbreekt'}; versie ${a.version || 'ontbreekt'}; datum ${a.date || 'onbekend'}; beoordelaar ${a.reviewer || 'onbekend'}; uitkomst ${a.outcome}`); });
+  });
+  const checks=data.flatMap(d=>d.checks); const blockers=checks.filter(c=>c.state==='blocker').length;
+  lines.push('', blockers ? `Conclusie: ${blockers} blocker(s) moeten nog worden opgelost voor beheerbare overdracht.` : checks.every(accepted) ? 'Conclusie: alle controles in de simulatie geaccepteerd; formeel besluit nog nodig.' : 'Conclusie: overdracht niet aangetoond; ontbrekende controles en aandachtspunten opvolgen.');
+  return lines.join('\n');
+}
+
+function showToast(message){
+  const t=document.getElementById('toast'); t.textContent=message; t.classList.add('show');
+  clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+document.getElementById('checkAssessment').addEventListener('input', () => {
+  clearCopy();
+  const c = data.find(d => d.id === activeDomainId).checks.find(c => c.id === activeCheckId);
+  c.assessment = Object.fromEntries(new FormData(document.getElementById('checkAssessment')));
+  if (c.state === 'ready') { c.state = 'unknown'; renderRing(); renderSummary(); renderDetail(); }
+  document.getElementById('assessmentStatus').textContent = 'Beoordeling gewijzigd; leg de status opnieuw vast.';
+  document.querySelectorAll('.state-btn').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.state === c.state)));
+});
+document.getElementById('checkAssessment').addEventListener('submit', e => { e.preventDefault(); setState('unknown'); });
+document.querySelectorAll('.state-btn').forEach(btn=>btn.addEventListener('click',()=>setState(btn.dataset.state)));
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  data=structuredClone(INITIAL); activeDomainId=data[0].id; activeCheckId=data[0].checks[0].id; renderAll(); showToast('Voorbeeld hersteld');
+});
+document.getElementById('copyBtn').addEventListener('click', async()=>{
+  const version=++copyVersion, text=buildSummaryText();
+  try { await navigator.clipboard.writeText(text); if (version === copyVersion) { document.getElementById('copyFallback').hidden=true; showToast('Samenvatting gekopieerd'); } }
+  catch { if (version !== copyVersion) return; const field=document.getElementById('copyFallback'); field.value=text; field.hidden=false; field.focus(); field.select(); showToast('Kopieer de samenvatting handmatig uit het tekstvak'); }
+});
+
+renderAll();
+</script>
+<section class="review-context" aria-label="Beheerkaart en overdrachtschecklist" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Kan regulier beheer de oplevering dragen?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB en dienst-/proceseigenaar bij inbeheername en overdracht. <strong>Vervolgstap:</strong> een controlelijst met bron, versie, datum, beoordelaar, uitkomst en eigenaar van open punten in het bestaande overdrachts- of wijzigingsdossier. FAB adviseert; de bevoegde dienst-/proceseigenaar accepteert overdracht en restrisico.</p>
+  <p><strong>Bron:</strong> synthetische cliëntportaal-checklist, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: prototype voor overleg, geen formele acceptatie of lokale validatie. Een referentie zoals “Config-register” is een verwachte bron, geen beoordeeld bewijs. Voorgenomen, uitgevoerd, gecontroleerd en geaccepteerd zijn afzonderlijke fasen; ontbrekend bewijs is niet getoetst. Alle invoer blijft in deze browsersessie en verdwijnt bij herladen.</p>
+  <nav aria-label="Overdrachtsviews"><a href="fab-releaseatelier.html#test-coverage">Wijziging en testdekking</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies (andere casus)</a> · <a href="incident-onepager.html#continuity">Continuïteitsvoorwaarden</a></nav>
+  <details id="scanChecklist" open><summary>Alle vijftien controles als leesbare checklist</summary><ol><li>Configuratie: doel, eigenaar, afhankelijkheden en wijzigingshistorie vastleggen.</li><li>Veilige standaardwaarden en bevoegde afwijkingen afspreken.</li><li>Herstelpad praktisch toetsen.</li><li>Kritieke gebruikersscenario’s reproduceerbaar maken.</li><li>Beheerhandelingen en fout-/negatieve autorisatiescenario’s toetsen.</li><li>Synthetische testdata en testrollen beschikbaar maken.</li><li>Functionele verstoringssignalen benoemen.</li><li>Meldroute, prioriteit en opvolging toetsen.</li><li>Ketenfouten naar bron en eindverwerking herleiden.</li><li>Diagnosevragen met bewijs en onzekerheid vastleggen.</li><li>Escalatiepad en leverancierscontact in de afgesproken bron controleren.</li><li>Workarounds voorzien van voorwaarden, risico, eigenaar en herbeoordelingsdatum.</li><li>Uitvoerder, toetser en bevoegde beslisser onderscheiden.</li><li>Beheerkennis op één vindbare, actuele bronplek houden.</li><li>Restpunten aan eigenaar, deadline en bewijs van opvolging koppelen.</li></ol><p>Deze lijst is geen volledige testdekking. Toets ook bereikbaarheid van het goedgekeurde noodplan, zorgimpact en herstelcontrole. Geen zorginhoudelijke noodwerkwijze is hier vastgesteld.</p></details>
+  <p><strong>Onderhoud en toelating:</strong> wijs eerst een bronhouder en concrete overdrachtsactie aan; herzie bij release-, proces- of bronwijziging. Gebruik alleen synthetische referenties, geen cliëntgegevens of volledige logs. Vergelijk de ring met deze checklist op juistheid, overdracht en onderhoudslast. Bronregistraties blijven leidend; deze pagina is geen tweede administratie. Gebruikerswaarde is nog niet aangetoond.</p>
+</section>
+<noscript><style>.workspace { display:none; }</style><p style="padding:24px">JavaScript staat uit. Er is geen beoordeeld overdrachtsakkoord. Gebruik de volledige checklist hierboven; de interactie en invoer zijn niet beschikbaar.</p></noscript>
+</body>
+</html>

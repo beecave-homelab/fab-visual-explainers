@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAB Rapportage Lineage — waar komt dit getal vandaan?</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --paper: #f3e6e1;
+  --surface: #fffaf7;
+  --ink: #3a1f2b;
+  --muted: #6e4b58;
+  --rule: #c9a5a6;
+  --b1: #f7e6df;
+  --b2: #ebc9c0;
+  --b3: #d4a09b;
+  --b4: #94586a;
+  --trace: #0c6a8a;
+  --warn: #b86a00;
+  --bad: #a8211c;
+  --display: Rockwell, "Roboto Slab", "Superclarendon", "Rockwell Nova", Georgia, serif;
+  --body: "Gill Sans", "Gill Sans MT", "Trebuchet MS", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 var(--body); }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--trace); outline-offset: 3px; }
+[hidden] { display: none !important; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+.skip { position: fixed; top: -100px; left: 16px; padding: 12px; background: white; z-index: 20; }
+.skip:focus { top: 16px; }
+.page { max-width: 1520px; margin: auto; padding: 36px 44px 28px; }
+.head { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 48px; align-items: end; padding-bottom: 26px; }
+.head h1 { font: 700 clamp(40px, 5vw, 68px)/1.04 var(--display); letter-spacing: -.02em; max-width: 14ch; }
+.head p { color: var(--muted); font-size: 17px; max-width: 54ch; }
+.case { border-left: 4px solid var(--b4); padding: 2px 0 2px 18px; font-size: 15px; color: var(--muted); }
+.case strong { display: block; color: var(--ink); font: 700 17px/1.3 var(--display); margin-bottom: 4px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 0 20px; border-top: 2px solid var(--ink); }
+.toolbar > span { font-size: 15px; font-weight: 700; margin-right: 4px; }
+.chip { border: 1.5px solid var(--ink); border-radius: 999px; background: transparent; padding: 6px 14px; min-height: 40px; font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--bad); color: #fff; border-color: var(--bad); }
+.chip small { font-size: 12px; opacity: .8; }
+.quiet { border: 0; background: none; text-decoration: underline; text-underline-offset: 5px; padding: 8px 4px; min-height: 40px; font-size: 14px; }
+.toolbar .push { margin-left: auto; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 36px; align-items: start; }
+.strata { position: relative; display: grid; gap: 58px; }
+.band { position: relative; z-index: 1; display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; padding: 18px 20px 20px; border-radius: 2px; }
+.band[data-l="1"] { background: var(--b1); }
+.band[data-l="2"] { background: var(--b2); }
+.band[data-l="3"] { background: var(--b3); }
+.band[data-l="4"] { background: var(--b4); color: #fdeff0; }
+.band h2 { font: 700 18px/1.25 var(--display); align-self: start; padding-top: 4px; }
+.band h2 small { display: block; margin-top: 4px; font: 400 13px/1.4 var(--body); opacity: .85; }
+.nodes { display: flex; flex-wrap: wrap; gap: 12px; }
+.node { position: relative; text-align: left; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--surface); color: var(--ink); padding: 10px 14px 11px; min-width: 150px; max-width: 220px; flex: 1 1 150px; transition: opacity .15s, transform .15s; }
+.node b { display: block; font: 700 14.5px/1.3 var(--display); }
+.node span { display: block; font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.node .val { font: 700 26px/1 var(--display); color: var(--ink); margin: 0 0 4px; }
+.node.hand::after { content: "handwerk"; position: absolute; top: -9px; right: 8px; background: var(--ink); color: #fff; font-size: 11px; padding: 0 7px; border-radius: 2px; line-height: 17px; }
+.node.sel { outline: 3px solid var(--trace); outline-offset: 2px; background: #fff; }
+.node.dim { opacity: .32; }
+.node.taint { background: repeating-linear-gradient(135deg, #fff2d6 0 8px, #ffe3a8 8px 16px); border-color: var(--warn); }
+.node.taint.src { background: repeating-linear-gradient(135deg, #ffd9d4 0 8px, #ffb7ae 8px 16px); border-color: var(--bad); }
+.node .flag { color: var(--bad); font-weight: 700; }
+svg.veins { position: absolute; inset: 0; z-index: 2; pointer-events: none; width: 100%; height: 100%; overflow: visible; }
+svg.veins path { fill: none; stroke: var(--ink); stroke-opacity: .22; stroke-width: 1.5; }
+svg.veins path.on { stroke: var(--trace); stroke-opacity: 1; stroke-width: 3.5; }
+svg.veins path.on.warn { stroke: var(--bad); stroke-dasharray: 9 6; }
+.detail { position: sticky; top: 16px; background: var(--surface); border: 2px solid var(--ink); border-radius: 3px; padding: 22px 24px 24px; }
+.detail .layer { font-size: 14px; color: var(--muted); }
+.detail h2 { font: 700 26px/1.2 var(--display); margin: 4px 0 10px; }
+.detail p { font-size: 15.5px; }
+.detail h3 { font: 700 16px/1.3 var(--display); margin: 20px 0 8px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.formula { background: var(--b1); border-left: 4px solid var(--b4); padding: 10px 14px; margin-top: 12px; font-size: 14.5px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px; }
+.links button { border: 1px solid var(--ink); background: var(--b1); border-radius: 3px; padding: 4px 10px; font-size: 14px; min-height: 34px; text-align: left; }
+.links button:hover { background: var(--b2); }
+.trace li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 6px 0; font-size: 14.5px; border-bottom: 1px dotted var(--rule); }
+.trace li i { font: 700 13px/22px var(--display); font-style: normal; width: 22px; height: 22px; text-align: center; background: var(--trace); color: #fff; border-radius: 50%; }
+.verdict { margin-top: 14px; padding: 10px 14px; font-size: 14.5px; border-left: 4px solid var(--trace); background: #e3f1f5; }
+.verdict.bad { border-color: var(--bad); background: #fbe3e0; }
+.verdict.warn { border-color: var(--warn); background: #fff0d4; }
+.checkpoint { font-size: 14.5px; }
+.detail .actions { margin-top: 18px; display: flex; gap: 14px; align-items: center; }
+.btn { border: 2px solid var(--ink); background: var(--ink); color: #fff; border-radius: 3px; padding: 9px 16px; min-height: 44px; font-weight: 700; }
+.btn:hover { background: var(--b4); border-color: var(--b4); }
+#status { font-size: 14px; color: var(--muted); }
+.empty { color: var(--muted); }
+footer { padding: 28px 0 8px; font-size: 13.5px; color: var(--muted); max-width: 90ch; }
+@media (max-width: 1180px) {
+  .layout, .head { grid-template-columns: 1fr; }
+  .detail { position: static; }
+}
+@media (max-width: 860px) {
+  .page { padding: 22px 16px; }
+  .band { grid-template-columns: 1fr; gap: 8px; }
+  svg.veins { display: none; }
+  .strata { gap: 14px; }
+  .node { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff; font-size: 11px; }
+  .page { padding: 0; max-width: none; }
+  .toolbar, .actions, .skip, footer { display: none; }
+  .head { padding-bottom: 8px; gap: 20px; grid-template-columns: 1fr 260px; }
+  .head h1 { font-size: 30px; }
+  .layout { grid-template-columns: 1fr 280px; gap: 14px; }
+  .strata { gap: 30px; }
+  .band { padding: 8px 10px; }
+  .node { padding: 5px 8px; min-width: 100px; }
+  .node .val { font-size: 18px; }
+  .detail { position: static; padding: 10px 12px; }
+  .detail h2 { font-size: 18px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#detail">Naar details</a>
+<div class="page">
+  <header class="head">
+    <div>
+      <h1>Waar komt dit getal vandaan?</h1>
+      <p>Kies een getal op het dashboard en volg het naar de bron. Kies een bronveld en zie welke getallen meeverschuiven als dat veld verandert.</p>
+    </div>
+    <div class="case"><strong>Wachttijd tot eerste geplande afspraak</strong>Vier illustratieve dashboardgetallen, vier bronnen. Geen meting van eerste werkelijk verleende zorg. Definities: demo v2; peildatum 2 november 2026, 08:00 Europe/Amsterdam. Rapportage-eigenaar en BI moeten de definities en berekening nog lokaal valideren; FAB toetst bronregistraties. Een actuele bron bewijst geen juiste KPI.</div>
+  </header>
+
+  <div class="toolbar" role="group" aria-label="Simulatie">
+    <span>Wat als een bron achterloopt?</span>
+    <span id="chips" style="display:contents"></span>
+    <button class="quiet" id="reset" type="button">Alles herstellen</button>
+    <button class="quiet push" id="clear" type="button">Selectie wissen</button>
+  </div>
+
+  <div class="layout">
+    <main class="strata" id="strata" aria-label="Doorsnede van dashboard tot bron"></main>
+    <aside class="detail" id="detail" aria-live="polite" tabindex="-1"></aside>
+  </div>
+  <footer>Fictieve demo v2. Een bronachterstandsimulatie verandert alleen de onzekerheidsmarkering, niet de illustratieve cijfers. Definities en perioden zijn demo-afspraken, geen VVT-standaard. Laat de rapportage-eigenaar en BI betekenis en berekening goedkeuren; FAB toetst de bronregistraties. Niet gebruiken als gevalideerde stuurinformatie.</footer>
+</div>
+
+<script>
+const LAYERS = [
+  { l: 1, name: 'Wat je ziet', sub: 'Getallen op het dashboard' },
+  { l: 2, name: 'Hoe het wordt berekend', sub: 'Regels en telling' },
+  { l: 3, name: 'Welke gegevens', sub: 'Velden die erin gaan' },
+  { l: 4, name: 'Waar het ontstaat', sub: 'Systemen en bestanden' }
+];
+const DEFINITION = { version: 'demo v2', asOf: '2 november 2026, 08:00 Europe/Amsterdam', review: 'Niet lokaal gevalideerd; rapportage-eigenaar stelt definitie vast, BI toetst berekening, FAB toetst bronregistraties.' };
+const N = {
+  k1: { l:1, t:'Wachttijd tot eerste geplande afspraak', val:'17,4 dagen', sub:'Illustratie, kalenderdagen', down:['c1'], owner:'Rapportage-eigenaar intake', desc:'Gemiddelde tijd van aanmelding tot de eerste nog geldige ingeplande afspraak. Dit is niet de eerste werkelijk verleende zorg.', cp:'Laat de rapportage-eigenaar de populatie en de betekenis van eerste afspraak goedkeuren.' },
+  k2: { l:1, t:'Open aanmeldingen per team', val:'212', sub:'Illustratie, op peildatum', down:['c2','c5'], owner:'Rapportage-eigenaar intake', desc:'Open aanmeldingen zonder geldige ingeplande afspraak op de peildatum. Een aanmelding is geen unieke cliënt.', cp:'Vergelijk aantallen en dossierstatus met het ECD; toon onbekende teamcodes apart.' },
+  k3: { l:1, t:'Urenregistratiegraad', val:'86%', sub:'Illustratie, oktober 2026', down:['c3','c5'], owner:'Rapportage-eigenaar capaciteit', desc:'Goedgekeurde geregistreerde werkuren als aandeel van contracturen over dezelfde maand. Geen maat voor cliëntcontact of bezettingsgraad; overwerk kan boven 100% uitkomen.', cp:'Laat BI de periodeconversie en HR de geldigheidsperioden controleren.' },
+  k4: { l:1, t:'No-showpercentage', val:'6,1%', sub:'Illustratie, laatste afgesloten week', down:['c4'], owner:'Rapportage-eigenaar planning', desc:'Aandeel niet-verschenen afspraken onder afgesloten afspraken in 26 oktober tot en met 1 november 2026.', cp:'Laat Planning statusbetekenissen, annuleringen en verplaatsingen valideren.' },
+  c1: { l:2, t:'Kalenderdagen aanmelding tot afspraak', sub:'Cohort 5 oktober–1 november', down:['f1','f2','f3','f9'], owner:'BI', desc:'Per aanmelding met eerste geldige afspraak in [5 oktober, 2 november): kalenderdatum afspraak minus kalenderdatum aanmelding in lokale tijd. Sluit geannuleerde dossiers, ontbrekende datums en negatieve intervallen uit en rapporteer die afwijkingen apart.', formula:'Teller = som kalenderdagen; noemer = aantal geldige aanmeldingen in cohort. Gemiddelde = teller / noemer; bij noemer 0: onbekend.', cp:'Gebruik de eerste geldige afspraak per aanmeldsleutel op peildatum; bewaar wijzigingshistorie. Dit bewijst geen geleverde zorg.' },
+  c2: { l:2, t:'Open aanmeldingen zonder afspraak', sub:'Stand op peildatum', down:['f1','f2','f3','f9','f12'], owner:'BI', desc:'Unieke aanmeldsleutels met aanmelding vóór de peildatum, dossierstatus Open en geen geldige afspraak. Uitgesloten: geannuleerd, afgesloten en onbekende status; onbekende status wordt als datakwaliteitsafwijking gemeld.', formula:'Teller = aantal geldige open aanmeldsleutels zonder afspraak; noemer = niet van toepassing. Eenheid = aanmeldingen, per intake-team op peildatum.', cp:'Controleer dossierstatus als eigen bronafhankelijkheid; leg de lokaal geldige statuswaarden vast.' },
+  c3: { l:2, t:'Werkuren / contracturen in dezelfde maand', sub:'1–31 oktober 2026, per team', down:['f5','f6','f4','f11'], owner:'BI', desc:'Teller: goedgekeurde werkuren op werkdagen in oktober. Noemer: per medewerker en kalenderdag in oktober de op die dag geldige weekcontracturen / 7, opgeteld per team. Teamwissels en contractwijzigingen worden per dag toegerekend; geen dubbeltelling bij meerdere teamrollen.', formula:'100 × som(goedgekeurde werkuren oktober) / som(geldige weekcontracturen per kalenderdag / 7). Beide in uren over oktober; bij noemer 0: onbekend.', cp:'Sluit ontbrekende contract- of teamgeldigheid uit en meld die apart. Deze kalenderdagconversie is een demo-afspraak, geen sectorstandaard.' },
+  c4: { l:2, t:'Niet verschenen / afgesloten afspraken', sub:'26 oktober–1 november 2026', down:['f3','f10'], owner:'BI', desc:'Teller: unieke afspraken met status Niet verschenen. Noemer: unieke afspraken met status Verschenen of Niet verschenen in [26 oktober, 2 november). Geannuleerd, verplaatst, gepland en ontbrekende status tellen niet mee; open/ontbrekende statussen worden apart gemeld.', formula:'100 × aantal(Niet verschenen) / aantal(Verschenen of Niet verschenen), op afspraakdatum. Bij noemer 0: onbekend.', cp:'Dedupliceer op afspraaksleutel en toets de lokale statusmapping.' },
+  c5: { l:2, t:'Teamtoewijzing met geldigheid', sub:'Intake-team of medewerkersteam', down:['f4','f8','f12'], owner:'FAB met gegevenseigenaar', desc:'Voor open aanmeldingen geldt het intake-team op peildatum; voor werkuren het medewerkersteam op de werkdatum. Dit zijn verschillende bronvelden.', formula:'Teamnaam = mapping(teamcode, geldigheidsdatum). Ontbrekende mapping → Onbekend, nooit stilzwijgend een ander team.', cp:'Toets de mapping en voorkom dat meerdere teamrollen dezelfde uren verdubbelen.' },
+  f1: { l:3, t:'Aanmeldsleutel en aanmelddatum', sub:'ECD-ontvangsttijd', down:['s1'], owner:'Intake', desc:'Unieke aanmeldsleutel en ontvangstdatum, niet de verwijsdatum. Datumvergelijking in Europe/Amsterdam.', cp:'Controleer ontbrekende sleutels en negatieve intervallen apart.' },
+  f2: { l:3, t:'Datum eerste geldige geplande afspraak', sub:'Afspraak per aanmeldsleutel', down:['s2'], owner:'Planning', desc:'Vroegste afspraak die op peildatum niet geannuleerd of vervangen is, gekoppeld via de aanmeldsleutel. Niet een werkelijk zorgmoment.', cp:'Bewaar oorspronkelijke afspraak en vervangingshistorie; toets koppeling aan de juiste aanmelding.' },
+  f3: { l:3, t:'Afspraakstatus en vervangingshistorie', sub:'Inclusief geannuleerd en verplaatst', down:['s2'], owner:'Planning', desc:'Status op peildatum per unieke afspraaksleutel, plus vervanging/annulering. Lokale statusmapping is nog te valideren.', cp:'Ontbrekende status niet als verschenen of geldig tellen.' },
+  f4: { l:3, t:'Medewerkersteam met geldigheid', sub:'Team per werkdatum', down:['s3'], owner:'HR', desc:'Teamcode per medewerker met ingangs- en einddatum en verdeling bij meerdere teamrollen.', cp:'Toets dagelijkse toerekening met HR; gebruik niet alleen het team op peildatum.' },
+  f5: { l:3, t:'Goedgekeurde werkuren', sub:'Medewerker, werkdatum en akkoord', down:['s2'], owner:'Teamleider', desc:'Geregistreerde werkuren met medewerker-ID, werkdatum en akkoordstatus. Geen automatisch bewijs van cliëntcontact.', cp:'Sluit niet-goedgekeurde en dubbele regels uit; leg inclusie van overwerk lokaal vast.' },
+  f6: { l:3, t:'Weekcontracturen', sub:'Uren per medewerker per week', down:['s3'], owner:'HR', desc:'Contracturen per week, te combineren met de geldigheidsperioden. Eerst omrekenen naar uren over dezelfde maand als de teller.', cp:'Controleer terugwerkende wijzigingen en medewerkers zonder contractgegevens.' },
+  f8: { l:3, t:'Opzoeklijst teams', sub:'Teamcode, naam en geldigheid', down:['s4'], owner:'Gegevenseigenaar teams met FAB', desc:'Versiebeheerde mapping van teamcodes met geldigheidsperioden.', cp:'Leg bronversie en goedkeuring vast bij een teamwijziging.' },
+  f9: { l:3, t:'Dossierstatus op peildatum', sub:'Open, afgesloten, geannuleerd', down:['s1'], owner:'Intake', desc:'Status per aanmeldsleutel op peildatum; nodig om geannuleerde en afgesloten aanmeldingen uit te sluiten.', cp:'Rapporteer onbekende status afzonderlijk en valideer de lokale mapping.' },
+  f10: { l:3, t:'Afspraaksleutel en afspraakdatum', sub:'Geplande datum in lokale tijd', down:['s2'], owner:'Planning', desc:'Unieke afspraak-ID en geplande datum voor periodeselectie en deduplicatie.', cp:'Tel een verplaatste afspraak niet dubbel; verbind aan status en historie.' },
+  f11: { l:3, t:'Contractgeldigheid', sub:'Medewerker, begin- en einddatum', down:['s3'], owner:'HR', desc:'Geldigheidsperioden voor weekcontracturen; dagelijkse omzetting houdt rekening met starten, vertrek en wijzigingen in oktober.', cp:'Meld gaten en overlappende contractperioden; laat BI en HR de omzetting toetsen.' },
+  f12: { l:3, t:'Intake-team op peildatum', sub:'Teamcode per aanmelding', down:['s1'], owner:'Intake', desc:'Teamtoewijzing van de aanmelding op peildatum. Dit is niet de medewerkersteamcode uit HR.', cp:'Controleer ontbrekende toewijzingen en onbekende teamcodes.' },
+  s1: { l:4, t:'ECD', sub:'Demo-export, dagelijks 02:00', down:[], owner:'Gegevenseigenaar intake', fresh:'dagelijks (demo-afspraak)', desc:'Bron van aanmeldsleutel, datum, dossierstatus en intake-team. FAB toetst registraties; leverancier beheert de technische levering.', cp:'Controleer exportdatum, aantallen en statusmapping.' },
+  s2: { l:4, t:'Roosterportaal', sub:'Demo-export, elk uur', down:[], owner:'Proceseigenaar planning', fresh:'elk uur (demo-afspraak)', desc:'Bron van afspraak-ID, datum, status, historie en goedgekeurde werkuren.', cp:'Controleer volledigheid en bronactualiteit; FAB beheert niet vanzelf het leveranciersplatform.' },
+  s3: { l:4, t:'HR-systeem', sub:'Demo-export, maandelijks', down:[], owner:'HR', fresh:'maandelijks (demo-afspraak)', desc:'Bron van medewerkersteams, weekcontracturen en geldigheidsperioden.', cp:'Een late export maakt de urenregistratiegraad onzeker, ook als de formule klopt.' },
+  s4: { l:4, t:'Teamcodemapping', sub:'Handmatig, versie demo v2', down:[], owner:'Gegevenseigenaar teams met FAB', fresh:'bij wijziging', hand:true, desc:'Versiebeheerde teamcodemapping; geen tweede administratie naast de afgesproken bron.', cp:'Controleer geldigheidsperioden en goedkeuring.' }
+};
+const ids = Object.keys(N);
+const up = Object.fromEntries(ids.map(i => [i, []]));
+ids.forEach(i => N[i].down.forEach(d => up[d].push(i)));
+const closure = (start, map) => { const out = new Set(), q = [start]; while (q.length) { for (const x of map[q.pop()]) if (!out.has(x)) { out.add(x); q.push(x); } } return out; };
+const downSet = Object.fromEntries(ids.map(i => [i, closure(i, Object.fromEntries(ids.map(k => [k, N[k].down])))]));
+const upSet = Object.fromEntries(ids.map(i => [i, closure(i, up)]));
+const stale = new Set();
+let sel = null;
+
+const $ = s => document.querySelector(s);
+const strata = $('#strata'), detail = $('#detail');
+strata.innerHTML = '<svg class="veins" aria-hidden="true"></svg>' + LAYERS.map(L => `
+  <section class="band" data-l="${L.l}" aria-label="${L.name}">
+    <h2>${L.name}<small>${L.sub}</small></h2>
+    <div class="nodes">${ids.filter(i => N[i].l === L.l).map(i => `
+      <button type="button" class="node${N[i].hand ? ' hand' : ''}" data-id="${i}" aria-pressed="false">
+        ${N[i].val ? `<p class="val">${N[i].val}</p>` : ''}<b>${N[i].t}</b><span>${N[i].sub}</span>
+      </button>`).join('')}</div>
+  </section>`).join('');
+const sources = ids.filter(i => N[i].l === 4);
+$('#chips').innerHTML = sources.map(s => `<button type="button" class="chip" data-s="${s}" aria-pressed="false">${N[s].t}</button>`).join('');
+
+const tainted = i => stale.has(i) || [...downSet[i]].some(x => stale.has(x));
+const tName = i => N[i].t;
+
+function hl() {
+  if (!sel) return null;
+  const set = new Set([sel, ...downSet[sel], ...upSet[sel]]);
+  return set;
+}
+function paint() {
+  const set = hl();
+  strata.querySelectorAll('.node').forEach(b => {
+    const i = b.dataset.id, t = tainted(i);
+    b.classList.toggle('sel', i === sel);
+    b.classList.toggle('dim', !!set && !set.has(i));
+    b.classList.toggle('taint', t);
+    b.classList.toggle('src', stale.has(i));
+    b.setAttribute('aria-pressed', i === sel);
+  });
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', stale.has(c.dataset.s)));
+  drawVeins();
+  renderDetail();
+}
+function drawVeins() {
+  const svg = strata.querySelector('svg.veins');
+  if (getComputedStyle(svg).display === 'none') return;
+  const box = strata.getBoundingClientRect();
+  const pos = id => { const r = strata.querySelector(`[data-id="${id}"]`).getBoundingClientRect(); return { x: r.left - box.left + r.width / 2, top: r.top - box.top, bot: r.bottom - box.top }; };
+  let on = '', off = '';
+  ids.forEach(a => N[a].down.forEach(b => {
+    const pa = pos(a), pb = pos(b), m = (pb.top - pa.bot) / 2;
+    const d = `M${pa.x},${pa.bot} C${pa.x},${pa.bot + m} ${pb.x},${pb.top - m} ${pb.x},${pb.top}`;
+    const isOn = sel && ((a === sel || downSet[sel].has(a)) || (b === sel || upSet[sel].has(b)));
+    const bad = isOn && (tainted(a) && tainted(b));
+    if (isOn) on += `<path class="on${bad ? ' warn' : ''}" d="${d}"/>`; else off += `<path d="${d}" style="${sel ? 'stroke-opacity:.08' : ''}"/>`;
+  }));
+  svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+  svg.innerHTML = off + on;
+}
+const linkBtns = list => list.length ? `<div class="links">${list.map(i => `<button type="button" data-go="${i}">${tName(i)}</button>`).join('')}</div>` : '<p class="empty">Geen.</p>';
+function layerName(i) { return LAYERS[N[i].l - 1].name; }
+function renderDetail() {
+  if (!sel) {
+    const t = ids.filter(i => N[i].l === 1 && tainted(i)).length;
+    detail.innerHTML = `<p class="layer">Doorsnede</p><h2>Kies een blok</h2>
+      <p>Begin bovenaan met een getal om te zien waar het vandaan komt, of onderaan met een bron om te zien wat er verandert als die achterloopt.</p>
+      ${stale.size ? `<div class="verdict warn">${t} van 4 dashboardgetallen zijn onzeker door de gesimuleerde achterstand.</div>` : ''}`;
+    return;
+  }
+  const n = N[sel], d = [...downSet[sel]], u = [...upSet[sel]];
+  const order = (arr, dir) => arr.sort((a, b) => dir * (N[a].l - N[b].l));
+  let main = '';
+  if (n.l < 4) {
+    const dn = order(d, 1);
+    main += `<h3>Zo komt het tot stand</h3><ol class="trace">${dn.length ? [...new Set(dn.map(layerName))].map((ln, k) => `<li><i>${k + 1}</i><span><b>${ln}:</b> ${dn.filter(x => layerName(x) === ln).map(tName).join(', ')}</span></li>`).join('') : ''}</ol>`;
+  }
+  if (n.l > 1) main += `<h3>Dit raakt</h3>${linkBtns(order(u, 1).filter(x => N[x].l === 1))}${n.l > 2 ? `<p class="empty" style="margin-top:8px;font-size:14px">Plus ${u.filter(x => N[x].l === 2).length} berekening(en) onderweg.</p>` : ''}`;
+  let verdict = '';
+  if (tainted(sel)) {
+    const bad = [sel, ...d].filter(x => stale.has(x));
+    verdict = `<div class="verdict bad"><b>Onzeker.</b> ${bad.map(tName).join(' en ')} loopt achter. ${n.l === 1 ? 'Meld bij het delen van dit getal dat de bron achterloopt.' : 'Alles erboven schuift mee.'}</div>`;
+  } else if (n.l === 4 && n.hand) verdict = `<div class="verdict warn">Handmatig bestand: er is geen automatische controle op de inhoud.</div>`;
+  else if (n.l < 4 && d.some(x => N[x].hand)) verdict = `<div class="verdict warn">Bevat een handmatige stap: ${d.filter(x => N[x].hand).map(tName).join(', ')}.</div>`;
+  else verdict = `<div class="verdict">Geen bekende afwijking in deze keten.</div>`;
+  detail.innerHTML = `
+    <p class="layer">${layerName(sel)} · inhoudelijk eigenaar ${n.owner}</p>
+    <h2>${n.t}</h2><p>${n.desc}</p>
+    <p class="formula"><b>Definitie en geldigheid:</b> ${DEFINITION.version}; peildatum ${DEFINITION.asOf}. ${DEFINITION.review} Getallen zijn illustratief en worden niet opnieuw berekend bij de bronachterstandsimulatie.</p>
+    ${n.formula ? `<p class="formula">${n.formula}</p>` : ''}
+    ${n.fresh ? `<p style="margin-top:10px;font-size:14.5px"><b>Ververst:</b> ${n.fresh}</p>` : ''}
+    ${verdict}${main}
+    <h3>Controlepunt voor FAB</h3><p class="checkpoint">${n.cp}</p>
+    <div class="actions"><button class="btn" id="copy" type="button">Kopieer herkomstnotitie</button><span id="status" role="status"></span></div>`;
+}
+function summary() {
+  const n = N[sel], d = [...downSet[sel]].sort((a, b) => N[a].l - N[b].l), u = [...upSet[sel]].filter(x => N[x].l === 1);
+  return [`Herkomstnotitie: ${n.t} — fictieve ${DEFINITION.version}`, `Bron: synthetische KPI-definities en bronvelden; revisie 2026-10-01; peildatum: ${DEFINITION.asOf}; export ${new Date().toISOString()}`, `Inhoudelijk eigenaar: ${n.owner}`, DEFINITION.review, `Definitie: ${n.desc}`, `Berekening: ${n.formula || 'zie onderliggende berekening'}`, '',
+    n.l < 4 ? 'Herkomst:' : 'Bron:', ...(n.l < 4 ? d.map(x => `- ${layerName(x)}: ${tName(x)}; ${N[x].desc}${N[x].formula ? '; ' + N[x].formula : ''}${stale.has(x) ? ' (gesimuleerde achterstand)' : ''}`) : [`- ${n.sub}`]),
+    ...(n.l > 1 ? ['', 'Raakt dashboardgetallen:', ...u.map(x => `- ${tName(x)}`)] : []),
+    '', `Controlepunt: ${n.cp}`, tainted(sel) ? 'Onzeker door gesimuleerde bronachterstand; geen actuele meting.' : 'Geen gesimuleerde achterstand; inhoudelijke juistheid niet bewezen.'].join('\n');
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.id) { sel = sel === b.dataset.id ? null : b.dataset.id; paint(); }
+  else if (b.dataset.go) { sel = b.dataset.go; paint(); detail.focus({ preventScroll: true }); }
+  else if (b.dataset.s) { stale.has(b.dataset.s) ? stale.delete(b.dataset.s) : stale.add(b.dataset.s); paint(); }
+  else if (b.id === 'reset') { stale.clear(); paint(); }
+  else if (b.id === 'clear') { sel = null; paint(); }
+  else if (b.id === 'copy') {
+    const st = $('#status');
+    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(summary()); st.textContent = 'Gekopieerd.'; }
+    catch { const t = document.createElement('textarea'); t.value = summary(); document.body.append(t); t.select(); try { document.execCommand('copy'); st.textContent = 'Gekopieerd.'; } catch { st.textContent = 'Kopiëren lukt niet. Selecteer de tekst handmatig.'; } t.remove(); }
+  }
+});
+addEventListener('resize', drawVeins);
+addEventListener('beforeprint', drawVeins);
+sel = 'k1';
+paint();
+requestAnimationFrame(drawVeins);
+</script>
+<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welk bronveld of welke berekening verklaart een rapportageafwijking?</h2>
+  <p><strong>Gebruiker en moment:</strong> FAB voor bronregistraties, samen met BI en rapportage-eigenaar bij een afwijkend getal. <strong>Uitkomst:</strong> herleidbare definitie- en aansluitcontrole met getroffen afnemers, bewijs en herstelactie. Gericht inzetten wanneer rapportageketens tot het takenpakket behoren, niet als dagelijkse kerntaak voor iedere FAB’er.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische KPI-definities en afhankelijkheden, demo v3, revisie 2026-10-01. De aparte demopeildatum staat in de casus. Echte bronhouder nog niet aangewezen; rapportage-eigenaar stelt definitie/populatie vast, BI beoordeelt berekening en perioden, FAB bronregistraties en functionele gevolgen. Geldigheid: niet lokaal gevalideerd of geschikt als echte stuurinformatie.</p>
+  <nav aria-label="Gegevensviews"><a href="fab-ketenkaart.html#data-quality">Keten en kwaliteitsregels</a> · <a href="fab-proces-applicatie-map.html">Bronregistraties</a></nav>
+  <p>Een actuele bron bewijst geen juiste KPI. Leg teller, noemer, tijdseenheid, populatie, uitsluitingen, peildatum en bronvelden vast; bron/versie, controledatum, beoordelaar en uitkomst horen bij echte controles. Ontbrekende beoordeling is onbekend. Let op zorg-, privacy- en financiële gevolgen van onjuiste informatie.</p>
+  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete controlevraag eerst aanwijzen; herzie bij definities, bronnen of mapping. Gebruik alleen synthetische data, geen cliëntgegevens of volledige logs. Bevindingen horen in het bestaande BI-/meldingsdossier, geen tweede administratie. Vergelijk met huidige definitiedocumentatie op juistheid en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

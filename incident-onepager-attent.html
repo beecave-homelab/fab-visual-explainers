@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#611750" />
+  <title>Van melding naar oplossing</title>
+  <meta name="description" content="Interactieve one-pager over incidentafhandeling, vormgegeven in de Attent-kleur- en typografiestijl." />
+  <style>
+    :root {
+      --ink: #611750;
+      --ink-2: #705b6b;
+      --paper: #fbf8fb;
+      --paper-2: #f6eef5;
+      --line: #e6d8e3;
+      --brand: #9d3293;
+      --brand-deep: #611750;
+      --brand-mid: #b85cae;
+      --brand-light: #d899d1;
+      --brand-pale: #f3e4f1;
+      --white: #ffffff;
+      --shadow: 0 18px 50px rgba(97, 23, 80, .10);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(97,23,80,.026) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(97,23,80,.026) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      color: var(--ink);
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+    }
+
+    button, a { font: inherit; }
+    button { color: inherit; }
+
+    .shell {
+      width: min(1500px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 0 26px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 4px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--white);
+      box-shadow: 0 8px 24px rgba(97,23,80,.18);
+    }
+
+    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-text { min-width: 0; }
+    .brand-text strong {
+      display: block;
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: .96rem;
+      letter-spacing: -.02em;
+    }
+    .brand-text span {
+      color: var(--ink-2);
+      font-size: .79rem;
+    }
+
+    .view-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(10px);
+    }
+
+    .view-switch button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 600;
+    }
+    .view-switch button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(250px, .78fr) minmax(520px, 1.55fr) minmax(300px, .92fr);
+      gap: 18px;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(230,216,227,.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .intro {
+      padding: clamp(22px, 3vw, 34px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -110px;
+      bottom: -105px;
+      border-radius: 50%;
+      border: 34px solid rgba(157,50,147,.08);
+      z-index: -1;
+    }
+
+
+    h1 {
+      max-width: 8ch;
+      margin: 70px 0 20px;
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: clamp(2.8rem, 5vw, 5.8rem);
+      line-height: .92;
+      letter-spacing: -.055em;
+      font-weight: 700;
+    }
+
+    .intro p {
+      max-width: 40ch;
+      margin: 0;
+      color: var(--ink-2);
+      font-size: clamp(.98rem, 1.4vw, 1.08rem);
+      line-height: 1.62;
+    }
+
+    .legend {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+      font-size: .8rem;
+      color: var(--ink-2);
+    }
+    .legend span { display: flex; align-items: center; gap: 8px; }
+    .legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .legend .l1 { background: var(--brand-deep); }
+    .legend .l2 { background: var(--brand); }
+    .legend .l3 { background: var(--brand-light); }
+
+    .map-panel {
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 620px;
+      overflow: hidden;
+    }
+
+    .map-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 16px;
+      padding: 3px 3px 16px;
+    }
+    .map-head h2, .detail h2 {
+      margin: 0;
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: -.025em;
+    }
+    .map-head p {
+      margin: 4px 0 0;
+      color: var(--ink-2);
+      font-size: .82rem;
+    }
+
+
+    .process {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 40px 22px 24px;
+    }
+
+    .process::before {
+      content: "";
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 50%;
+      height: 4px;
+      transform: translateY(-50%);
+      background: linear-gradient(90deg, var(--brand-deep) 0 28%, var(--brand) 28% 66%, var(--brand-light) 66% 100%);
+      border-radius: 99px;
+      opacity: .65;
+    }
+
+    .node {
+      position: relative;
+      z-index: 1;
+      border: 0;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      gap: 13px;
+      cursor: pointer;
+      min-width: 0;
+      padding: 10px 4px;
+    }
+
+    .node .orb {
+      width: clamp(72px, 7vw, 98px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--white);
+      border: 2px solid var(--line);
+      box-shadow: 0 12px 30px rgba(97,23,80,.08);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .node svg { width: 30px; height: 30px; }
+    .node .name {
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-weight: 600;
+      font-size: .84rem;
+      letter-spacing: -.02em;
+      text-align: center;
+    }
+    .node .meta {
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: .66rem;
+      color: var(--ink-2);
+      text-align: center;
+    }
+
+    .node:hover .orb,
+    .node:focus-visible .orb,
+    .node.active .orb {
+      transform: translateY(-4px) scale(1.04);
+      border-color: var(--ink);
+      box-shadow: 0 16px 34px rgba(97,23,80,.16);
+    }
+
+    .node.active .orb {
+      outline: 5px solid rgba(157,50,147,.13);
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .node:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 4px;
+      border-radius: 12px;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+    }
+    .fact {
+      padding: 16px 18px 6px;
+      min-width: 0;
+    }
+    .fact + .fact { border-left: 1px solid var(--line); }
+    .fact strong {
+      display: block;
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: -.04em;
+    }
+    .fact span {
+      color: var(--ink-2);
+      font-size: .76rem;
+      line-height: 1.35;
+    }
+
+    .detail {
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 18px;
+    }
+
+    .detail-index {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--white);
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-weight: 600;
+      font-size: .8rem;
+    }
+
+    .detail-lead {
+      color: var(--ink-2);
+      line-height: 1.58;
+      font-size: .95rem;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .detail-item {
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: var(--paper-2);
+      border: 1px solid #efe3ed;
+    }
+    .detail-item strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: .84rem;
+    }
+    .detail-item span {
+      color: var(--ink-2);
+      font-size: .78rem;
+      line-height: 1.4;
+    }
+
+    .detail-foot {
+      display: grid;
+      gap: 9px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .detail-foot .label {
+      color: var(--ink-2);
+      font-size: .75rem;
+    }
+    .detail-foot .answer {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 600;
+      font-size: .88rem;
+    }
+    .answer-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
+
+    .design-note {
+      margin-left: auto;
+      max-width: 760px;
+      color: var(--ink-2);
+    }
+    .design-note summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 600;
+      list-style: none;
+    }
+    .design-note summary::-webkit-details-marker { display: none; }
+    .design-note summary::after { content: " +"; color: var(--brand); }
+    .design-note[open] summary::after { content: " −"; }
+    .design-note p {
+      margin: 8px 0 0;
+      max-width: 72ch;
+      line-height: 1.5;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      color: var(--ink-2);
+      font-size: .75rem;
+      padding: 0 3px;
+    }
+
+    .compact .intro { display: none; }
+    .compact main { grid-template-columns: minmax(0, 1.7fr) minmax(300px, .9fr); }
+
+    @media (max-width: 1120px) {
+      .shell { width: min(100% - 22px, 1050px); }
+      main { grid-template-columns: .88fr 1.4fr; }
+      .detail { grid-column: 1 / -1; grid-template-columns: auto 1fr 1fr; grid-template-rows: auto auto; align-items: start; }
+      .detail .detail-index { grid-row: 1 / 3; }
+      .detail .detail-lead { margin: 0; }
+      .detail-list { grid-column: 2 / 4; grid-template-columns: repeat(3, 1fr); }
+      .detail-foot { grid-column: 3; grid-row: 1; padding: 0 0 0 18px; border-top: 0; border-left: 1px solid var(--line); }
+      .compact main { grid-template-columns: 1fr; }
+      .compact .detail { grid-column: auto; }
+    }
+
+    @media (max-width: 760px) {
+      body { background-size: 24px 24px; }
+      .shell { width: min(100% - 16px, 720px); padding-top: 12px; }
+      .shell > * { min-width: 0; }
+      header, .map-head { flex-wrap: wrap; }
+      header { align-items: flex-start; }
+      h1 { overflow-wrap: anywhere; }
+      .brand-text span { display: none; }
+      .view-switch button { padding: 7px 9px; }
+      main, .compact main { display: block; }
+      .panel { margin-bottom: 12px; }
+      .intro { min-height: 410px; }
+      h1 { font-size: clamp(3rem, 15vw, 5rem); }
+      .map-panel { min-height: auto; padding: 15px; }
+      .map-head { padding-bottom: 8px; }
+      .process {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px 0;
+      }
+      .process::before {
+        top: 9%; bottom: 9%; left: 34px; right: auto; width: 4px; height: auto; transform: none;
+        background: linear-gradient(180deg, var(--brand-deep) 0 28%, var(--brand) 28% 66%, var(--brand-light) 66% 100%);
+      }
+      .node {
+        grid-template-columns: 68px 1fr;
+        grid-template-rows: auto auto;
+        justify-items: start;
+        text-align: left;
+        padding: 5px 0;
+      }
+      .node .orb { width: 68px; grid-row: 1 / 3; }
+      .node .name, .node .meta { text-align: left; }
+      .node .name { align-self: end; font-size: .95rem; }
+      .node .meta { align-self: start; }
+      .facts { grid-template-columns: 1fr; }
+      .fact { padding: 13px 4px; }
+      .fact + .fact { border-left: 0; border-top: 1px solid var(--line); }
+      .detail { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto; }
+      .detail .detail-index { grid-row: auto; }
+      .detail h2 { align-self: center; }
+      .detail .detail-lead, .detail-list, .detail-foot { grid-column: 1 / -1; }
+      .detail-list { grid-template-columns: 1fr; }
+      .detail-foot { grid-row: auto; border-left: 0; border-top: 1px solid var(--line); padding: 16px 0 0; }
+      footer { flex-direction: column; gap: 4px; padding: 4px 2px 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; transition: none !important; }
+    }
+    @media print { body { background:white;color:black; } .shell { width:100%; } .shell main,.view-switch { display:none; } .review-context details > :not(summary) { display:block!important; } .review-context { border:0!important;margin:0!important; } }
+  </style>
+</head>
+<body>
+  <div class="shell" id="pageShell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h8M4 12h12M4 17h7"/><circle cx="17" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg>
+        </div>
+        <div class="brand-text">
+          <strong>Incidentbeeld</strong>
+          <span>Interactieve proces-one-pager</span>
+        </div>
+      </div>
+      <div class="view-switch" aria-label="Weergave">
+        <button id="storyBtn" aria-pressed="true">Met context</button>
+        <button id="focusBtn" aria-pressed="false">Focusmodus</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel intro" aria-labelledby="page-title">
+        <div>
+          <h1 id="page-title">Van melding naar oplossing.</h1>
+          <p>Een incident is geen lijst tickets. Het is een keten van beslissingen. Klik op een stap om te zien wat daar nodig is, wie aan zet is en wat een goede overdracht oplevert.</p>
+        </div>
+        <div class="legend" aria-label="Legenda">
+          <span><i class="l1"></i> Ontvangst en urgentie</span>
+          <span><i class="l2"></i> Analyse en uitvoering</span>
+          <span><i class="l3"></i> Afronding en leren</span>
+        </div>
+      </section>
+
+      <section class="panel map-panel" aria-labelledby="map-title">
+        <div class="map-head">
+          <div>
+            <h2 id="map-title">Proceslijn</h2>
+            <p>Gebruik de vijf knooppunten als navigatie.</p>
+          </div>
+        </div>
+
+        <div class="process" id="process" aria-label="Incidentproces">
+          <button class="node active" data-step="0" aria-pressed="true">
+            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v12H8l-3 3V4Z"/><path d="M8 8h8M8 12h5"/></svg></span>
+            <span class="name">Melding</span><span class="meta">signaal binnen</span>
+          </button>
+          <button class="node" data-step="1" aria-pressed="false">
+            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/><circle cx="18" cy="6" r="2"/></svg></span>
+            <span class="name">Triage</span><span class="meta">impact bepalen</span>
+          </button>
+          <button class="node" data-step="2" aria-pressed="false">
+            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="5"/><path d="m15 15 5 5M11 8v6M8 11h6"/></svg></span>
+            <span class="name">Analyse</span><span class="meta">oorzaak vinden</span>
+          </button>
+          <button class="node" data-step="3" aria-pressed="false">
+            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 13 5 5L20 7"/><path d="M6 6h7"/></svg></span>
+            <span class="name">Herstel</span><span class="meta">werking herstellen</span>
+          </button>
+          <button class="node" data-step="4" aria-pressed="false">
+            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>
+            <span class="name">Leren</span><span class="meta">herhaling voorkomen</span>
+          </button>
+        </div>
+
+        <div class="facts" aria-label="Kernprincipes">
+          <div class="fact"><strong>1 bron</strong><span>Leg besluiten en voortgang op één herkenbare plek vast.</span></div>
+          <div class="fact"><strong>1 eigenaar</strong><span>Maak per fase duidelijk wie de volgende actie bewaakt.</span></div>
+          <div class="fact"><strong>1 einde</strong><span>Sluit pas af als werking én terugkoppeling zijn bevestigd.</span></div>
+        </div>
+      </section>
+
+      <aside class="panel detail" aria-live="polite" aria-labelledby="detail-title">
+        <div class="detail-index" id="detailIndex">01</div>
+        <h2 id="detail-title">De melding maakt het probleem reproduceerbaar</h2>
+        <p class="detail-lead" id="detailLead">De eerste vastlegging moet genoeg context bevatten om te begrijpen wat de gebruiker ervaart, zonder direct naar een technische oorzaak te springen.</p>
+        <div class="detail-list" id="detailList"></div>
+        <div class="detail-foot">
+          <span class="label">Door naar de volgende stap wanneer</span>
+          <span class="answer"><i class="answer-dot"></i><span id="detailReady">impact en context duidelijk genoeg zijn voor triage.</span></span>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <details class="design-note">
+        <summary>Ontwerpkeuze</summary>
+        <p>De oorspronkelijke driedeling blijft intact: context links, de klikbare proceslijn centraal en details rechts. Zo blijft de volledige keten zichtbaar en hoeft informatie niet in lange pagina’s onder elkaar te worden gezocht.</p>
+        <p>Alle visuele nadruk komt uit één Attent-kleurfamilie met pruim, paars en zachte lila tinten. De typografie is bewust vriendelijk en helder gehouden, met voldoende contrast en grote klikdoelen voor een rustige zorgcontext.</p>
+      </details>
+      <span>Toetsenbord: Tab + Enter/Spatie</span>
+    </footer>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        title: 'De melding maakt het probleem reproduceerbaar',
+        lead: 'De eerste vastlegging moet genoeg context bevatten om te begrijpen wat de gebruiker ervaart, zonder direct naar een technische oorzaak te springen.',
+        items: [
+          ['Wat gebeurt er?', 'Beschrijf zichtbaar gedrag, foutmelding en verwachte werking.'],
+          ['Waar gebeurt het?', 'Leg applicatie, processtap, scherm en betrokken gebruiker of rol vast.'],
+          ['Sinds wanneer?', 'Noteer moment, frequentie en eventuele recente wijziging.']
+        ],
+        ready: 'impact en context duidelijk genoeg zijn voor triage.'
+      },
+      {
+        title: 'Triage bepaalt wat eerst moet gebeuren',
+        lead: 'Triage scheidt urgentie van ruis. Niet elk incident is kritiek, maar elk incident verdient een bewuste prioriteit en een duidelijke eigenaar.',
+        items: [
+          ['Impact', 'Onderscheid hinder, stilgevallen zorgondersteuning, privacyrisico en financiële gevolgen; het aantal gebruikers alleen bepaalt geen prioriteit.'],
+          ['Omweg', 'Start bij zorgimpact direct het goedgekeurde lokale continuïteitsproces, naast de analyse. Gebruik geen onbeoordeelde workaround.'],
+          ['Eigenaarschap', 'Wie pakt de eerstvolgende actie op en wie blijft aanspreekpunt?']
+        ],
+        ready: 'prioriteit, eigenaar en eerstvolgende actie expliciet zijn.'
+      },
+      {
+        title: 'Analyse zoekt bewijs vóór een oplossing',
+        lead: 'De kernvraag is niet alleen wat er misgaat, maar onder welke omstandigheden. Goede analyse maakt aannames zichtbaar en toetst ze met data of reproduceerbare stappen.',
+        items: [
+          ['Reproduceren', 'Probeer het gedrag gecontroleerd opnieuw op te roepen.'],
+          ['Vergelijken', 'Kijk naar werkende versus niet-werkende situaties om verschillen te isoleren.'],
+          ['Afbakenen', 'Bepaal of de oorzaak in configuratie, data, koppeling, gebruik of software zit.']
+        ],
+        ready: 'de vermoedelijke oorzaak voldoende is onderbouwd om gericht te herstellen.'
+      },
+      {
+        title: 'Herstel gaat over werking én controle',
+        lead: 'Een technische wijziging is pas herstel wanneer de gebruiker of het proces aantoonbaar weer kan doen wat nodig is.',
+        items: [
+          ['Wijzigen', 'Voer de minst ingrijpende passende correctie uit.'],
+          ['Valideren', 'Test de oorspronkelijke fout én het normale proces daaromheen.'],
+          ['Terugkoppelen', 'Vertel wat is hersteld, wat de gebruiker merkt en of vervolgactie nodig is.']
+        ],
+        ready: 'de werking is bevestigd en de melder weet wat er is veranderd.'
+      },
+      {
+        title: 'Leren voorkomt dat dezelfde fout opnieuw verrast',
+        lead: 'Niet ieder incident vraagt een uitgebreide evaluatie. Herhaling, hoge impact of een structurele oorzaak zijn wel signalen om kennis, monitoring of werkwijze aan te passen.',
+        items: [
+          ['Patroon', 'Komt hetzelfde type verstoring vaker terug?'],
+          ['Borging', 'Moet documentatie, monitoring, configuratie of een werkafspraak worden aangepast?'],
+          ['Delen', 'Welke kennis helpt collega’s een volgende melding sneller te herkennen?']
+        ],
+        ready: 'relevante leerpunten zijn vastgelegd of bewust als niet nodig beoordeeld.'
+      }
+    ];
+
+    const nodes = [...document.querySelectorAll('.node')];
+    const list = document.getElementById('detailList');
+    const idx = document.getElementById('detailIndex');
+    const title = document.getElementById('detail-title');
+    const lead = document.getElementById('detailLead');
+    const ready = document.getElementById('detailReady');
+
+    function renderStep(stepIndex) {
+      const step = steps[stepIndex];
+      nodes.forEach((node, i) => {
+        const active = i === stepIndex;
+        node.classList.toggle('active', active);
+        node.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      idx.textContent = String(stepIndex + 1).padStart(2, '0');
+      title.textContent = step.title;
+      lead.textContent = step.lead;
+      ready.textContent = step.ready;
+      list.innerHTML = step.items.map(([head, text]) => `
+        <div class="detail-item"><strong>${head}</strong><span>${text}</span></div>
+      `).join('');
+    }
+
+    nodes.forEach((node, i) => node.addEventListener('click', () => renderStep(i)));
+    renderStep(0);
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('incidentChecklist').innerHTML = steps.map(s => `<li><strong>${s.title}</strong><p>${s.lead}</p><ul>${s.items.map(([h,t])=>`<li><strong>${h}</strong> ${t}</li>`).join('')}</ul><p>Vervolg: ${s.ready}</p></li>`).join('');
+    });
+
+    const shell = document.getElementById('pageShell');
+    const storyBtn = document.getElementById('storyBtn');
+    const focusBtn = document.getElementById('focusBtn');
+
+    function setMode(compact) {
+      shell.classList.toggle('compact', compact);
+      storyBtn.setAttribute('aria-pressed', compact ? 'false' : 'true');
+      focusBtn.setAttribute('aria-pressed', compact ? 'true' : 'false');
+    }
+    storyBtn.addEventListener('click', () => setMode(false));
+    focusBtn.addEventListener('click', () => setMode(true));
+  </script>
+<section class="review-context" aria-label="Beheerkaart en incidentingang" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Incident en continuïteit</h2>
+  <p><strong>Hoofdvraag:</strong> welke controle, eigenaar en overdracht zijn nu nodig? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en incidentoverleg; geen actueel incidentdossier. <strong>Uitkomst:</strong> prioriteit op basis van zorgimpact, een veilig escalatiepakket en bevestigde herstelcontrole in de bestaande melding. Dit is dezelfde functionele variant als het gewone Incidentbeeld, met andere vormgeving.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische incidentroute, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: demonstratie, niet lokaal gevalideerd. FAB onderzoekt en bewaakt opvolging; ICT/leverancier voeren technische acties uit; bevoegde proces- en zorginhoudelijke rollen bepalen noodwerkwijze en acceptatie van herstel. Leg bron, versie, controledatum, beoordelaar en uitkomst in de melding vast. Een geplande actie is geen uitgevoerde of geaccepteerde controle.</p>
+  <nav aria-label="Incidentviews"><a href="fab-serviceradar.html">Zes analyseperspectieven</a> · <a href="fab-oorzaakopsporing.html">Hypothesen en bewijs</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a> · <a href="vraagkompas.html">Kennispatroon</a></nav>
+  <p>Deze links verbinden presentatiepatronen, niet dezelfde melding. Voor een bekende fout: gebruik het actuele kennisitem met toepassingsvoorwaarden, risico, eigenaar en herbeoordelingsdatum. De kennisdemo bevat geen goedgekeurde workaround. Gebruik de bestaande meldingen- en kennisregistratie, geen tweede administratie; deel geen cliëntgegevens, accounts of volledige logs in HTML.</p>
+  <details id="readableIncident"><summary>Alle vijf stappen als leesbare checklist</summary><ol id="incidentChecklist"><li>Melding: leg zichtbaar gedrag, verwachte werking, rol, processtap, moment en recente wijziging vast.</li><li>Triage: onderscheid hinder, stilgevallen zorgondersteuning, privacyrisico en financiële gevolgen. Start bij zorgimpact direct de goedgekeurde continuïteitsroute; wacht niet op diagnose.</li><li>Analyse: toets hypothesen met bron, datum en beoordelaar; onbekend is niet uitgesloten.</li><li>Herstel: alleen bevoegde wijzigingen; controleer oorspronkelijke fout, keten, dubbele verwerking en normale werking met de gebruiker.</li><li>Leren: registreer terugkoppeling, restpunten, eigenaar, datum en herbeoordeling van kennis.</li></ol></details>
+  <section id="continuity" aria-labelledby="continuityTitle">
+    <h3 id="continuityTitle">Continuïteitscasus: ECD-uitval op een woonzorglocatie</h3>
+    <p><strong>INC-DEMO-LOC-02:</strong> medewerkers op een fictieve woonzorglocatie kunnen het ECD niet openen tijdens een overdracht. Zorgondersteuning kan stilvallen; omvang alleen bepaalt niet de prioriteit. Dit is een oefencasus, geen zorgprotocol. <strong>Gereedheid: niet aangetoond</strong> — lokaal noodplan, contactroute, bevoegde goedkeuring en bereikbaarheidstest ontbreken.</p>
+    <ol>
+      <li><strong>Direct melden en opschalen:</strong> gebruik de lokaal afgesproken contactroute voor zorgcoördinatie en servicedesk. De bevoegde zorg-/proceseigenaar beoordeelt cliëntveiligheid en activeert het bestaande continuïteitsplan. FAB legt tijdstip, getroffen functies en de volgende verantwoordelijke vast. Start dit naast de analyse, niet pas erna.</li>
+      <li><strong>Veilige noodwerkwijze:</strong> volg uitsluitend het actuele, goedgekeurde lokale plan. Vul vóór gebruik documentreferentie, versie, goedkeuringsdatum, eigenaar, toepassingsgrenzen en herbeoordelingsdatum in de afgesproken bron aan. Deze demo schrijft geen medicatie-, zorg- of papieren registratiewijze voor en autoriseert geen ruimere toegang.</li>
+      <li><strong>Bereikbaar zonder ECD:</strong> bewaar een gecontroleerde offline of afdrukbare versie van het lokale plan en contactroute op de afgesproken beveiligde plek. Test ook uitval van netwerk, IAM en stroom waar relevant. Dit HTML-bestand is zelfstandig offline leesbaar, maar bevat geen daadwerkelijk noodplan of contactpersonen; een afdruk bewijst geen bereikbaarheid van de juiste informatie.</li>
+      <li><strong>Escalatiepakket:</strong> meld incidentreferentie, tijd/tijdzone, proces- en zorgimpact, getroffen locatie/functie, wat nog werkt, toegepaste goedgekeurde noodmaatregel en interne eigenaar. Gebruik alleen noodzakelijke gegevens via de beveiligde supportroute; geen volledige logs of cliëntgegevens in de vrij deelbare samenvatting.</li>
+      <li><strong>Herstel bevestigen:</strong> ICT/leverancier bevestigt technische werking; FAB en kerngebruiker toetsen toegang met juiste scope, inhoudelijke verwerking, aantallen en actualiteit. Vergelijk eventuele achterstanden en tijdelijke registraties op dezelfde peildatum; herverwerk pas na goedkeuring en controle op dubbelen. De bevoegde proceseigenaar bevestigt hervatting van het normale proces.</li>
+    </ol>
+    <p><strong>Vervolgstap:</strong> oefen met proceseigenaar, zorginhoudelijke deskundige, FAB en ICT. Leg bron/versie, datum, uitvoerder, beoordelaar, uitkomst en open actie vast bij INC-DEMO-LOC-02 in een synthetisch oefendossier. Werkelijk gebruik vraagt echte, gecontroleerde contactroutes en een goedgekeurd noodplan.</p>
+  </section>
+  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete overdracht eerst vaststellen; herzie bij proces-, contact- of systeemwijziging. Vergelijk met het bestaande noodplan en de meldchecklist op juiste escalatie, gemiste veiligheidsinformatie, bereikbaarheid en dubbele invoer. Technische werking is geen lokale validatie of bewezen gebruikerswaarde.</p>
+</section>
+</body>
+</html>

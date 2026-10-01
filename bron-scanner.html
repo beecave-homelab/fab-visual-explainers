@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BronScanner</title>
+<style>
+:root{
+  --paper:#f6f7f3;
+  --ink:#141714;
+  --muted:#626962;
+  --line:#cbd0c8;
+  --blue:#1557ff;
+  --blue-soft:#dfe8ff;
+  --amber:#ffb800;
+  --amber-soft:#fff1c4;
+  --red:#c73737;
+  --white:#fff;
+  --shadow:0 18px 60px rgba(15,25,18,.10);
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Aptos","Segoe UI",system-ui,sans-serif;
+  min-height:100vh;
+}
+button,input{font:inherit}
+button{color:inherit}
+a{color:inherit}
+.shell{
+  width:min(1500px,100%);
+  margin:0 auto;
+  padding:18px;
+}
+.topbar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:end;
+  border-bottom:2px solid var(--ink);
+  padding:8px 0 16px;
+}
+.brandline{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  min-width:0;
+}
+.mark{
+  width:46px;height:46px;
+  border:2px solid var(--ink);
+  position:relative;
+  flex:0 0 auto;
+  background:var(--white);
+}
+.mark:before,.mark:after{
+  content:"";
+  position:absolute;
+  background:var(--ink);
+}
+.mark:before{left:8px;right:8px;height:2px;top:13px;box-shadow:0 8px 0 var(--ink),0 16px 0 var(--ink)}
+.mark:after{width:8px;height:8px;right:6px;bottom:6px;background:var(--blue)}
+h1{font-size:clamp(1.45rem,3vw,2.35rem);line-height:1;margin:0;font-weight:760;letter-spacing:-.035em}
+.subtitle{margin:.35rem 0 0;color:var(--muted);max-width:68ch;line-height:1.5}
+.search-wrap{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:min(390px,42vw);
+}
+.search-wrap input{
+  width:100%;
+  min-height:46px;
+  border:1px solid var(--ink);
+  background:var(--white);
+  padding:0 14px;
+  border-radius:0;
+}
+.search-wrap input:focus,.chip:focus-visible,.strip:focus-visible,.step:focus-visible,.mode:focus-visible{
+  outline:3px solid var(--amber);
+  outline-offset:2px;
+}
+.stats{
+  display:flex;
+  gap:8px;
+  margin:14px 0 0;
+  flex-wrap:wrap;
+}
+.stat{
+  border:1px solid var(--line);
+  background:var(--white);
+  padding:6px 10px;
+  font-size:.82rem;
+}
+.stat strong{font-size:1rem}
+.workspace{
+  display:grid;
+  grid-template-columns:290px minmax(0,1fr) 300px;
+  gap:14px;
+  margin-top:14px;
+  align-items:stretch;
+}
+.panel{
+  border:1px solid var(--line);
+  background:var(--white);
+  min-width:0;
+}
+.panel-head{
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--line);
+}
+.panel-head h2{
+  margin:0;
+  font-size:1rem;
+  letter-spacing:-.015em;
+}
+.panel-head p{
+  margin:.3rem 0 0;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.35;
+}
+.map{
+  padding:10px;
+  display:grid;
+  gap:6px;
+}
+.strip{
+  appearance:none;
+  border:0;
+  width:100%;
+  min-height:54px;
+  padding:0;
+  display:grid;
+  grid-template-columns:18px minmax(0,1fr) auto;
+  text-align:left;
+  background:transparent;
+  cursor:pointer;
+  border-left:4px solid transparent;
+}
+.strip .bar{
+  align-self:stretch;
+  background:var(--line);
+  position:relative;
+}
+.strip .bar:after{
+  content:"";
+  position:absolute;
+  inset:auto 0 0 0;
+  height:var(--weight,50%);
+  background:var(--blue);
+}
+.strip .copy{
+  padding:8px 10px;
+  min-width:0;
+}
+.strip .copy b{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip .copy small{color:var(--muted);display:block;margin-top:3px}
+.strip .count{
+  padding:8px 4px 0 6px;
+  font-size:.76rem;
+  color:var(--muted);
+}
+.strip[aria-current="true"]{
+  background:var(--blue-soft);
+  border-left-color:var(--blue);
+}
+.strip[hidden]{display:none}
+.focus{
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  box-shadow:var(--shadow);
+  border:2px solid var(--ink);
+  background:var(--white);
+  min-width:0;
+}
+.focus-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--line);
+}
+.kicker{
+  font-size:.82rem;
+  color:var(--muted);
+}
+.focus h2{
+  margin:.2rem 0 0;
+  font-size:clamp(1.45rem,3vw,2.65rem);
+  line-height:1.05;
+  letter-spacing:-.045em;
+  max-width:20ch;
+}
+.confidence{
+  border:1px solid var(--ink);
+  padding:8px 10px;
+  text-align:right;
+  min-width:112px;
+}
+.confidence strong{display:block;font-size:1.2rem}
+.confidence span{font-size:.75rem;color:var(--muted)}
+.progress{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  height:10px;
+  border-bottom:1px solid var(--line);
+}
+.progress span{background:#e7eae4;border-right:1px solid var(--white)}
+.progress span.active{background:var(--blue)}
+.focus-body{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(220px,.75fr);
+  min-height:430px;
+}
+.story{
+  padding:24px 28px;
+  border-right:1px solid var(--line);
+}
+.lead{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(1.15rem,2vw,1.45rem);
+  line-height:1.55;
+  margin:0 0 22px;
+  max-width:54ch;
+}
+.story h3{
+  font-size:.95rem;
+  margin:22px 0 8px;
+}
+.story p,.story li{line-height:1.55;color:#313731}
+.story ul{padding-left:1.2rem}
+.quote{
+  margin:22px 0 0;
+  padding:14px 16px;
+  border-left:6px solid var(--amber);
+  background:var(--amber-soft);
+  font-family:Georgia,"Times New Roman",serif;
+  line-height:1.5;
+}
+.inspect{
+  padding:18px;
+  background:#f0f2ed;
+}
+.inspect h3{margin:0 0 12px;font-size:.95rem}
+.meter{
+  margin:0 0 18px;
+}
+.meter-row{
+  display:flex;justify-content:space-between;gap:10px;font-size:.78rem;color:var(--muted);margin-bottom:5px
+}
+.meter-track{height:8px;background:#d7dbd3}
+.meter-track i{display:block;height:100%;background:var(--ink);width:var(--meter,50%)}
+.signal{
+  border-top:1px solid var(--line);
+  padding:13px 0;
+}
+.signal:first-of-type{border-top:0}
+.signal b{display:block;font-size:.86rem;margin-bottom:4px}
+.signal p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.4}
+.focus-nav{
+  display:flex;
+  gap:8px;
+  padding:12px 16px;
+  border-top:1px solid var(--line);
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+.step{
+  border:1px solid var(--ink);
+  background:var(--white);
+  min-height:42px;
+  padding:0 13px;
+  cursor:pointer;
+}
+.step.primary{background:var(--ink);color:var(--white)}
+.evidence{
+  padding:0 14px 14px;
+}
+.evidence-block{
+  border-bottom:1px solid var(--line);
+  padding:14px 2px;
+}
+.evidence-block:last-child{border-bottom:0}
+.evidence-block b{font-size:.84rem;display:block;margin-bottom:5px}
+.evidence-block p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.42}
+.evidence-block button{
+  border:0;
+  background:none;
+  padding:6px 0 0;
+  text-decoration:underline;
+  cursor:pointer;
+  font-size:.8rem;
+}
+.design-note{
+  margin-top:14px;
+  border-top:2px solid var(--ink);
+  padding:15px 0 6px;
+  display:grid;
+  grid-template-columns:180px minmax(0,1fr);
+  gap:20px;
+}
+.design-note h2{font-size:1rem;margin:0}
+.design-note p{margin:0;color:var(--muted);line-height:1.5;max-width:85ch}
+.toast{
+  position:absolute;
+  width:1px;height:1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+}
+mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
+@media(max-width:1040px){
+  .workspace{grid-template-columns:230px minmax(0,1fr)}
+  .side-right{grid-column:1/-1}
+  .side-right .evidence{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .side-right .evidence-block{border-bottom:0;border-right:1px solid var(--line);padding-right:14px}
+  .side-right .evidence-block:last-child{border-right:0}
+}
+@media(max-width:760px){
+  .shell{padding:12px}
+  .topbar{grid-template-columns:1fr}
+  .search-wrap{min-width:0}
+  .workspace{grid-template-columns:1fr}
+  .map{display:flex;overflow:auto;gap:8px;padding:10px}
+  .strip{min-width:210px}
+  .focus{grid-row:auto}
+  .focus-body{grid-template-columns:1fr;min-height:0}
+  .story{border-right:0;border-bottom:1px solid var(--line);padding:20px}
+  .inspect{padding:16px}
+  .side-right{grid-column:auto}
+  .side-right .evidence{display:block}
+  .side-right .evidence-block{border-right:0;border-bottom:1px solid var(--line)}
+  .design-note{grid-template-columns:1fr;gap:6px}
+}
+@media(max-width:460px){
+  .focus-top{display:block}
+  .confidence{margin-top:12px;text-align:left}
+  .focus h2{font-size:1.65rem}
+}
+@media(prefers-reduced-motion:no-preference){
+  .strip,.step{transition:background-color .15s ease,color .15s ease}
+}
+</style>
+</head>
+<body>
+<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Waar staat de relevante onderbouwing in een omvangrijke bron?</h2>
+  <p><strong>Fictieve bron:</strong> alle secties, citaten, percentages en bewijsscores hieronder zijn verzonnen. Informatiedichtheid en betrouwbaarheid zijn handgekozen demonstratiewaarden zonder meetmethode, steekproef of gekalibreerde schaal; geen gemeten betrouwbaarheid of aangetoonde tijdwinst. Gebruik zulke scores niet voor een echt besluit zonder uitgelegde, controleerbare grondslag.</p>
+  <p><strong>Gebruiker en moment:</strong> FAB bij gerichte oriëntatie in omvangrijke leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare passage → lokaal gevolg → actie → eigenaar in het bestaande dossier. Gericht bronpatroon; een inhoudsopgave kan genoeg zijn. Vergelijk met <a href="bronkaart-onepager.html">Bronkaart</a> op dezelfde bron.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetisch bronmodel, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De broneigenaar bewaakt publicatie, versie en geldigheid; FAB beoordeelt lokale beheerimpact; bevoegde deskundigen beoordelen zorg-, privacy- of beleidsgevolgen. Geldigheid: presentatieprototype, geen FAB-werkinstructie of lokaal gevalideerde bron.</p>
+  <p><strong>Vervolg en onderhoud:</strong> selecteer alleen met actuele bron, controleerbare verwijzingen, eigenaar en concrete vervolgactie. Herzie bij bronwijziging; leg echte bronversie, datum, beoordelaar en uitkomst vast in de bestaande registratie, geen tweede administratie. Ontbrekend bewijs blijft onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk met de inhoudsopgave op juistheid, zoektijd en onderhoudslast; gebruikerswaarde is nog niet bewezen.</p>
+</section>
+<main class="shell" id="app">
+  <header class="topbar">
+    <div>
+      <div class="brandline">
+        <div class="mark" aria-hidden="true"></div>
+        <div>
+          <h1>BronScanner</h1>
+          <p class="subtitle">Een grote bron teruggebracht tot een scanbare strook. Kies een sectie, zie direct de kern, de onderbouwing en waar de tekst onzeker of onvolledig is.</p>
+        </div>
+      </div>
+      <div class="stats" aria-label="Bronoverzicht">
+        <span class="stat"><strong>42</strong> pagina's</span>
+        <span class="stat"><strong>8</strong> hoofdsecties</span>
+        <span class="stat"><strong>31</strong> bronverwijzingen</span>
+        <span class="stat"><strong>6</strong> aandachtspunten</span>
+      </div>
+    </div>
+    <label class="search-wrap">
+      <span class="toast">Zoek in onderwerpen</span>
+      <input id="search" type="search" placeholder="Zoek onderwerp of begrip…" autocomplete="off">
+    </label>
+  </header>
+
+  <section class="workspace">
+    <aside class="panel side-left">
+      <div class="panel-head">
+        <h2>Bron als strook</h2>
+        <p>Hoogte van de blauwe balk toont een handgekozen demo-index, geen gemeten informatiedichtheid.</p>
+      </div>
+      <nav class="map" id="map" aria-label="Secties"></nav>
+    </aside>
+
+    <article class="focus" aria-live="polite">
+      <div class="focus-top">
+        <div>
+          <div class="kicker" id="meta">Sectie 1 van 8</div>
+          <h2 id="title">Aanleiding en context</h2>
+        </div>
+        <div class="confidence">
+          <strong id="confidence">92/100</strong>
+          <span>fictieve demo-index; niet gemeten</span>
+        </div>
+      </div>
+      <div class="progress" id="progress" aria-hidden="true"></div>
+
+      <div class="focus-body">
+        <div class="story">
+          <p class="lead" id="summary"></p>
+          <h3>Wat moet je hiervan onthouden?</h3>
+          <ul id="takeaways"></ul>
+          <blockquote class="quote" id="quote"></blockquote>
+        </div>
+        <aside class="inspect">
+          <h3>Snelle inspectie</h3>
+          <div class="meter">
+            <div class="meter-row"><span>Onderbouwing</span><strong id="evidenceLabel">sterk</strong></div>
+            <div class="meter-track"><i id="evidenceMeter"></i></div>
+          </div>
+          <div class="meter">
+            <div class="meter-row"><span>Impact</span><strong id="impactLabel">hoog</strong></div>
+            <div class="meter-track"><i id="impactMeter"></i></div>
+          </div>
+          <div class="signal">
+            <b>Waarom relevant</b>
+            <p id="why"></p>
+          </div>
+          <div class="signal">
+            <b>Let op</b>
+            <p id="caution"></p>
+          </div>
+          <div class="signal">
+            <b>Verwant</b>
+            <p id="related"></p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="focus-nav">
+        <button class="step" id="prev" type="button">Vorige sectie</button>
+        <button class="step primary" id="next" type="button">Volgende sectie</button>
+      </div>
+    </article>
+
+    <aside class="panel side-right">
+      <div class="panel-head">
+        <h2>Bewijsspoor</h2>
+        <p>De belangrijkste ondersteuning bij de geselecteerde sectie.</p>
+      </div>
+      <div class="evidence" id="evidence"></div>
+    </aside>
+  </section>
+
+  <section class="design-note">
+    <h2>Ontwerprichting</h2>
+    <p>Dit concept behandelt een bron als iets dat je scant, niet als iets dat je van boven naar beneden moet uitlezen. De verticale strook blijft het vaste oriëntatiepunt; één selectie vult het middenscherm met precies genoeg context om te besluiten of je verder wilt verdiepen.</p>
+    <p>De vormgeving is bewust technisch en functioneel: scherpe lijnen, minimale decoratie en één dominante interactiekleur. Informatiedichtheid, onderbouwing en impact worden visueel gecodeerd, zodat de structuur van de bron zelf onderdeel wordt van de interface. Alle inhoud hieronder is fictieve demo-inhoud.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const data = [
+    {
+      title:"Aanleiding en context", weight:82, confidence:92, evidence:88, impact:74,
+      summary:"De organisatie wil informatie sneller vindbaar maken zonder de oorspronkelijke nuance kwijt te raken. De bron beschrijft waarom bestaande rapportages te veel leestijd vragen en te weinig richting geven.",
+      takeaways:["De huidige informatie is inhoudelijk rijk, maar versnipperd.","Lezers zoeken meestal een antwoord, niet het volledige document.","Samenvatten zonder broncontext vergroot het risico op verkeerde interpretatie."],
+      quote:"“De centrale opgave is niet minder informatie aanbieden, maar sneller zichtbaar maken welke informatie op dat moment relevant is.”",
+      why:"Legt het probleem vast dat alle volgende keuzes probeert op te lossen.",
+      caution:"De bron meet leestijd niet rechtstreeks; dit is gebaseerd op interviews.",
+      related:"Gebruikersonderzoek, informatiearchitectuur, zoekgedrag",
+      proofs:[
+        ["Interviews","12 semigestructureerde gesprekken met eindgebruikers."],
+        ["Analyse bestaand materiaal","42 pagina’s, 31 bronverwijzingen en 8 hoofdsecties."],
+        ["Beperking","Geen observatiestudie van feitelijk leesgedrag uitgevoerd."]
+      ]
+    },
+    {
+      title:"Gebruikersbehoeften", weight:67, confidence:87, evidence:82, impact:90,
+      summary:"Gebruikers willen eerst weten wat belangrijk is, daarna waarom dat zo is en pas daarna de volledige onderbouwing kunnen openen. Die volgorde komt in vrijwel alle gesprekken terug.",
+      takeaways:["Oriëntatie moet binnen enkele seconden mogelijk zijn.","Details moeten beschikbaar blijven zonder het hoofdoverzicht te verdringen.","Dezelfde bron moet meerdere leesroutes ondersteunen."],
+      quote:"“Ik wil eerst weten waar ik moet kijken. Daarna beslis ik zelf hoe diep ik ga.”",
+      why:"Bepaalt de gewenste volgorde van informatie in de interface.",
+      caution:"Behoeften verschillen per rol; één standaardweergave is niet altijd genoeg.",
+      related:"Progressive disclosure, rollen, filters",
+      proofs:[
+        ["Patroon","10 van 12 deelnemers beschrijven dezelfde leesvolgorde."],
+        ["Variatie","Managers starten vaker bij conclusies; specialisten vaker bij bewijs."],
+        ["Open punt","Rolprofielen zijn nog niet formeel gevalideerd."]
+      ]
+    },
+    {
+      title:"Informatiehiërarchie", weight:91, confidence:95, evidence:93, impact:96,
+      summary:"De bron onderscheidt vier informatielagen: kernboodschap, duiding, bewijs en broncontext. Een interface moet die lagen niet mengen, maar wel direct aan elkaar koppelbaar houden.",
+      takeaways:["Kernboodschappen moeten zelfstandig leesbaar zijn.","Bewijs hoort één klik van de conclusie verwijderd te zijn.","Broncontext moet zichtbaar blijven bij verdieping."],
+      quote:"“Een goede samenvatting verbergt de bron niet; ze maakt de route ernaartoe korter.”",
+      why:"Dit vormt het structurele model waarop de hele informatiepresentatie rust.",
+      caution:"Niet iedere bron bevat even duidelijk bewijs of onzekerheidsinformatie.",
+      related:"Bronverwijzingen, detailniveau, context",
+      proofs:[
+        ["Documentanalyse","Alle 8 secties konden in de vier lagen worden ingedeeld."],
+        ["Validatie","Indeling besproken met 6 inhoudsdeskundigen."],
+        ["Risico","Automatische extractie kan nuance verkeerd classificeren."]
+      ]
+    },
+    {
+      title:"Navigatiepatronen", weight:74, confidence:85, evidence:79, impact:88,
+      summary:"Niet scrolllengte maar keuzevrijheid blijkt bepalend voor ervaren overzicht. Gebruikers waarderen vaste ankerpunten, voorspelbare labels en terugkeer naar een bekende positie.",
+      takeaways:["Beperk gelijktijdig zichtbare keuzes.","Laat selectie altijd zichtbaar blijven.","Gebruik zoeken als versneller, niet als enige navigatie."],
+      quote:"“Als ik weet waar ik ben, voelt een groot document ineens veel kleiner.”",
+      why:"Vertaalt de informatiehiërarchie naar concreet interactiegedrag.",
+      caution:"Op mobiel moeten navigatie en detailweergave anders herschikken.",
+      related:"Zoeken, filters, focusstates",
+      proofs:[
+        ["Prototype-test","8 van 9 testers konden na verdieping terugkeren zonder hulp."],
+        ["Mobiel","Op kleine schermen nam de zoektijd toe bij een te brede navigatiestructuur."],
+        ["Aanbeveling","Houd primaire keuzes binnen één zichtbare reeks."]
+      ]
+    },
+    {
+      title:"Bronkwaliteit", weight:58, confidence:81, evidence:76, impact:79,
+      summary:"Niet alle onderdelen van de bron zijn even sterk onderbouwd. De presentatie moet daarom onderscheid maken tussen feiten, interpretaties, aannames en open vragen.",
+      takeaways:["Laat onzekerheid zichtbaar zijn vóór verdieping.","Maak herkomst van uitspraken traceerbaar.","Gebruik geen visuele zekerheid waar de bron die niet biedt."],
+      quote:"“Betrouwbaarheid is zelf informatie en hoort dus in het ontwerp thuis.”",
+      why:"Voorkomt dat een compacte presentatie stelliger wordt dan de bron.",
+      caution:"Een enkel percentage kan schijnprecisie suggereren; combineer cijfers met tekst.",
+      related:"Bewijs, aannames, onzekerheid",
+      proofs:[
+        ["Classificatie","31 verwijzingen verdeeld over primaire en secundaire bronnen."],
+        ["Hiaten","6 uitspraken hebben geen directe bronverwijzing."],
+        ["Proces","Open punten gemarkeerd voor inhoudelijke verificatie."]
+      ]
+    },
+    {
+      title:"Implementatie", weight:76, confidence:89, evidence:84, impact:83,
+      summary:"De voorgestelde aanpak begint met een vaste inhoudsstructuur en pas daarna met automatisering. Zo blijft controleerbaar welke informatie uit de bron waar terechtkomt.",
+      takeaways:["Start met expliciete velden voor kern, bewijs, context en onzekerheid.","Houd bronverwijzingen machineleesbaar.","Test met echte lezers vóór verdere automatisering."],
+      quote:"“Automatiseer pas nadat de structuur handmatig begrijpelijk en bruikbaar is.”",
+      why:"Maakt de ontwerpprincipes uitvoerbaar zonder afhankelijk te zijn van één platform.",
+      caution:"Automatisering lost een onduidelijke bronstructuur niet vanzelf op.",
+      related:"Datamodel, extractie, validatie",
+      proofs:[
+        ["Pilot","Twee documenten handmatig gemodelleerd."],
+        ["Techniek","Structuur kan als JSON worden opgeslagen en door HTML worden gerenderd."],
+        ["Volgende stap","Automatische extractie nog apart valideren."]
+      ]
+    },
+    {
+      title:"Risico's en randvoorwaarden", weight:63, confidence:86, evidence:80, impact:92,
+      summary:"De grootste risico’s zijn verlies van nuance, verouderde broninformatie en een interface die te veel zekerheid suggereert. Governance rond actualiteit en herkomst is daarom onderdeel van het ontwerp.",
+      takeaways:["Toon altijd datum en bronstatus.","Bewaar letterlijke bronpassages naast samenvattingen.","Maak onduidelijkheid zichtbaar in plaats van die weg te poetsen."],
+      quote:"“Een snelle interface is alleen betrouwbaar als ook zichtbaar is waar haar grenzen liggen.”",
+      why:"Bepaalt wanneer compacte informatiepresentatie verantwoord gebruikt kan worden.",
+      caution:"Demo-interfaces kunnen vollediger lijken dan de onderliggende inhoud werkelijk is.",
+      related:"Actualiteit, governance, betrouwbaarheid",
+      proofs:[
+        ["Risicoworkshop","Vier kernrisico’s benoemd met inhouds- en beheerrollen."],
+        ["Beheereis","Elke samenvatting moet naar een herleidbare bronpassage verwijzen."],
+        ["Open punt","Eigenaarschap van periodieke herbeoordeling is nog niet toegewezen."]
+      ]
+    },
+    {
+      title:"Aanbevolen vervolgstap", weight:48, confidence:90, evidence:85, impact:94,
+      summary:"Bouw één inhoudelijk realistische pilot en laat gebruikers drie taken uitvoeren: oriënteren, bewijs vinden en onzekerheid herkennen. Meet waar zij vastlopen voordat nieuwe functies worden toegevoegd.",
+      takeaways:["Test het informatiemodel, niet alleen de vormgeving.","Gebruik echte complexe broninhoud.","Meet zoektijd, begrip en terugvindbaarheid."],
+      quote:"“De beste volgende stap is een kleine pilot met echte complexiteit.”",
+      why:"Zet analyse om in een concrete, toetsbare vervolgactie.",
+      caution:"Een positieve demo-ervaring zegt nog niets over schaalbaarheid naar honderden bronnen.",
+      related:"Pilot, gebruikerstest, meetplan",
+      proofs:[
+        ["Doel","Valideren of gebruikers binnen 30 seconden de juiste kern vinden."],
+        ["Taak","Laat deelnemers bij iedere conclusie ook de onderbouwing terugvinden."],
+        ["Succescriterium","Gebruikers herkennen expliciet wanneer informatie onzeker is."]
+      ]
+    }
+  ];
+
+  const app = document.getElementById("app");
+  const map = document.getElementById("map");
+  const search = document.getElementById("search");
+  const title = document.getElementById("title");
+  const meta = document.getElementById("meta");
+  const confidence = document.getElementById("confidence");
+  const summary = document.getElementById("summary");
+  const takeaways = document.getElementById("takeaways");
+  const quote = document.getElementById("quote");
+  const why = document.getElementById("why");
+  const caution = document.getElementById("caution");
+  const related = document.getElementById("related");
+  const evidence = document.getElementById("evidence");
+  const evidenceMeter = document.getElementById("evidenceMeter");
+  const impactMeter = document.getElementById("impactMeter");
+  const evidenceLabel = document.getElementById("evidenceLabel");
+  const impactLabel = document.getElementById("impactLabel");
+  const progress = document.getElementById("progress");
+  const prev = document.getElementById("prev");
+  const next = document.getElementById("next");
+  let active = 0;
+
+  const label = value => value >= 88 ? "sterk" : value >= 75 ? "redelijk" : "beperkt";
+
+  function renderMap(){
+    map.innerHTML = "";
+    data.forEach((item,index)=>{
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "strip";
+      button.dataset.index = index;
+      button.style.setProperty("--weight", item.weight + "%");
+      button.setAttribute("aria-current", index === active ? "true" : "false");
+      button.innerHTML = `<span class="bar" aria-hidden="true"></span><span class="copy"><b>${item.title}</b><small>demo-index ${item.confidence}/100 · niet gemeten</small></span><span class="count">${index+1}/8</span>`;
+      button.addEventListener("click",()=>select(index));
+      map.appendChild(button);
+    });
+  }
+
+  function renderProgress(){
+    progress.innerHTML="";
+    data.forEach((_,index)=>{
+      const s=document.createElement("span");
+      if(index<=active) s.className="active";
+      progress.appendChild(s);
+    });
+  }
+
+  function select(index){
+    active = Math.max(0,Math.min(data.length-1,index));
+    const item = data[active];
+    title.textContent=item.title;
+    meta.textContent=`Sectie ${active+1} van ${data.length}`;
+    confidence.textContent=item.confidence+"/100";
+    summary.textContent=item.summary;
+    takeaways.innerHTML=item.takeaways.map(x=>`<li>${x}</li>`).join("");
+    quote.textContent=item.quote;
+    why.textContent=item.why;
+    caution.textContent=item.caution;
+    related.textContent=item.related;
+    evidenceMeter.style.setProperty("--meter",item.evidence+"%");
+    impactMeter.style.setProperty("--meter",item.impact+"%");
+    evidenceLabel.textContent=label(item.evidence);
+    impactLabel.textContent=item.impact>=88?"hoog":item.impact>=72?"middel":"beperkt";
+    evidence.innerHTML=item.proofs.map(p=>`<div class="evidence-block"><b>${p[0]}</b><p>${p[1]}</p><button type="button" tabindex="0">Bekijk broncontext</button></div>`).join("");
+    evidence.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+      const note=btn.previousElementSibling.textContent;
+      alert("Demo: in een echte bron opent hier de exacte passage of bronverwijzing.\n\n"+note);
+    }));
+    [...map.querySelectorAll(".strip")].forEach((b,i)=>b.setAttribute("aria-current",i===active?"true":"false"));
+    renderProgress();
+    prev.disabled=active===0;
+    next.disabled=active===data.length-1;
+  }
+
+  function filter(){
+    const q=search.value.trim().toLowerCase();
+    [...map.querySelectorAll(".strip")].forEach((button,index)=>{
+      const item=data[index];
+      const hay=[item.title,item.summary,item.related,...item.takeaways].join(" ").toLowerCase();
+      button.hidden=q!=="" && !hay.includes(q);
+    });
+  }
+
+  prev.addEventListener("click",()=>select(active-1));
+  next.addEventListener("click",()=>select(active+1));
+  search.addEventListener("input",filter);
+  app.addEventListener("keydown",event=>{
+    const tag=event.target.tagName;
+    if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT") return;
+    if(event.key==="ArrowLeft"){event.preventDefault();select(active-1)}
+    if(event.key==="ArrowRight"){event.preventDefault();select(active+1)}
+  });
+
+  renderMap();
+  select(0);
+})();
+</script>
+</body>
+</html>

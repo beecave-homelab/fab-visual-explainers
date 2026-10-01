@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Bronkaart — interactieve one-pager</title>
+  <style>
+    :root {
+      --paper: #f6f8fc;
+      --surface: #ffffff;
+      --ink: #17213a;
+      --muted: #667085;
+      --line: #d9e0ec;
+      --line-strong: #b7c2d6;
+      --accent: #3559e8;
+      --accent-soft: #edf1ff;
+      --signal: #147d64;
+      --signal-soft: #e8f6f1;
+      --warn: #98620b;
+      --warn-soft: #fff5dd;
+      --shadow: 0 18px 50px rgba(23, 33, 58, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1440px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(53, 89, 232, 0.06), transparent 28rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+    }
+
+    button, input { font: inherit; }
+
+    button { cursor: pointer; }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(53, 89, 232, 0.28);
+      outline-offset: 3px;
+    }
+
+    .page {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .86rem;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(2.2rem, 5.2vw, 5.4rem);
+      line-height: .94;
+      letter-spacing: -0.055em;
+      font-weight: 750;
+    }
+
+    .intro-copy {
+      margin: 16px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.18rem);
+    }
+
+    .source-meta {
+      border-left: 2px solid var(--ink);
+      padding: 4px 0 4px 18px;
+    }
+
+    .source-meta strong,
+    .source-meta span { display: block; }
+
+    .source-meta strong { font-size: 1rem; }
+    .source-meta span { color: var(--muted); margin-top: 5px; font-size: .92rem; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 0 0 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 420px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      translate: 0 -50%;
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #sourceSearch {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 16px 10px 42px;
+      background: rgba(255,255,255,.82);
+      color: var(--ink);
+    }
+
+    .tool-button {
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: var(--surface);
+      color: var(--ink);
+      font-weight: 650;
+    }
+
+    .tool-button:hover { border-color: var(--line-strong); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(240px, .72fr) minmax(360px, 1.22fr) minmax(300px, 1fr);
+      min-height: 610px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .pane {
+      min-width: 0;
+      padding: 24px;
+      background: rgba(255,255,255,.86);
+    }
+
+    .pane + .pane { border-left: 1px solid var(--line); }
+
+    .pane h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+
+    .pane-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: .91rem;
+    }
+
+    .scan-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .scan-item {
+      position: relative;
+      width: 100%;
+      min-height: 64px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 11px 10px 11px 2px;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      transition: background-color .16s ease, padding .16s ease;
+    }
+
+    .scan-item:last-child { border-bottom: 0; }
+
+    .scan-item .kind {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: 3px;
+    }
+
+    .scan-item .label {
+      display: block;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .scan-item:hover,
+    .scan-item[aria-current="true"] {
+      background: var(--accent-soft);
+      padding-left: 12px;
+      border-radius: 10px;
+      border-bottom-color: transparent;
+    }
+
+    .scan-item[aria-current="true"]::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 13px;
+      bottom: 13px;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--accent);
+    }
+
+    .map-pane {
+      position: relative;
+      background:
+        linear-gradient(rgba(53,89,232,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53,89,232,.035) 1px, transparent 1px),
+        #fbfcff;
+      background-size: 28px 28px;
+    }
+
+    .topic-map {
+      position: relative;
+      min-height: 500px;
+      margin-top: 4px;
+    }
+
+    .topic-map::before,
+    .topic-map::after {
+      content: "";
+      position: absolute;
+      background: var(--line-strong);
+      z-index: 0;
+    }
+
+    .topic-map::before {
+      width: 2px;
+      left: 50%;
+      top: 80px;
+      bottom: 84px;
+      translate: -50% 0;
+    }
+
+    .topic-map::after {
+      height: 2px;
+      left: 12%;
+      right: 12%;
+      top: 50%;
+      translate: 0 -50%;
+    }
+
+    .map-center,
+    .map-node {
+      position: absolute;
+      z-index: 2;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      box-shadow: 0 8px 24px rgba(23,33,58,.06);
+    }
+
+    .map-center {
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      width: min(46%, 210px);
+      min-height: 116px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      padding: 20px;
+      text-align: center;
+      display: grid;
+      place-content: center;
+      background: #fff;
+    }
+
+    .map-center strong { display: block; font-size: 1.02rem; }
+    .map-center span { display: block; margin-top: 4px; color: var(--muted); font-size: .78rem; }
+
+    .map-node {
+      width: min(41%, 180px);
+      min-height: 76px;
+      border-radius: 15px;
+      padding: 12px 13px;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .map-node .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line-strong);
+      display: inline-block;
+      margin-right: 7px;
+      vertical-align: 1px;
+    }
+
+    .map-node strong { font-size: .88rem; line-height: 1.2; }
+    .map-node small { display: block; margin-top: 5px; color: var(--muted); line-height: 1.3; }
+
+    .map-node:hover { transform: translateY(-2px); border-color: var(--line-strong); }
+    .map-node[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .map-node[aria-pressed="true"] .dot { background: var(--accent); }
+
+    .map-node[data-id="context"] { top: 16px; left: 6%; }
+    .map-node[data-id="finding"] { top: 16px; right: 6%; }
+    .map-node[data-id="evidence"] { top: 41%; left: 0; }
+    .map-node[data-id="impact"] { top: 41%; right: 0; }
+    .map-node[data-id="questions"] { bottom: 8px; left: 50%; translate: -50% 0; }
+
+    .detail-pane { background: #fff; }
+
+    .detail-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    #detailTitle {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.4vw, 2.15rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    #detailSummary {
+      margin: 12px 0 17px;
+      color: #3e4961;
+      font-size: .98rem;
+    }
+
+    .detail-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 9px;
+    }
+
+    .detail-list li {
+      padding-left: 18px;
+      position: relative;
+      color: #344054;
+      font-size: .91rem;
+    }
+
+    .detail-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .62em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .primary-action,
+    .secondary-action {
+      min-height: 42px;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-weight: 700;
+    }
+
+    .primary-action {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary-action {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .source-fragment {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-left: 3px solid var(--signal);
+      background: var(--signal-soft);
+      border-radius: 0 10px 10px 0;
+      color: #29433c;
+      font-size: .88rem;
+    }
+
+    .source-fragment.is-open { display: block; }
+
+    .source-fragment strong { display: block; margin-bottom: 5px; color: #1b4639; }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: .79rem;
+    }
+
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .legend .selected i { background: var(--accent); }
+    .legend .supported i { background: var(--signal); }
+    .legend .uncertain i { background: var(--warn); }
+
+    .empty {
+      display: none;
+      padding: 18px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 12px;
+      color: var(--muted);
+      background: #fff;
+      text-align: center;
+    }
+
+    .empty.is-visible { display: block; }
+
+    .footnote {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    @media (max-width: 1050px) {
+      .workspace { grid-template-columns: 260px minmax(0,1fr); }
+      .detail-pane {
+        grid-column: 1 / -1;
+        border-left: 0 !important;
+        border-top: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, .75fr);
+        column-gap: 28px;
+      }
+      .detail-actions,
+      .source-fragment { grid-column: 2; }
+      .detail-badge,
+      #detailTitle,
+      #detailSummary,
+      .detail-list { grid-column: 1; }
+      .detail-badge { justify-self: start; }
+      .detail-actions { grid-row: 1 / span 4; align-self: start; margin-top: 0; padding-top: 0; border-top: 0; }
+      .source-fragment { grid-row: 4 / span 2; }
+    }
+
+    @media (max-width: 760px) {
+      .page { width: min(calc(100% - 22px), var(--max)); padding-top: 18px; }
+      .intro { grid-template-columns: 1fr; gap: 18px; }
+      h1 { font-size: clamp(2.5rem, 14vw, 4.3rem); }
+      .source-meta { max-width: 520px; }
+      .workspace { display: block; border-radius: 18px; }
+      .pane { padding: 19px; }
+      .pane + .pane { border-left: 0; border-top: 1px solid var(--line); }
+      .scan-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .scan-item { border: 1px solid var(--line); border-radius: 12px; padding: 11px; min-height: 72px; }
+      .scan-item:hover, .scan-item[aria-current="true"] { padding-left: 11px; }
+      .scan-item[aria-current="true"]::before { display: none; }
+      .topic-map { min-height: 380px; }
+      .map-node { width: 43%; min-height: 70px; padding: 9px; }
+      .map-node small { display: none; }
+      .map-center { width: 42%; min-height: 98px; padding: 12px; }
+      .detail-pane { display: block; }
+      .detail-actions { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .source-fragment { margin-top: 14px; }
+      .footnote { display: block; }
+      .footnote span { display: block; margin-top: 4px; }
+    }
+
+    @media (max-width: 430px) {
+      .scan-list { grid-template-columns: 1fr; }
+      .topic-map { min-height: auto; display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .topic-map::before, .topic-map::after { display: none; }
+      .map-center, .map-node {
+        position: static;
+        translate: none !important;
+        width: 100%;
+        min-height: 0;
+        border-radius: 12px;
+      }
+      .map-center { order: -1; border-radius: 12px; text-align: left; place-content: start; }
+      .map-node small { display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Welke bronpassages hebben gevolgen voor mijn beheer?</h2>
+  <p><strong>Fictieve bron:</strong> de evaluatie, citaten, effecten, cijfers en eventuele pilotclaims hieronder zijn verzonnen. Ze tonen het presentatiepatroon, geen onderzoek of bewezen gebruikerswaarde.</p>
+  <p><strong>Gebruiker en moment:</strong> FAB bij beoordeling van leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare bronpassage → lokale gevolgen → actie → eigenaar in het bestaande dossier. Gericht bronpatroon, geen zelfstandige dagelijkse beheertool. Vergelijk met <a href="bron-scanner.html">BronScanner</a> of een gewone inhoudsopgave op dezelfde bron.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische bronthema’s, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Broneigenaar bewaakt versie en geldigheid, FAB lokale beheerimpact, bevoegde deskundigen zorg- en beleidsinhoud. Geldigheid: presentatieprototype, geen lokaal gevalideerde instructie.</p>
+  <p><strong>Vervolg en onderhoud:</strong> eerst actuele bron, controleerbare verwijzingen, eigenaar en vervolgactie vaststellen. Herzie bij bronwijziging; leg versie, datum, beoordelaar en uitkomst in de bestaande registratie vast, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk op juistheid, zoektijd en onderhoudslast; technische werking is geen gebruikersvalidatie.</p>
+</section>
+  <main class="page">
+    <header class="intro">
+      <div>
+        <p class="eyebrow">Interactieve bronverkenner</p>
+        <h1>Zie eerst het geheel. Zoom daarna pas in.</h1>
+        <p class="intro-copy">Een one-pager voor grote informatiebronnen: scan de kern, ontdek verbanden en open alleen de onderbouwing die je nodig hebt.</p>
+      </div>
+      <div class="source-meta" aria-label="Voorbeeldbron">
+        <strong>Demo: Evaluatie digitale dienstverlening 2026</strong>
+        <span>Voorbeeldinhoud · 82 pagina’s · 5 hoofdthema’s · 14 bronverwijzingen</span>
+      </div>
+    </header>
+
+    <div class="toolbar" role="search">
+      <label class="search-wrap">
+        <span style="position:absolute;left:-9999px">Zoek in thema’s</span>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="sourceSearch" type="search" placeholder="Zoek bijvoorbeeld op risico, bewijs of impact" autocomplete="off" />
+      </label>
+      <button class="tool-button" id="resetButton" type="button">Herstel overzicht</button>
+    </div>
+
+    <section class="workspace" aria-label="Bronverkenner">
+      <aside class="pane scan-pane">
+        <h2>Kern in vijf klikken</h2>
+        <p class="pane-intro">Begin hier. Elk punt opent dezelfde verdieping rechts.</p>
+        <div class="scan-list" id="scanList"></div>
+        <div class="empty" id="emptyState">Geen thema’s gevonden. Probeer een ander woord.</div>
+      </aside>
+
+      <section class="pane map-pane">
+        <h2>Hoe de informatie samenhangt</h2>
+        <p class="pane-intro">De kaart maakt zichtbaar wat context, bewijs, effect of onzekerheid is.</p>
+        <div class="topic-map" id="topicMap" aria-label="Interactieve themakaart">
+          <div class="map-center" aria-hidden="true">
+            <strong>De bron</strong>
+            <span>één verhaal, meerdere lagen</span>
+          </div>
+        </div>
+        <div class="legend" aria-label="Legenda">
+          <span class="selected"><i></i>geselecteerd</span>
+          <span class="supported"><i></i>onderbouwd</span>
+          <span class="uncertain"><i></i>onzekerheid</span>
+        </div>
+      </section>
+
+      <article class="pane detail-pane" aria-live="polite">
+        <span class="detail-badge" id="detailKind">Kernbevinding</span>
+        <h2 id="detailTitle">Gebruik stijgt, maar de winst is ongelijk verdeeld</h2>
+        <p id="detailSummary"></p>
+        <ul class="detail-list" id="detailList"></ul>
+        <div class="detail-actions">
+          <button class="primary-action" id="sourceButton" type="button" aria-expanded="false">Toon bronfragment</button>
+          <button class="secondary-action" id="nextButton" type="button">Volgend thema</button>
+        </div>
+        <div class="source-fragment" id="sourceFragment"></div>
+      </article>
+    </section>
+
+    <div class="footnote">
+      <span>Ontworpen voor snelle oriëntatie zonder lange leesroute.</span>
+      <span>Demo-inhoud is fictief; de interactie is het concept.</span>
+    </div>
+  </main>
+
+  <script>
+    const topics = [
+      {
+        id: 'context',
+        kind: 'Context',
+        label: 'Waarom deze bron ertoe doet',
+        summary: 'De evaluatie onderzoekt niet alleen gebruik, maar vooral waar digitale dienstverlening tijd wint, waar mensen afhaken en welke randvoorwaarden nodig zijn.',
+        bullets: [
+          'De bron combineert gebruiksdata, interviews en procesmetingen.',
+          'De centrale vraag is: waar verbetert digitaal echt de dienstverlening?',
+          'Resultaten verschillen per doelgroep en type proces.'
+        ],
+        fragment: 'Bronfragment (demo): “De toegevoegde waarde is het grootst wanneer digitaal contact een eenvoudige stap vervangt, niet wanneer een complex gesprek wordt gedigitaliseerd.”',
+        status: 'supported'
+      },
+      {
+        id: 'finding',
+        kind: 'Kernbevinding',
+        label: 'Gebruik stijgt, winst verschilt sterk',
+        summary: 'Het algemene gebruik neemt toe, maar gemiddelde groei maskeert grote verschillen. Eenvoudige taken verschuiven snel naar digitaal; complexe taken veel minder.',
+        bullets: [
+          'Sterke groei bij herhaalhandelingen en statusvragen.',
+          'Beperkte groei bij situaties met uitleg, twijfel of uitzonderingen.',
+          'Gemiddelden zijn daarom minder bruikbaar dan uitsplitsing per taak.'
+        ],
+        fragment: 'Bronfragment (demo): “De adoptie groeide in totaal, maar 71% van de verschuiving kwam uit drie routinematige processen.”',
+        status: 'supported'
+      },
+      {
+        id: 'evidence',
+        kind: 'Onderbouwing',
+        label: 'Drie soorten bewijs versterken elkaar',
+        summary: 'De sterkste conclusies worden gedragen door meerdere typen bewijs. Losse cijfers krijgen pas betekenis wanneer procesdata en ervaringen hetzelfde patroon laten zien.',
+        bullets: [
+          'Gebruiksdata toont wat mensen daadwerkelijk doen.',
+          'Procesmetingen tonen tijd, wachtrijen en overdrachtsmomenten.',
+          'Interviews verklaren waarom bepaald gedrag optreedt.'
+        ],
+        fragment: 'Bronfragment (demo): “Waar kwantitatieve en kwalitatieve signalen overeenkomen, beoordelen we de bevinding als robuust.”',
+        status: 'supported'
+      },
+      {
+        id: 'impact',
+        kind: 'Betekenis',
+        label: 'Ontwerp op taak, niet op kanaal',
+        summary: 'De praktische consequentie is dat “meer digitaal” geen doel op zichzelf hoort te zijn. Het type taak bepaalt of digitaal, persoonlijk of hybride het beste past.',
+        bullets: [
+          'Automatiseer voorspelbare stappen, niet de uitzonderingen.',
+          'Bied een duidelijke uitweg naar persoonlijk contact.',
+          'Meet succes op afgeronde taken en ervaren moeite, niet alleen gebruik.'
+        ],
+        fragment: 'Bronfragment (demo): “Kanaalsturing zonder taakdifferentiatie vergroot uitval bij complexe vragen.”',
+        status: 'supported'
+      },
+      {
+        id: 'questions',
+        kind: 'Open vraag',
+        label: 'Effect op kwetsbare groepen blijft onzeker',
+        summary: 'De bron bevat aanwijzingen dat sommige groepen minder profiteren, maar de steekproef is te klein om harde uitspraken over afzonderlijke groepen te doen.',
+        bullets: [
+          'De signalen zijn consistent, maar aantallen zijn beperkt.',
+          'Vervolgonderzoek moet uitval en hulpvragen per doelgroep volgen.',
+          'De interface markeert dit bewust als onzekerheid, niet als conclusie.'
+        ],
+        fragment: 'Bronfragment (demo): “Subgroepanalyses zijn indicatief; aantallen zijn onvoldoende voor statistisch betrouwbare vergelijkingen.”',
+        status: 'uncertain'
+      }
+    ];
+
+    const scanList = document.getElementById('scanList');
+    const topicMap = document.getElementById('topicMap');
+    const detailKind = document.getElementById('detailKind');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailSummary = document.getElementById('detailSummary');
+    const detailList = document.getElementById('detailList');
+    const sourceFragment = document.getElementById('sourceFragment');
+    const sourceButton = document.getElementById('sourceButton');
+    const nextButton = document.getElementById('nextButton');
+    const sourceSearch = document.getElementById('sourceSearch');
+    const resetButton = document.getElementById('resetButton');
+    const emptyState = document.getElementById('emptyState');
+
+    let selectedId = 'finding';
+    let visibleIds = topics.map(t => t.id);
+
+    function renderNavigation(filter = '') {
+      const q = filter.trim().toLocaleLowerCase('nl');
+      const filtered = topics.filter(topic => {
+        const haystack = [topic.kind, topic.label, topic.summary, ...topic.bullets].join(' ').toLocaleLowerCase('nl');
+        return !q || haystack.includes(q);
+      });
+      visibleIds = filtered.map(t => t.id);
+      scanList.innerHTML = '';
+      topicMap.querySelectorAll('.map-node').forEach(node => node.remove());
+
+      filtered.forEach(topic => {
+        const scanButton = document.createElement('button');
+        scanButton.type = 'button';
+        scanButton.className = 'scan-item';
+        scanButton.dataset.id = topic.id;
+        scanButton.setAttribute('aria-current', String(topic.id === selectedId));
+        scanButton.innerHTML = `<span class="kind">${topic.kind}</span><span class="label">${topic.label}</span>`;
+        scanButton.addEventListener('click', () => selectTopic(topic.id));
+        scanList.appendChild(scanButton);
+
+        const mapButton = document.createElement('button');
+        mapButton.type = 'button';
+        mapButton.className = 'map-node';
+        mapButton.dataset.id = topic.id;
+        mapButton.setAttribute('aria-pressed', String(topic.id === selectedId));
+        mapButton.innerHTML = `<span><i class="dot"></i><strong>${topic.label}</strong></span><small>${topic.kind}</small>`;
+        mapButton.addEventListener('click', () => selectTopic(topic.id));
+        topicMap.appendChild(mapButton);
+      });
+
+      const noResults = filtered.length === 0;
+      emptyState.classList.toggle('is-visible', noResults);
+
+      if (!noResults && !visibleIds.includes(selectedId)) {
+        selectTopic(filtered[0].id, false);
+      } else {
+        syncSelection();
+      }
+    }
+
+    function syncSelection() {
+      document.querySelectorAll('.scan-item').forEach(el => {
+        el.setAttribute('aria-current', String(el.dataset.id === selectedId));
+      });
+      document.querySelectorAll('.map-node').forEach(el => {
+        el.setAttribute('aria-pressed', String(el.dataset.id === selectedId));
+      });
+    }
+
+    function selectTopic(id, focusDetail = true) {
+      const topic = topics.find(item => item.id === id);
+      if (!topic) return;
+      selectedId = id;
+      detailKind.textContent = topic.kind;
+      detailTitle.textContent = topic.label;
+      detailSummary.textContent = topic.summary;
+      detailList.innerHTML = topic.bullets.map(item => `<li>${item}</li>`).join('');
+      sourceFragment.innerHTML = `<strong>Onderliggende passage</strong>${topic.fragment}`;
+      sourceFragment.classList.remove('is-open');
+      sourceButton.setAttribute('aria-expanded', 'false');
+      sourceButton.textContent = 'Toon bronfragment';
+
+      if (topic.status === 'uncertain') {
+        detailKind.style.background = 'var(--warn-soft)';
+        detailKind.style.color = 'var(--warn)';
+      } else {
+        detailKind.style.background = 'var(--accent-soft)';
+        detailKind.style.color = 'var(--accent)';
+      }
+
+      syncSelection();
+
+      if (focusDetail && window.matchMedia('(max-width: 760px)').matches) {
+        document.querySelector('.detail-pane').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    sourceButton.addEventListener('click', () => {
+      const willOpen = !sourceFragment.classList.contains('is-open');
+      sourceFragment.classList.toggle('is-open', willOpen);
+      sourceButton.setAttribute('aria-expanded', String(willOpen));
+      sourceButton.textContent = willOpen ? 'Verberg bronfragment' : 'Toon bronfragment';
+    });
+
+    nextButton.addEventListener('click', () => {
+      const pool = visibleIds.length ? visibleIds : topics.map(t => t.id);
+      const current = pool.indexOf(selectedId);
+      const next = pool[(Math.max(current, -1) + 1) % pool.length];
+      selectTopic(next);
+    });
+
+    sourceSearch.addEventListener('input', event => renderNavigation(event.target.value));
+
+    resetButton.addEventListener('click', () => {
+      sourceSearch.value = '';
+      selectedId = 'finding';
+      renderNavigation();
+      selectTopic('finding', false);
+      sourceSearch.focus();
+    });
+
+    renderNavigation();
+    selectTopic(selectedId, false);
+  </script>
+</body>
+</html>

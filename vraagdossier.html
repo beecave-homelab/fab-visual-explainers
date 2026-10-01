@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vraagdossier — interactieve informatie-onepager</title>
+  <style>
+
+    :root{
+      color-scheme: light;
+      --switch-bg:#101316;
+      --switch-fg:#f7f8f9;
+      --switch-muted:#a8b0b7;
+      --switch-line:rgba(255,255,255,.15);
+      --focus:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+    body{background:#101316;color:#fff;overflow-x:hidden}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .shell{min-height:100vh}
+    .design-switcher{
+      position:sticky;top:0;z-index:50;
+      display:flex;align-items:center;gap:14px;justify-content:space-between;
+      min-height:64px;padding:10px 18px;
+      background:rgba(16,19,22,.96);backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--switch-line);
+    }
+    .switch-title{display:flex;align-items:center;gap:11px;min-width:0}
+    .switch-mark{width:24px;height:24px;border:1px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:12px;flex:none}
+    .switch-title strong{font-size:14px;letter-spacing:.01em;white-space:nowrap}
+    .switch-title span{color:var(--switch-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+    .switch-controls{display:flex;gap:6px;padding:4px;border:1px solid var(--switch-line);border-radius:999px}
+    .switch-controls button{border:0;background:transparent;color:#c4cbd0;padding:8px 13px;border-radius:999px;font-weight:700;font-size:12px}
+    .switch-controls button.active{background:#fff;color:#111}
+    .design{display:none;min-height:calc(100vh - 64px)}
+    .design.active{display:block}
+
+    /* ---------- DESIGN A: ATLAS ---------- */
+    #atlas{
+      --a-bg:#061923;
+      --a-panel:#0b2634;
+      --a-panel2:#102f40;
+      --a-line:#34515d;
+      --a-text:#e8f2f4;
+      --a-muted:#9cb3bb;
+      --a-cyan:#71d4cf;
+      --a-amber:#f4b968;
+      --a-coral:#ee8176;
+      --a-lime:#b8d982;
+      background:var(--a-bg);color:var(--a-text);
+      font-family:"Avenir Next","Segoe UI",Arial,sans-serif;
+    }
+    .atlas-wrap{min-height:calc(100vh - 64px);padding:20px;display:grid;grid-template-rows:auto 1fr;gap:16px}
+    .atlas-head{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:24px;align-items:end}
+    .atlas-kicker{font-size:13px;color:var(--a-cyan);font-weight:700;margin-bottom:8px}
+    .atlas-head h1{font-size:clamp(28px,4vw,58px);line-height:.98;letter-spacing:-.045em;margin:0;max-width:820px;font-weight:750}
+    .atlas-head p{margin:0;color:var(--a-muted);line-height:1.6;max-width:620px;font-size:14px}
+    .atlas-board{display:grid;grid-template-columns:220px minmax(420px,1fr) 330px;gap:14px;min-height:620px}
+    .atlas-side,.atlas-detail,.atlas-map{border:1px solid rgba(150,190,204,.18);background:linear-gradient(180deg,rgba(13,38,52,.96),rgba(8,29,40,.96));border-radius:18px;min-width:0}
+    .atlas-side{padding:16px;display:flex;flex-direction:column;gap:14px}
+    .atlas-side h2,.atlas-detail h2{font-size:13px;margin:0;color:var(--a-muted);font-weight:700}
+    .route-list{display:grid;gap:8px}
+    .route-button{width:100%;text-align:left;border:0;background:transparent;color:var(--a-text);padding:10px 10px 10px 12px;border-left:2px solid rgba(255,255,255,.12);min-height:48px}
+    .route-button span{display:block;font-size:13px;font-weight:700}
+    .route-button small{display:block;color:var(--a-muted);font-size:11px;margin-top:4px}
+    .route-button.active{border-left-color:var(--a-cyan);background:rgba(113,212,207,.08)}
+    .atlas-legend{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);display:grid;gap:8px;color:var(--a-muted);font-size:11px}
+    .legend-row{display:flex;align-items:center;gap:8px}
+    .legend-dot{width:9px;height:9px;border-radius:50%;background:var(--a-cyan)}
+    .legend-dot.evidence{background:var(--a-amber)}
+    .legend-dot.risk{background:var(--a-coral)}
+    .atlas-map{position:relative;overflow:hidden;min-height:620px}
+    .atlas-map::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 50% 50%,rgba(113,212,207,.12),transparent 36%),linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:auto,48px 48px,48px 48px;pointer-events:none}
+    .map-top{position:absolute;left:18px;right:18px;top:16px;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .map-top .mode{display:flex;gap:6px;flex-wrap:wrap}
+    .map-chip{border:1px solid rgba(255,255,255,.14);background:rgba(6,25,35,.78);color:var(--a-muted);border-radius:999px;padding:7px 10px;font-size:11px}
+    .map-chip.active{color:var(--a-text);border-color:rgba(113,212,207,.6);background:rgba(113,212,207,.1)}
+    .map-stats{font-size:11px;color:var(--a-muted);white-space:nowrap}
+    .connections{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+    .connections path{fill:none;stroke:#56727e;stroke-width:1.4;stroke-dasharray:5 7;opacity:.55}
+    .connections path.strong{stroke:var(--a-cyan);stroke-width:2;stroke-dasharray:none;opacity:.5}
+    .atlas-node{position:absolute;z-index:3;transform:translate(-50%,-50%);width:144px;min-height:72px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:rgba(11,38,52,.92);color:var(--a-text);text-align:left;padding:11px 12px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+    .atlas-node strong{display:block;font-size:12px;line-height:1.2}
+    .atlas-node small{display:block;margin-top:6px;color:var(--a-muted);font-size:10px;line-height:1.35}
+    .atlas-node::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;top:10px;right:10px;background:var(--a-cyan)}
+    .atlas-node.evidence::after{background:var(--a-amber)}
+    .atlas-node.risk::after{background:var(--a-coral)}
+    .atlas-node.active{border-color:var(--a-cyan);box-shadow:0 0 0 2px rgba(113,212,207,.15),0 20px 55px rgba(0,0,0,.32);background:#12384a}
+    .atlas-node.dim{opacity:.16;pointer-events:none;filter:saturate(.25)}
+    .atlas-detail{padding:18px;display:flex;flex-direction:column;gap:16px}
+    .focus-type{font-size:11px;color:var(--a-cyan);font-weight:800}
+    .focus-title{font-size:28px;line-height:1.04;letter-spacing:-.03em;margin:0}
+    .focus-summary{font-size:14px;line-height:1.55;color:#d4e4e8;margin:0}
+    .detail-section{padding-top:14px;border-top:1px solid rgba(255,255,255,.09)}
+    .detail-section h3{font-size:11px;color:var(--a-muted);margin:0 0 8px}
+    .detail-section p,.detail-section li{font-size:12px;line-height:1.5;color:#bed0d5}
+    .detail-section ul{margin:0;padding-left:17px;display:grid;gap:7px}
+    .source-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(244,185,104,.35);background:rgba(244,185,104,.08);color:#ffd59b;border-radius:10px;padding:8px 10px;font-size:11px}
+    .atlas-note{margin-top:auto;padding-top:12px;color:var(--a-muted);font-size:11px;line-height:1.5}
+
+    /* ---------- DESIGN B: DOSSIER ---------- */
+    #dossier{
+      --d-paper:#eef0e8;
+      --d-ink:#171819;
+      --d-blue:#2546d8;
+      --d-yellow:#f2c74f;
+      --d-red:#d96355;
+      --d-green:#2d6a57;
+      --d-line:#242628;
+      background:#cfd3ca;color:var(--d-ink);
+      font-family:Georgia,"Times New Roman",serif;
+    }
+    .dossier-wrap{min-height:calc(100vh - 64px);padding:18px;display:grid;grid-template-rows:auto 1fr;gap:12px}
+    .dossier-head{display:flex;justify-content:space-between;gap:26px;align-items:flex-end;padding:4px 4px 0}
+    .dossier-head h1{font-family:"Arial Narrow",Arial,sans-serif;font-size:clamp(30px,5vw,66px);line-height:.9;letter-spacing:-.055em;margin:0;max-width:800px;font-stretch:condensed}
+    .dossier-head p{margin:0;max-width:570px;font-size:14px;line-height:1.55}
+    .dossier-desk{background:var(--d-paper);border:2px solid var(--d-line);min-height:630px;display:grid;grid-template-columns:200px minmax(460px,1fr) 300px;box-shadow:8px 8px 0 rgba(23,24,25,.22)}
+    .question-index{border-right:2px solid var(--d-line);display:flex;flex-direction:column;min-width:0}
+    .index-label{font-family:Arial,sans-serif;font-size:11px;font-weight:800;padding:16px;border-bottom:2px solid var(--d-line)}
+    .question-button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid rgba(23,24,25,.35);background:transparent;padding:14px 14px 15px;color:var(--d-ink);min-height:70px}
+    .question-button b{display:block;font-family:Arial,sans-serif;font-size:11px;margin-bottom:6px}
+    .question-button span{display:block;font-size:13px;line-height:1.25}
+    .question-button.active{background:var(--d-yellow)}
+    .index-bottom{margin-top:auto;padding:14px;border-top:2px solid var(--d-line);font-family:Arial,sans-serif;font-size:10px;line-height:1.45}
+    .brief-stage{min-width:0;display:grid;grid-template-rows:auto 1fr auto}
+    .brief-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--d-line);font-family:Arial,sans-serif}
+    .depth-tabs{display:flex;gap:4px}
+    .depth-tabs button{border:1px solid var(--d-line);background:transparent;color:var(--d-ink);padding:7px 10px;font-size:11px;font-weight:700}
+    .depth-tabs button.active{background:var(--d-blue);color:#fff}
+    .brief-count{font-size:11px;font-weight:700}
+    .brief-content{padding:28px 34px 24px;display:grid;align-content:start;gap:22px;min-width:0}
+    .brief-question{font-family:Arial,sans-serif;font-size:12px;font-weight:800;color:var(--d-blue)}
+    .brief-title{font-family:"Arial Narrow",Arial,sans-serif;font-size:clamp(34px,5vw,68px);line-height:.92;letter-spacing:-.055em;margin:0;max-width:850px}
+    .brief-deck{font-size:18px;line-height:1.55;max-width:760px;margin:0}
+    .brief-body{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;max-width:960px}
+    .brief-body p{font-size:15px;line-height:1.65;margin:0}
+    .margin-note{border-left:8px solid var(--d-blue);padding:12px 0 12px 16px;font-family:Arial,sans-serif;font-size:12px;line-height:1.5}
+    .margin-note strong{display:block;margin-bottom:5px}
+    .source-strip{border-top:2px solid var(--d-line);padding:10px 14px;font-family:Arial,sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:10px}
+    .source-strip b{white-space:nowrap}
+    .source-strip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .evidence-rail{border-left:2px solid var(--d-line);display:grid;grid-template-rows:auto 1fr auto;min-width:0}
+    .rail-title{padding:16px;font-family:Arial,sans-serif;font-size:11px;font-weight:800;border-bottom:2px solid var(--d-line)}
+    .evidence-list{display:grid;align-content:start}
+    .evidence-item{padding:15px 16px;border-bottom:1px solid rgba(23,24,25,.35);background:transparent}
+    .evidence-item button{all:unset;cursor:pointer;display:block;width:100%}
+    .evidence-item .tag{font-family:Arial,sans-serif;font-size:10px;font-weight:800;margin-bottom:7px}
+    .evidence-item p{font-size:13px;line-height:1.35;margin:0}
+    .evidence-item.active{background:#fff}
+    .evidence-item[data-kind="risk"]{border-left:8px solid var(--d-red)}
+    .evidence-item[data-kind="evidence"]{border-left:8px solid var(--d-blue)}
+    .evidence-item[data-kind="context"]{border-left:8px solid var(--d-green)}
+    .rail-note{padding:14px;border-top:2px solid var(--d-line);font-family:Arial,sans-serif;font-size:10px;line-height:1.45;background:#e3e5dd}
+    .detail-popover{position:absolute;z-index:20;right:18px;bottom:18px;width:min(360px,calc(100% - 36px));border:2px solid var(--d-line);background:#fff;padding:16px;box-shadow:8px 8px 0 rgba(23,24,25,.25);display:none}
+    .detail-popover.open{display:block}
+    .detail-popover header{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:10px}
+    .detail-popover h3{font-family:Arial,sans-serif;font-size:15px;margin:0}
+    .detail-popover p{font-size:13px;line-height:1.55;margin:0}
+    .detail-popover button{border:1px solid var(--d-line);background:#fff;width:30px;height:30px;font-weight:800}
+    .brief-stage{position:relative}
+
+    @media (max-width:1100px){
+      .atlas-board{grid-template-columns:190px 1fr 285px}
+      .dossier-desk{grid-template-columns:180px 1fr 260px}
+      .brief-content{padding:24px}
+    }
+    @media (max-width:900px){
+      .design-switcher{align-items:flex-start;flex-wrap:wrap}
+      .switch-title span{max-width:62vw}
+      .atlas-head,.dossier-head{grid-template-columns:1fr;display:grid;align-items:start}
+      .atlas-board{grid-template-columns:170px minmax(0,1fr);grid-template-areas:"side map" "detail detail";min-height:auto}
+      .atlas-side{grid-area:side}
+      .atlas-map{grid-area:map;min-height:560px}
+      .atlas-detail{grid-area:detail;min-height:280px}
+      .dossier-desk{grid-template-columns:160px minmax(0,1fr);grid-template-areas:"index brief" "rail rail"}
+      .question-index{grid-area:index}
+      .brief-stage{grid-area:brief}
+      .evidence-rail{grid-area:rail;border-left:0;border-top:2px solid var(--d-line);grid-template-rows:auto auto auto}
+      .evidence-list{grid-template-columns:repeat(3,1fr)}
+      .evidence-item{border-right:1px solid rgba(23,24,25,.35)}
+    }
+    @media (max-width:650px){
+      .design-switcher{position:relative;padding:10px 12px}
+      .switch-title span{display:none}
+      .switch-controls{width:100%}
+      .switch-controls button{flex:1}
+      .atlas-wrap,.dossier-wrap{padding:10px}
+      .atlas-head h1,.dossier-head h1{font-size:40px}
+      .atlas-head p,.dossier-head p{font-size:13px}
+      .atlas-board{display:block}
+      .atlas-side{margin-bottom:10px;display:grid;grid-template-columns:1fr;gap:10px}
+      .route-list{grid-template-columns:repeat(2,1fr)}
+      .route-button{border-left:0;border-top:2px solid rgba(255,255,255,.12);padding:9px}
+      .route-button.active{border-top-color:var(--a-cyan)}
+      .atlas-legend{display:none}
+      .atlas-map{min-height:480px;margin-bottom:10px}
+      .atlas-node{width:118px;min-height:66px;padding:9px}
+      .atlas-node strong{font-size:11px}
+      .atlas-node small{font-size:9px}
+      .atlas-detail{min-height:auto}
+      .dossier-head,.dossier-desk{min-width:0}
+      .dossier-head{grid-template-columns:minmax(0,1fr)}
+      .dossier-desk{display:block;box-shadow:5px 5px 0 rgba(23,24,25,.22)}
+      .question-index{border-right:0;border-bottom:2px solid var(--d-line)}
+      .index-label,.index-bottom{display:none}
+      .question-index{display:grid;grid-template-columns:repeat(5,minmax(128px,1fr));overflow-x:auto}
+      .question-button{border-right:1px solid rgba(23,24,25,.35);border-bottom:0;min-height:88px}
+      .brief-tools{flex-wrap:wrap}
+      .brief-content{padding:22px 18px}
+      .brief-body{grid-template-columns:1fr}
+      .brief-title{font-size:43px}
+      .brief-deck{font-size:17px}
+      .source-strip{align-items:flex-start}
+      .source-strip span{white-space:normal}
+      .evidence-list{grid-template-columns:1fr}
+      .evidence-rail{border-top:2px solid var(--d-line)}
+    }
+    @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  
+
+body{background:#cfd3ca;color:#171819}
+#dossier.design{display:block;min-height:100vh}
+#dossier .dossier-wrap{min-height:100vh}
+
+  </style>
+</head>
+<body>
+<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Wat moet ik onderbouwen of besluiten over één beheervraag?</h2>
+  <p><strong>Fictieve bron:</strong> antwoorden, citaten, bewijsstroken en pilot-/tijdwinstclaims hieronder zijn verzonnen. Een bewijslabel is geen beoordeeld document of uitgevoerd onderzoek; geen aangetoonde gebruikerswaarde.</p>
+  <p><strong>Gebruiker en moment:</strong> FAB bij kennisoverdracht of voorbereiding van een advies. <strong>Uitkomst:</strong> antwoord met controleerbare onderbouwing, voorwaarden, onzekerheden en vervolgactie in het bestaande kennis- of wijzigingsdossier. Gericht kennispatroon; vergelijk met <a href="vraagkompas.html">VraagKompas</a> op hetzelfde dossier, niet beide doorontwikkelen zonder aantoonbaar verschil.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetisch vraagdossier, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Kennis-/proceseigenaar bewaakt inhoud en geldigheid, FAB beheeruitleg; de bevoegde beslisser neemt een echt besluit. Geldigheid: presentatieprototype, geen lokaal gevalideerde werkinstructie of formeel besluit.</p>
+  <p><strong>Vervolg en onderhoud:</strong> eerst bronhouder, concrete vraag en vervolgstap aanwijzen; herzie bij bronwijziging. Gebruik de bestaande kennisbank als bron met versie, datum, beoordelaar en uitkomst, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen cliëntgegevens, vertrouwelijke documenten of volledige logs in HTML. Vergelijk met het bestaande kennisitem op juistheid, zoektijd en onderhoudslast; technische werking bewijst geen gebruikerswaarde.</p>
+</section>
+<section aria-label="Ontwerp B: Vraagdossier" class="design active" id="dossier">
+<div class="dossier-wrap">
+<header class="dossier-head">
+<h1>Begin niet bij hoofdstuk één. Begin bij de vraag die je hebt.</h1>
+<p>Deze richting zet het document om in een compact dossier van beslisvragen. De pagina herschrijft zichzelf rond je gekozen vraag: eerst een antwoord in 30 seconden, daarna meer context of de bronlaag. Bewijsstukken staan ernaast als losse stroken en openen pas wanneer je ze nodig hebt.</p>
+</header>
+<div class="dossier-desk">
+<nav aria-label="Belangrijkste vragen" class="question-index">
+<div class="index-label">Waar wil je antwoord op?</div>
+<button class="question-button active" data-question="main"><b>Kernvraag</b><span>Wat is de hoofdconclusie?</span></button>
+<button class="question-button" data-question="why"><b>Verklaring</b><span>Waarom gebeurt dit?</span></button>
+<button class="question-button" data-question="impact"><b>Betekenis</b><span>Wat verandert hierdoor?</span></button>
+<button class="question-button" data-question="conditions"><b>Voorwaarden</b><span>Wat moet eerst geregeld zijn?</span></button>
+<button class="question-button" data-question="uncertainty"><b>Grenzen</b><span>Wat weten we nog niet?</span></button>
+<div class="index-bottom">Klik eerst op een vraag. Verdiep daarna alleen wanneer je meer zekerheid nodig hebt.</div>
+</nav>
+<section aria-live="polite" class="brief-stage">
+<div class="brief-tools">
+<div aria-label="Leesdiepte" class="depth-tabs" role="tablist">
+<button class="active" data-depth="short">30 sec</button>
+<button data-depth="medium">2 min</button>
+<button data-depth="source">Bronlaag</button>
+</div>
+<div class="brief-count" id="briefCount">1 kernantwoord · 3 bewijsstukken</div>
+</div>
+<article class="brief-content">
+<div class="brief-question" id="briefQuestion">Wat is de hoofdconclusie?</div>
+<h2 class="brief-title" id="briefTitle">Mensen gebruiken complexe informatie beter wanneer ze niet alles tegelijk hoeven te zien.</h2>
+<p class="brief-deck" id="briefDeck">De bron wijst steeds in dezelfde richting: eerst een compacte betekenislaag, daarna gericht kunnen doorklikken naar bewijs en nuance.</p>
+<div class="brief-body" id="briefBody">
+<p>In plaats van een document van boven naar beneden te lezen, werkt een vraaggestuurde ingang beter voor lezers die snel willen bepalen wat relevant is. De volledigheid verdwijnt niet, maar verhuist naar een tweede of derde laag.</p>
+<aside class="margin-note"><strong>Wat je hiervan onthoudt</strong>De interface moet keuzes maken vóór de gebruiker dat zelf moet doen.</aside>
+</div>
+</article>
+<div class="source-strip">
+<b>Bronpad</b><span id="sourceTrail">Samenvatting → hoofdstuk 3 → bevinding 4 → bijlage B</span>
+</div>
+<div aria-labelledby="evidenceTitle" aria-modal="false" class="detail-popover" id="evidencePopover" role="dialog">
+<header><h3 id="evidenceTitle">Bewijsstuk</h3><button aria-label="Sluit bewijsstuk" id="closeEvidence" type="button">×</button></header>
+<p id="evidenceDetail"></p>
+</div>
+</section>
+<aside aria-label="Onderliggende bewijsstukken" class="evidence-rail">
+<div class="rail-title">Onderliggende stukken</div>
+<div class="evidence-list" id="evidenceList"></div>
+<div class="rail-note">De gekleurde rand zegt wat voor soort informatie dit is. Klik een strook om de volledige toelichting te openen zonder je leescontext kwijt te raken.</div>
+</aside>
+</div>
+</div>
+</section>
+<script>
+(() => {
+  const dossierData = {
+    main:{
+      question:'Wat is de hoofdconclusie?',
+      title:'Mensen gebruiken complexe informatie beter wanneer ze niet alles tegelijk hoeven te zien.',
+      short:'De bron wijst steeds in dezelfde richting: eerst een compacte betekenislaag, daarna gericht kunnen doorklikken naar bewijs en nuance.',
+      medium:'Wanneer mensen een grote informatiebron openen, proberen ze eerst te bepalen wat relevant is. Een interface die die oriëntatie ondersteunt met duidelijke vragen en verdiepingsniveaus verlaagt de mentale belasting. De volledigheid blijft beschikbaar, maar hoeft niet de eerste indruk te domineren.',
+      source:'De conclusie is opgebouwd uit gebruiksobservaties, tijdmetingen en interviews. De sterkste ondersteuning zit in de pilotresultaten; causale claims blijven beperkt omdat de steekproef klein is.',
+      takeaway:'De interface moet keuzes maken vóór de gebruiker dat zelf moet doen.',
+      trail:'Samenvatting → hoofdstuk 3 → bevinding 4 → bijlage B',
+      evidence:[
+        {kind:'evidence',tag:'Meting',text:'Gebruikers vonden hoofdpunten sneller.',detail:'In de pilot daalde de zoektijd vooral bij taken waarbij deelnemers één concrete vraag moesten beantwoorden.'},
+        {kind:'context',tag:'Observatie',text:'Minder heen-en-weer tussen hoofdstukken.',detail:'Deelnemers bleven langer in dezelfde context wanneer kernpunten en bronpaden naast elkaar stonden.'},
+        {kind:'risk',tag:'Beperking',text:'Kleine pilotgroep beperkt generaliseerbaarheid.',detail:'De uitkomst is richtinggevend, niet definitief. Een bredere test is nodig voordat harde effectclaims worden gedaan.'}
+      ]
+    },
+    why:{
+      question:'Waarom gebeurt dit?',title:'De grootste frictie zit vóór het lezen: mensen moeten eerst zelf een structuur uit losse informatie bouwen.',short:'Versnipperde definities, uitzonderingen en bewijs zorgen ervoor dat lezers veel energie kwijt zijn aan oriënteren voordat ze inhoudelijk kunnen beoordelen.',medium:'Bij grote bronnen ontstaat vaak een verborgen taak: de lezer moet zelf reconstrueren welke onderdelen hoofdzaak, bewijs, context of uitzondering zijn. Dat is precies het werk dat de interface kan overnemen door relaties expliciet te maken en informatie in betekenisvolle lagen aan te bieden.',source:'Deze verklaring is vooral gebaseerd op observaties en interviewdata. De bron beschrijft het patroon consistent, maar meet cognitieve belasting niet rechtstreeks.',takeaway:'Niet te weinig informatie, maar te weinig structuur veroorzaakt de eerste vertraging.',trail:'Hoofdstuk 2 → observatiepatronen → interviewthema 1',
+      evidence:[
+        {kind:'context',tag:'Patroon',text:'Dezelfde begrippen verschijnen op meerdere plekken.',detail:'Dat dwingt lezers om definities en uitzonderingen zelf over het document heen samen te voegen.'},
+        {kind:'evidence',tag:'Interview',text:'Lezers vragen eerst: waar moet ik beginnen?',detail:'De eerste vragen gaan opvallend vaak over route en prioriteit, niet over inhoudelijke betekenis.'},
+        {kind:'risk',tag:'Nuance',text:'Experts ervaren minder oriëntatieproblemen.',detail:'Vakinhoudelijke voorkennis compenseert een deel van de slechte structuur, waardoor het effect per doelgroep verschilt.'}
+      ]
+    },
+    impact:{
+      question:'Wat verandert hierdoor?',title:'Een goede eerste laag verkort de route naar relevante details zonder transparantie op te offeren.',short:'De lezer krijgt sneller een bruikbaar mentaal model en kan daarna selectief controleren, vergelijken of verdiepen.',medium:'De winst zit niet alleen in snelheid. Wanneer conclusies, bewijs en onzekerheden zichtbaar van elkaar verschillen, wordt ook duidelijker waarom een uitspraak sterk of juist voorlopig is. Dat ondersteunt betere gesprekken over de inhoud.',source:'De effectbeschrijving combineert tijdmetingen met kwalitatieve feedback. De bron toont samenhang, maar geen langetermijneffect op besluitkwaliteit.',takeaway:'Snelheid en controleerbaarheid kunnen tegelijk verbeteren als detail op het juiste moment verschijnt.',trail:'Pilotmeting → evaluatie → thema vertrouwen',
+      evidence:[
+        {kind:'evidence',tag:'Tijd',text:'Kortere route naar specifieke bevindingen.',detail:'De grootste tijdswinst zit bij gerichte zoektaken, niet bij volledig documentlezen.'},
+        {kind:'context',tag:'Gedrag',text:'Lezers openen meer relevante bronpassages.',detail:'Omdat het bronpad zichtbaar blijft, wordt verdieping een korte actie in plaats van een nieuwe zoektocht.'},
+        {kind:'risk',tag:'Nog onbekend',text:'Langetermijneffect is niet gemeten.',detail:'De test zegt vooral iets over eerste begrip en navigatie, niet over kennisretentie na weken of maanden.'}
+      ]
+    },
+    conditions:{
+      question:'Wat moet eerst geregeld zijn?',title:'Zonder bronbeheer en duidelijke definities wordt een mooie samenvatting snel onbetrouwbaar.',short:'Een interactieve laag is pas waardevol wanneer versie, eigenaar, definities en bronverwijzingen consequent worden bijgehouden.',medium:'De visuele vorm kan alleen betrouwbaar blijven als er achter de schermen een heldere informatiehuishouding bestaat. Elke conclusie moet terug te leiden zijn naar een bronpassage, wijzigingen moeten herkenbaar zijn en iemand moet inhoudelijk eigenaar zijn.',source:'De randvoorwaarden komen uit het governancegedeelte van de bron en uit fouten die tijdens de pilot aan het licht kwamen.',takeaway:'Ontwerp lost informatiebeheer niet op. Het maakt goed beheer alleen veel bruikbaarder.',trail:'Governance → paragraaf 6.2 → wijzigingsproces',
+      evidence:[
+        {kind:'context',tag:'Eigenaarschap',text:'Elke samenvatting heeft een inhoudelijke eigenaar.',detail:'Die eigenaar bewaakt interpretatie, actualiteit en de koppeling naar bronmateriaal.'},
+        {kind:'evidence',tag:'Controle',text:'Versie en bronpad blijven zichtbaar.',detail:'Daarmee kan een lezer controleren of de gepresenteerde kern nog overeenkomt met de actuele bron.'},
+        {kind:'risk',tag:'Risico',text:'Handmatig onderhoud kan achterlopen.',detail:'Zonder expliciet wijzigingsproces kan de interactieve laag verouderen terwijl de bron wel wordt bijgewerkt.'}
+      ]
+    },
+    uncertainty:{
+      question:'Wat weten we nog niet?',title:'De richting is duidelijker dan de precieze omvang van het effect.',short:'De bron ondersteunt dat gelaagde informatie helpt bij oriëntatie, maar de pilot is te klein om universele prestatiewinst te claimen.',medium:'De bevindingen zijn sterk genoeg om het ontwerpprincipe verder te testen, maar niet om één vaste interfacevorm als bewezen beste oplossing te presenteren. Doelgroep, inhoudstype en voorkennis blijven belangrijke variabelen.',source:'Deze grens komt expliciet uit de methodologische beperkingen en de kleine omvang van de gebruikerstest.',takeaway:'Gebruik onzekerheid als navigatie-informatie, niet als voetnoot onderaan.',trail:'Methodologie → beperkingen → aanbevelingen voor vervolgonderzoek',
+      evidence:[
+        {kind:'risk',tag:'Steekproef',text:'Beperkt aantal deelnemers.',detail:'De pilot geeft sterke signalen, maar laat geen betrouwbare uitsplitsing naar doelgroep toe.'},
+        {kind:'context',tag:'Variatie',text:'Niet elk informatietype vraagt dezelfde navigatie.',detail:'Een normenkader, onderzoeksrapport en operationeel draaiboek hebben verschillende leespatronen.'},
+        {kind:'evidence',tag:'Consistent',text:'Oriëntatiewinst kwam in meerdere sessies terug.',detail:'Ondanks de kleine groep kwam dezelfde behoefte aan een duidelijke eerste laag herhaaldelijk naar voren.'}
+      ]
+    }
+  };
+
+  let currentQuestion = 'main';
+  let currentDepth = 'short';
+  const questionButtons = [...document.querySelectorAll('.question-button')];
+  const depthButtons = [...document.querySelectorAll('.depth-tabs button')];
+  const pop = document.getElementById('evidencePopover');
+
+  function renderDossier(){
+    const d = dossierData[currentQuestion];
+    document.getElementById('briefQuestion').textContent = d.question;
+    document.getElementById('briefTitle').textContent = d.title;
+    const deck = currentDepth === 'short' ? d.short : currentDepth === 'medium' ? d.medium : d.source;
+    document.getElementById('briefDeck').textContent = deck;
+    const bodyText = currentDepth === 'short' ? d.medium : currentDepth === 'medium' ? d.source : 'Bronlaag actief: gebruik de bewijsstroken rechts om afzonderlijke onderbouwingen en beperkingen te openen.';
+    document.getElementById('briefBody').innerHTML = `<p>${bodyText}</p><aside class="margin-note"><strong>Wat je hiervan onthoudt</strong>${d.takeaway}</aside>`;
+    document.getElementById('sourceTrail').textContent = d.trail;
+    document.getElementById('briefCount').textContent = `1 kernantwoord · ${d.evidence.length} bewijsstukken`;
+    const list = document.getElementById('evidenceList');
+    list.innerHTML = d.evidence.map((e,i)=>`<div class="evidence-item" data-kind="${e.kind}"><button type="button" data-evidence="${i}"><div class="tag">${e.tag}</div><p>${e.text}</p></button></div>`).join('');
+    [...list.querySelectorAll('button')].forEach(btn=>btn.addEventListener('click',()=>openEvidence(Number(btn.dataset.evidence))));
+    pop.classList.remove('open');
+  }
+  function openEvidence(i){
+    const e = dossierData[currentQuestion].evidence[i]; if(!e) return;
+    document.getElementById('evidenceTitle').textContent = e.tag;
+    document.getElementById('evidenceDetail').textContent = e.detail;
+    pop.classList.add('open');
+  }
+  questionButtons.forEach(btn=>btn.addEventListener('click',()=>{
+    currentQuestion = btn.dataset.question;
+    questionButtons.forEach(b=>b.classList.toggle('active',b===btn));
+    renderDossier();
+  }));
+  depthButtons.forEach(btn=>btn.addEventListener('click',()=>{
+    currentDepth = btn.dataset.depth;
+    depthButtons.forEach(b=>b.classList.toggle('active',b===btn));
+    renderDossier();
+  }));
+  document.getElementById('closeEvidence').addEventListener('click',()=>pop.classList.remove('open'));
+  renderDossier();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Releaseatelier · Functioneel applicatiebeheer</title>
+<style>
+:root{
+  --paper:#f7f4ee;
+  --sheet:#fffdfa;
+  --ink:#2d2730;
+  --muted:#746a73;
+  --wine:#611750;
+  --berry:#9D3293;
+  --rose:#eadbe7;
+  --sage:#dce3d6;
+  --sage-ink:#536047;
+  --line:#d8d0cc;
+  --warm:#c47d58;
+  --shadow:0 20px 45px rgba(69,47,57,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(90deg,rgba(97,23,80,.035) 1px,transparent 1px),linear-gradient(rgba(97,23,80,.035) 1px,transparent 1px),var(--paper);background-size:28px 28px;color:var(--ink);font-family:"Segoe UI",Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;padding:24px}
+button{font:inherit;color:inherit}
+.page{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;min-height:calc(100vh - 48px)}
+.sidebar{position:sticky;top:24px;align-self:start;min-height:calc(100vh - 48px);background:var(--wine);color:white;border-radius:24px;padding:26px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.brand{font-weight:800;font-size:1.2rem;margin-bottom:44px}.brand span{display:block;font-weight:400;color:#ecdcea;font-size:.82rem;margin-top:4px}.sidebar h1{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:3.25rem;line-height:.92;letter-spacing:-.05em;margin:0}.sidebar .intro{color:#ecdcea;line-height:1.68;font-size:.94rem;margin:22px 0 0}.design-note{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.2);font-size:.84rem;color:#e0cbe0;line-height:1.6}.design-note p{margin:0 0 10px}.side-bottom{margin-top:auto;padding-top:32px;font-size:.82rem;color:#dcc4d9}.side-bottom strong{display:block;color:white;font-size:.95rem;margin-bottom:5px}
+.main{display:grid;gap:18px}.topbar{background:rgba(255,253,250,.9);border:1px solid var(--line);border-radius:24px;padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:18px;box-shadow:var(--shadow)}.topbar h2{margin:0;font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:1.8rem;letter-spacing:-.025em}.meta{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.meta span{font-size:.82rem;padding:8px 10px;border:1px solid var(--line);background:white;border-radius:10px;color:#625961}
+.phase-rail{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.phase{border:1px solid var(--line);background:var(--sheet);border-radius:16px;padding:14px;text-align:left;cursor:pointer;position:relative;min-height:118px;box-shadow:0 7px 20px rgba(69,47,57,.05);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease}.phase:hover{transform:translateY(-2px);border-color:#c5b4bd}.phase:focus-visible{outline:3px solid rgba(157,50,147,.22);outline-offset:2px}.phase.active{background:linear-gradient(180deg,#7b2268,#611750);color:white;border-color:#611750;box-shadow:0 14px 30px rgba(97,23,80,.18)}.phase.active::after{content:'actief';position:absolute;top:12px;right:12px;font-size:.7rem;font-weight:700;letter-spacing:.02em;color:#f6dff2}.num{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 10px;border-radius:12px;background:#f2ebf0;color:var(--berry);font-size:.76rem;font-weight:800;margin-bottom:14px}.phase.active .num{background:rgba(255,255,255,.16);color:#fff}.phase strong{display:block;font-size:1rem}.phase small{display:block;margin-top:6px;color:var(--muted);line-height:1.35}.phase.active small{color:#f0d7ec}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(310px,.65fr);gap:18px}.board,.folder{background:var(--sheet);border:1px solid var(--line);box-shadow:var(--shadow);min-height:650px}.board{border-radius:24px;padding:24px;display:grid;grid-template-rows:auto 1fr auto;gap:20px}.folder{border-radius:4px 24px 24px 24px;padding:24px;position:relative}.folder:before{content:"";position:absolute;left:-1px;top:-22px;width:148px;height:23px;background:var(--sheet);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0}.board-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.kicker{font-size:.78rem;color:var(--muted);margin:0 0 7px}.board h3,.folder h3{margin:0;font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;letter-spacing:-.03em}.board h3{font-size:2.05rem;line-height:1.02}.folder h3{font-size:1.95rem;line-height:1.05}.state{padding:10px 12px;border-radius:14px;background:var(--sage);color:var(--sage-ink);font-size:.82rem;font-weight:700;white-space:nowrap}.cards{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-content:start}.stack{display:grid;gap:14px}.card{border:1px solid var(--line);background:white;padding:18px;border-radius:16px}.card.cut{clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%);position:relative}.card.cut:after{content:"";position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(135deg,#efe4db,#d7c0b4)}.card.soft{background:#f2eee7;border-style:dashed}.card h4{margin:0 0 8px;color:var(--wine);font-size:1rem}.card p{margin:0;color:#5f5660;line-height:1.58;font-size:.9rem}.card ul{margin:10px 0 0;padding-left:18px;color:#5f5660;line-height:1.6;font-size:.9rem}.facts{border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr)}.fact{padding:18px 14px 6px;border-right:1px solid var(--line)}.fact:last-child{border-right:0}.fact strong{display:block;font-size:1.4rem;color:var(--wine);letter-spacing:-.035em}.fact span{display:block;margin-top:5px;color:var(--muted);font-size:.82rem;line-height:1.45}.folder .lead{color:#625861;line-height:1.65;margin:18px 0 22px;font-size:.94rem}.questions{display:grid;gap:12px}.q{padding:15px 16px;border-left:4px solid var(--rose);background:#f8f3f7;border-radius:0 14px 14px 0}.q strong{display:block;color:var(--wine);font-size:.92rem;margin-bottom:5px}.q p{margin:0;color:#695f68;font-size:.85rem;line-height:1.55}.ready{margin-top:22px;border-top:1px solid var(--line);padding-top:18px;color:#756c74;font-size:.85rem;line-height:1.55}.ready strong{display:block;color:var(--ink);font-size:1rem;margin-top:6px}.signature{margin-top:24px;padding:14px 0 0;border-top:1px dashed var(--line);display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}.signature span{font-size:.78rem;color:var(--muted)}.signature b{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-weight:400;font-size:1.3rem;color:var(--wine)}
+@media(max-width:1100px){.page{grid-template-columns:1fr}.sidebar{position:static;min-height:auto}.side-bottom{margin-top:32px}.workspace{grid-template-columns:1fr}.board,.folder{min-height:0}}
+@media(max-width:760px){body{padding:10px}.page{gap:12px}.sidebar{border-radius:20px;padding:20px}.sidebar h1{font-size:2.8rem}.topbar{border-radius:20px;flex-direction:column;align-items:flex-start}.topbar h2{font-size:1.55rem}.meta{justify-content:flex-start}.phase-rail{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.phase{min-height:104px;padding:13px}.phase:last-child{grid-column:1/-1}.board,.folder{padding:18px}.board h3,.folder h3{font-size:1.7rem}.cards{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.fact{border-right:0;border-bottom:1px solid var(--line)}.fact:last-child{border-bottom:0}.folder:before{display:none}.signature{grid-template-columns:1fr}.state{font-size:.78rem;padding:8px 10px}}
+@media(max-width:480px){.sidebar h1{font-size:2.45rem}.phase strong{font-size:.95rem}.phase small{font-size:.8rem}.board h3{font-size:1.55rem}.folder h3{font-size:1.5rem}.card p,.card ul,.folder .lead,.q p{font-size:.88rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.review-context th,.review-context td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+.review-context p { margin:14px 0; }
+@media print { body { background:white;color:black;padding:0; } .page { display:block; } .sidebar { position:static;min-height:0; } .phase-rail,.workspace { display:none; } .review-context details > :not(summary) { display:block!important; } .review-context table { font-size:10pt; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <aside class="sidebar">
+    <div class="brand">Attent<span>functioneel applicatiebeheer</span></div>
+    <h1>Release atelier</h1>
+    <p class="intro">Gebruik dit ontwerp wanneer je wijzigingen of releases zorgvuldig wilt begeleiden van intake tot nazorg. De pagina werkt als een dossier en een werktafel tegelijk: klik op een fase en zie direct welke vragen, werkstukken en beslisregels daarbij horen.</p>
+    <div class="design-note">
+      <p>De stijl is bewust lichter en redactioneler dan Serviceradar. Geen regiescherm, maar een ordelijke werkmap waarin proces, besluitvorming en overdracht centraal staan.</p>
+      <p>Op mobiel worden alle fasen meteen zichtbaar in een compact raster. De actieve fase is duidelijk gevuld en gelabeld, zodat een tik direct zichtbaar resultaat geeft.</p>
+    </div>
+    <div class="side-bottom"><strong>Voorbeeld</strong>Wijziging: autorisatiemodel planning<br />Releasevenster: 17 oktober 2026</div>
+  </aside>
+
+  <main class="main">
+    <section class="topbar">
+      <div>
+        <h2>Wijzigingsdossier</h2>
+        <p class="kicker" style="margin:8px 0 0">Nieuwe teamrollen in het roosterportaal</p>
+      </div>
+      <div class="meta"><span>CHG-184</span><span>eigenaar: FAB</span><span>status: voorbereiding</span></div>
+    </section>
+
+    <nav class="phase-rail" aria-label="Fasen van het wijzigingsproces">
+      <button class="phase active" data-key="intake" aria-pressed="true"><span class="num">01</span><strong>Intake</strong><small>vraag en doel scherpstellen</small></button>
+      <button class="phase" data-key="impact" aria-pressed="false"><span class="num">02</span><strong>Impact</strong><small>gevolgen en risico's</small></button>
+      <button class="phase" data-key="testen" aria-pressed="false"><span class="num">03</span><strong>Testen</strong><small>werking en acceptatie</small></button>
+      <button class="phase" data-key="communicatie" aria-pressed="false"><span class="num">04</span><strong>Communicatie</strong><small>gebruikers meenemen</small></button>
+      <button class="phase" data-key="nazorg" aria-pressed="false"><span class="num">05</span><strong>Nazorg</strong><small>bevestigen en leren</small></button>
+    </nav>
+
+    <section class="workspace">
+      <div class="board">
+        <header class="board-head"><div><p class="kicker" id="boardKicker">Werktafel · intake</p><h3 id="boardTitle">Maak de vraag klein genoeg om goed te beoordelen</h3></div><div class="state" id="state">scope bepalen</div></header>
+        <div class="cards">
+          <div class="stack">
+            <article class="card cut"><h4 id="mainTitle">Wat moet direct duidelijk zijn?</h4><p id="mainText"></p></article>
+            <article class="card soft"><h4 id="decisionTitle">Beslisregel</h4><p id="decisionText"></p></article>
+          </div>
+          <div class="stack">
+            <article class="card"><h4 id="artifactTitle">Belangrijk werkstuk</h4><p id="artifactText"></p></article>
+            <article class="card"><h4 id="listTitle">Vastleggen</h4><ul id="list"></ul></article>
+          </div>
+        </div>
+        <footer class="facts"><div class="fact"><strong>1 eigenaar</strong><span>per fase expliciet benoemd</span></div><div class="fact"><strong>1 bewijsset</strong><span>voor acceptatie en besluitvorming</span></div><div class="fact"><strong>1 afsluiting</strong><span>met nazorg en terugkoppeling</span></div></footer>
+      </div>
+
+      <aside class="folder" aria-live="polite">
+        <p class="kicker" id="folderKicker">Geopende map · intake</p>
+        <h3 id="folderTitle">Intake voorkomt ruis aan de voorkant</h3>
+        <p class="lead" id="lead"></p>
+        <div class="questions" id="questions"></div>
+        <div class="ready" id="ready"></div>
+        <div class="signature"><span>Functioneel besluit</span><b id="sign">klaar voor impactanalyse</b></div>
+      </aside>
+    </section>
+  </main>
+</div>
+<script>
+const data={
+intake:{boardKicker:'Werktafel · intake',boardTitle:'Maak de vraag klein genoeg om goed te beoordelen',state:'scope bepalen',mainTitle:'Wat moet direct duidelijk zijn?',mainText:'Maak onderscheid tussen wens, probleem, deadline en aanname. Een sterke intake beschrijft niet alleen wat iemand vraagt, maar ook welk proces beter, veiliger of eenvoudiger moet worden.',decisionTitle:'Beslisregel',decisionText:'Ga pas door wanneer doel, scope, gebruikersgroep en gewenste uitkomst zonder extra vertaling te begrijpen zijn.',artifactTitle:'Belangrijk werkstuk',artifactText:'Een compacte intakekaart met doel, scope, betrokkenen, prioriteit en eerste afhankelijkheden.',listTitle:'Vastleggen',list:['aanleiding en doel','betrokken gebruikers of teams','urgentie en gewenste datum','wat expliciet buiten scope valt'],folderKicker:'Geopende map · intake',folderTitle:'Intake voorkomt ruis aan de voorkant',lead:'De intake is het moment om vraag en verandering uit elkaar te trekken. Wat is de behoefte, voor wie en welk resultaat moet aantoonbaar beter worden?',questions:[['Wie vraagt dit en waarom nu?','Zoek de aanleiding achter de vraag en benoem welk probleem of welke kans er speelt.'],['Wat verandert er voor gebruikers?','Beschrijf het concrete verschil in handelingen, informatie of rechten.'],['Wat hoort niet bij deze wijziging?','Voorkom scopekruip door expliciet te maken wat buiten de wijziging valt.']],ready:'Door wanneer|doel, scope en betrokkenen scherp genoeg zijn om gevolgen te onderzoeken.',sign:'klaar voor impactanalyse'},
+impact:{boardKicker:'Werktafel · impact',boardTitle:'Vertaal techniek naar gevolgen voor het werk',state:'risico’s wegen',mainTitle:'Waar raakt de wijziging de organisatie?',mainText:'Breng per doelgroep in beeld wat verandert in werkwijze, schermen, rapportages, berichtenstromen en beheeractiviteiten. Juist neveneffecten bepalen vaak of een wijziging landt.',decisionTitle:'Beslisregel',decisionText:'Ga pas door wanneer geraakt proces, risico, afhankelijkheid en beheersmaatregel in samenhang zijn beoordeeld.',artifactTitle:'Belangrijk werkstuk',artifactText:'Een impactkaart waarin proces, applicatie, data, ketenpartner en beheerimpact naast elkaar staan.',listTitle:'Vastleggen',list:['geraakte processen','risico’s en maatregelen','configuratie- of autorisatiewijzigingen','afhankelijkheden met leveranciers'],folderKicker:'Geopende map · impact',folderTitle:'Impactanalyse voorkomt verrassingen na livegang',lead:'Hier verbind je functionele wijziging met de echte werkpraktijk. Je kijkt niet alleen wat er verandert, maar ook waar dat verandering veroorzaakt buiten het oorspronkelijke verzoek.',questions:[['Welke processen raken we?','Denk aan zorgproces, planning, rapportage, ondersteuning en compliance.'],['Wie moet meedoen?','Maak zichtbaar welke key-users, beheerders of leveranciers input of akkoord moeten geven.'],['Wat kan misgaan?','Benoem risico én maatregel, zodat impact niet alleen een lijst zorgen blijft.']],ready:'Door wanneer|effecten, risico’s en afhankelijkheden bekend én gedeeld zijn.',sign:'klaar om te testen'},
+testen:{boardKicker:'Werktafel · testen',boardTitle:'Maak acceptatie aantoonbaar in plaats van gevoelsmatig',state:'bewijs verzamelen',mainTitle:'Wat maakt een test overtuigend?',mainText:'Goede testgevallen volgen herkenbare praktijksituaties. Ze tonen wat iemand doet, wat het systeem toont en wat het verwachte resultaat is.',decisionTitle:'Beslisregel',decisionText:'Ga pas door wanneer testresultaten herleidbaar, gedeeld en voldoende zijn voor een bewuste go/no-go.',artifactTitle:'Belangrijk werkstuk',artifactText:'Een acceptatieset met scenario’s, uitkomsten, bevindingen, screenshots en expliciete restpunten.',listTitle:'Vastleggen',list:['scenario en verwachting','daadwerkelijke uitkomst','bevindingen en restpunten','besluit: akkoord of voorwaardelijk'],folderKicker:'Geopende map · testen',folderTitle:'Testen levert bewijs voor het functionele besluit',lead:'Je toetst niet alleen of de functie technisch werkt, maar of de nieuwe werkwijze voor gebruikers klopt en beheersbaar blijft.',questions:[['Wie test wat?','Verdeel functionele toetsing, gebruikersacceptatie en technische validatie bewust.'],['Wat is voldoende bewijs?','Spreek vooraf af welke scenario’s minimaal moeten slagen.'],['Welke restpunten mogen mee?','Leg vast wat blocking is en wat na livegang gecontroleerd kan worden.']],ready:'Door wanneer|besluitvorming kan steunen op gedeelde, herleidbare testuitkomsten.',sign:'klaar voor communicatie'},
+communicatie:{boardKicker:'Werktafel · communicatie',boardTitle:'Maak verandering voorspelbaar voordat ze live gaat',state:'boodschap richten',mainTitle:'Wie moet wat weten?',mainText:'Bepaal per doelgroep of je moet informeren, instrueren of laten besluiten. Een goede boodschap vertelt vooral wat er voor die gebruiker verandert.',decisionTitle:'Beslisregel',decisionText:'Ga pas door wanneer iedere doelgroep op tijd weet wat verandert, wanneer dat gebeurt en waar ondersteuning te vinden is.',artifactTitle:'Belangrijk werkstuk',artifactText:'Een communicatiespoor met doelgroep, kanaal, verzendmoment, kernboodschap en eigenaar.',listTitle:'Vastleggen',list:['doelgroepen','kernboodschap per doelgroep','kanaal en verzendmoment','support- en contactinformatie'],folderKicker:'Geopende map · communicatie',folderTitle:'Communicatie voorkomt functionele verrassingen',lead:'Een goede wijziging kan alsnog mislukken als gebruikers, servicedesk en management pas na livegang ontdekken wat er voor hen veranderd is.',questions:[['Wie moet echt iets doen?','Maak verschil tussen informeren, instrueren en laten besluiten.'],['Wat moet de servicedesk weten?','Zorg dat ondersteuning dezelfde taal gebruikt als de gebruikerscommunicatie.'],['Wat zeggen we na livegang?','Sluit de lus met een korte bevestiging van wat nu actief is.']],ready:'Door wanneer|boodschap, kanaal en ondersteuning per doelgroep klaarstaan.',sign:'klaar voor livegang'},
+nazorg:{boardKicker:'Werktafel · nazorg',boardTitle:'Bevestig werking en borg wat je geleerd hebt',state:'stabiliteit toetsen',mainTitle:'Wat controleer je na livegang?',mainText:'Controleer niet alleen of incidenten uitblijven, maar ook of gebruikers de werkwijze begrijpen, rapportages kloppen en restpunten aantoonbaar worden opgepakt.',decisionTitle:'Beslisregel',decisionText:'Sluit pas af wanneer werking bevestigd is, terugkoppeling is gedaan en leerpunten een eigenaar hebben.',artifactTitle:'Belangrijk werkstuk',artifactText:'Een kort nazorgverslag met bevindingen, restpunten, gebruikssignalen en verbetervoorstellen.',listTitle:'Vastleggen',list:['praktijkbevindingen','incidenten of gebruikersvragen','restpunten en eigenaar','lessons learned'],folderKicker:'Geopende map · nazorg',folderTitle:'Nazorg sluit de wijziging inhoudelijk af',lead:'Na livegang controleer je of de wijziging ook buiten de testomgeving stabiel, begrijpelijk en bruikbaar blijkt.',questions:[['Werkt het in de praktijk?','Toets techniek, tempo, begrijpelijkheid en kwaliteit van de nieuwe werkwijze.'],['Is extra uitleg nodig?','Check of key-users, servicedesk of teams nog ondersteuning nodig hebben.'],['Wat nemen we mee?','Maak leerpunten concreet genoeg om het volgende traject aantoonbaar beter te doen.']],ready:'Afronden wanneer|werking bevestigd is, restpunten belegd zijn en terugkoppeling heeft plaatsgevonden.',sign:'wijziging kan worden gesloten'}
+};
+const $=s=>document.querySelector(s);const phases=[...document.querySelectorAll('.phase')];
+function render(key){const d=data[key];['boardKicker','boardTitle','state','mainTitle','mainText','decisionTitle','decisionText','artifactTitle','artifactText','listTitle','folderKicker','folderTitle','lead','sign'].forEach(id=>$('#'+id).textContent=d[id]);$('#list').innerHTML=d.list.map(x=>`<li>${x}</li>`).join('');$('#questions').innerHTML=d.questions.map(([h,p])=>`<article class="q"><strong>${h}</strong><p>${p}</p></article>`).join('');const[a,b]=d.ready.split('|');$('#ready').innerHTML=`${a}<strong>${b}</strong>`;phases.forEach(x=>{const active=x.dataset.key===key;x.classList.toggle('active',active);x.setAttribute('aria-pressed',active?'true':'false');});}
+phases.forEach(p=>p.addEventListener('click',()=>render(p.dataset.key)));render('intake');
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('releaseChecklist').innerHTML = Object.values(data).map(d => `<li><strong>${d.boardTitle}</strong><p>${d.mainText}</p><p>${d.decisionText}</p><p>Werkstuk: ${d.artifactText}</p><ul>${d.list.map(x=>`<li>${x}</li>`).join('')}${d.questions.map(([h,p])=>`<li><strong>${h}</strong> ${p}</li>`).join('')}</ul><p>${d.ready.replace('|', ': ')}</p></li>`).join('');
+});
+</script>
+<section class="review-context" aria-label="Beheerkaart en wijzigingsingang" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
+  <h2>Wijziging en acceptatie</h2>
+  <p><strong>Hoofdvraag:</strong> welke eis en kritieke praktijksituatie zijn nog niet aantoonbaar getest? <strong>Gebruiker:</strong> FAB met kerngebruikers, testcoördinator en proceseigenaar. <strong>Gebruik:</strong> voorbereiding, acceptatie en overdracht; deze pagina is een opleidings- en overlegprototype, geen actuele dossierregistratie.</p>
+  <p><strong>Bron en eigenaar:</strong> synthetische wijzigingsvoorbeelden, revisie 2026-10-01, demo v3. Een echte bronhouder is nog niet aangewezen. Gebruik het bestaande wijzigingsdossier (bijvoorbeeld TOPdesk); de proceseigenaar stelt eisen vast, testrollen controleren, de bevoegde beslisser accepteert livegang en restrisico. FAB adviseert. Geldigheid: alleen als demonstratie, niet lokaal gevalideerd.</p>
+  <nav aria-label="Wijzigingsviews"><a href="fab-change-impact-map.html">Impact RFC-2026-118</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies RFC-2026-118</a> · <a href="fab-beheerbaarheid-scan.html">Overdrachtschecklist (andere demo)</a> · <a href="fab-decision-canvas.html">Optiekeuze RFC-2026-118</a></nav>
+  <p>RFC-2026-118 is een gedeelde voorbeeldreferentie, geen gekoppeld dossier. CHG-184 hierboven en CHG-DEMO-LOC-02 hieronder zijn andere casussen. Geen status, bewijs of invoer wordt tussen bestanden gesynchroniseerd. Leg echte acties, bevindingen en besluiten één keer in de afgesproken bron vast en verwijs ernaar met ID, versie en datum. Gebruik geen cliëntgegevens, accounts of volledige logs in deelbare HTML.</p>
+  <details id="readableRelease"><summary>Alle vijf fasen als leesbare checklist</summary><ol id="releaseChecklist"><li>Intake: leg knelpunt, eis, doelgroep, scope en meetbare gewenste uitkomst vast.</li><li>Impact: beoordeel zorgcontinuïteit, privacy, inrichting, keten en bevoegde eigenaren.</li><li>Testen: verbind eis, scenario, testrol, versie, omgeving, uitkomst, bevinding en akkoord.</li><li>Communicatie: leg instructie, doelgroep, eigenaar, ondersteuning en verzendmoment vast.</li><li>Nazorg: bevestig werking, gecontroleerd gebruik, herstel en restpunten vóór afsluiting.</li></ol></details>
+  <section id="test-coverage" aria-labelledby="coverageTitle">
+    <h3 id="coverageTitle">Testdekking: zorgoverdracht naar een woonzorglocatie</h3>
+    <p><strong>Casus CHG-DEMO-LOC-02:</strong> een overdracht verschijnt te laat of dubbel in het ontvangende dossier. Gewenst verschil: één volledige, herleidbare overdracht bij de juiste locatie en rol. Alle vijf tests zijn <strong>niet uitgevoerd</strong>; testrol en inrichting zijn voorgenomen. Dit voorbeeld toont vereiste dekking, geen geslaagde acceptatie of zorgprotocol.</p>
+    <div style="overflow-x:auto" tabindex="0" role="region" aria-label="Testdekkingstabel"><table style="width:100%;border-collapse:collapse"><caption>Eis → inrichting → scenario → bewijs → bevoegd akkoord</caption><thead><tr><th scope="col">Eis / inrichting</th><th scope="col">Test / rol / verwacht resultaat</th><th scope="col">Omgeving / versie</th><th scope="col">Uitkomst / bevinding / akkoord</th></tr></thead><tbody>
+      <tr><td>E-01 · locatie- en rolmapping</td><td>T-01 · ontvangende verpleegkundige ziet volledige overdracht voor toegewezen locatie.</td><td>Acceptatie, synthetische dossiers; connector demo 0.3, mapping 0.2.</td><td>Niet uitgevoerd · bewijs, controledatum en beoordelaar ontbreken · geen akkoord.</td></tr>
+      <tr><td>E-02 · cliënt-/locatiescope</td><td>T-02 · medewerker buiten de toegewezen locatie krijgt geen inzage, ook niet via directe dossierlink.</td><td>Acceptatie; connector demo 0.3, rolmodel 0.2.</td><td>Niet uitgevoerd · privacykritiek · geen bevoegde acceptatie.</td></tr>
+      <tr><td>E-03 · verplichte velden en afwijzingsroute</td><td>T-03 · ontbrekende locatiecode wordt afgewezen; FAB vindt melding, eigenaar en herstelactie.</td><td>Acceptatie; connector demo 0.3, validatieregels 0.2.</td><td>Niet uitgevoerd · zorgimpact onbekend · bevinding nog te registreren.</td></tr>
+      <tr><td>E-04 · unieke overdrachtsleutel</td><td>T-04 · Integratiebeheer biedt dezelfde synthetische overdracht tweemaal aan; precies één inhoudelijke verwerking.</td><td>Acceptatie; connector demo 0.3, herverwerkingsconfiguratie 0.2.</td><td>Niet uitgevoerd · inhoudelijke bevestiging ontbreekt · geen akkoord.</td></tr>
+      <tr><td>E-05 · terugval en aansluitcontrole</td><td>T-05 · proceseigenaar en ICT toetsen bereikbaarheid van het goedgekeurde noodplan en volledige aansluiting na herstel.</td><td>Oefenomgeving; lokaal noodplan en productieverschillen nog onbekend.</td><td>Niet uitgevoerd · continuïteitskritiek · geen lokaal goedgekeurde noodwerkwijze aangeleverd.</td></tr>
+    </tbody></table></div>
+    <p><strong>Vervolgstap:</strong> maak deze eisen toetsbaar in het wijzigingsdossier. Leg per test bronreferentie, datum, uitvoerder, beoordelaar, feitelijke uitkomst en bevinding vast; registreer akkoord door de bevoegde rol apart. Toets versie, functionele configuratie, koppelingen en testrollen tegen productie. Veronderstel bij een extern portaal geen eigen testomgeving. Niet getoetste kritieke eisen blijven open, ongeacht een groen criterium elders.</p>
+  </section>
+  <p><strong>Onderhoud en toelating:</strong> herzie bij bron-, versie-, proces- of rolwijziging; wijs eerst bronhouder, vervolgstap en toetsbare gebruikswaarde aan. Vergelijk deze view met de bestaande checklist op juistheid, gemiste kritieke scenario’s en dubbele invoer. Technische werking is geen lokale validatie of bewezen gebruikerswaarde.</p>
+</section>
+</body>
+</html>
