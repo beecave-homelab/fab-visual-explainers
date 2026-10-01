@@ -2,7 +2,7 @@
 
 Zelfstandige HTML-prototypes voor functioneel applicatiebeheer. Open een HTML-bestand rechtstreeks in de browser; er is geen backend of buildstap. De voorbeelden zijn synthetisch en niet vrijgegeven voor operationeel gebruik.
 
-[AGENTS.md](AGENTS.md) bevat de projectafspraken. De [ideeënnotitie](Ideee%CC%88n%20voor%20interactieve%20FAB%20one-pagers.md) beschrijft concepten en actuele status.
+[AGENTS.md](AGENTS.md) bevat de projectafspraken. De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft concepten en actuele status.
 
 ## Ontwikkelen en controleren
 
