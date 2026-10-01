@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VraagKompas</title>
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>VraagKompas</title>
+    <style>
 :root{
   --bg:#eef1f4;
   --paper:#ffffff;
@@ -298,81 +298,109 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:no-preference){
   .q,.mode{transition:background-color .16s ease,color .16s ease,border-color .16s ease}
 }
-</style>
-</head>
-<body>
-<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke instructie of bron hoort bij deze gebruikersvraag?</h2>
-  <p><strong>Fictieve bron:</strong> antwoorden, passages, bewijs en pilot-/tijdwinstclaims hieronder zijn verzonnen. Deze demo bevat geen actuele FAB-instructie of goedgekeurde workaround en bewijst geen gebruikerswaarde.</p>
-  <p><strong>Gebruiker en moment:</strong> FAB en kerngebruikers bij ondersteuning en kennisoverdracht. <strong>Uitkomst:</strong> passende, gecontroleerde instructie met toepassingsvoorwaarden en concrete vervolgactie in de bestaande kennisbank. Gericht kennispatroon; vergelijk met <a href="vraagdossier.html">Vraagdossier</a> op dezelfde vraag en bron. <a href="incident-onepager.html">Incidentingang</a> laat zien waar actuele kennis nodig is.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische vraagroutes, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Kennis-/proceseigenaar bewaakt inhoud en geldigheid, FAB ondersteunt en adviseert; bevoegde zorg-/privacydeskundigen beoordelen hun eigen inhoud. Geldigheid: presentatieprototype, geen lokaal gevalideerde werkinstructie.</p>
-  <p><strong>Vervolg en onderhoud:</strong> eerst bronhouder, hoofdvraag en vervolgactie aanwijzen; herzie bij bronwijziging. Verwijs naar actuele kennisitems met versie, datum, beoordelaar en uitkomst, geen tweede administratie. Een omweg vraagt voorwaarden, risico, eigenaar en herbeoordelingsdatum; onbekend is niet goedgekeurd. Deel geen cliëntgegevens, vertrouwelijke documenten of volledige logs in HTML. Vergelijk met het bestaande kennisitem op juist antwoord, zoektijd en onderhoudslast; technische werking is geen gebruikersvalidatie.</p>
-</section>
-<main class="page" id="app">
-  <header class="mast">
-    <div>
-      <h1>VraagKompas</h1>
-      <p>Begin niet bij de inhoudsopgave, maar bij wat je wilt weten. Kies een vraag en de bron wordt opnieuw geordend rond het antwoord, inclusief bewijs, nuance en relevante vervolgvragen.</p>
-    </div>
-    <div class="source-stamp">
-      <strong>Demo-bron</strong>
-      Programma informatievoorziening 2026<br>
-      42 pagina’s · 31 verwijzingen · fictieve inhoud
-    </div>
-  </header>
-
-  <section class="board">
-    <aside class="compass">
-      <h2>Waar wil je antwoord op?</h2>
-      <p class="hint">Zes leesroutes door dezelfde bron.</p>
-      <div class="question-ring" id="questions">
-        <button class="q" type="button" data-id="why"><b>Waarom is dit nodig?</b><span>Aanleiding, problemen, context</span></button>
-        <button class="q" type="button" data-id="what"><b>Wat verandert er?</b><span>Kernkeuzes en nieuwe werkwijze</span></button>
-        <button class="q" type="button" data-id="evidence"><b>Waar blijkt dat uit?</b><span>Onderbouwing en bronkwaliteit</span></button>
-        <button class="q" type="button" data-id="risk"><b>Wat kan misgaan?</b><span>Risico’s, onzekerheden, grenzen</span></button>
-        <button class="q" type="button" data-id="action"><b>Wat moeten we doen?</b><span>Vervolgstappen en voorwaarden</span></button>
-        <button class="q" type="button" data-id="who"><b>Wie merkt dit?</b><span>Rollen, gebruikers, impact</span></button>
-        <div class="center"><strong>Dezelfde bron, andere ingang</strong></div>
-      </div>
-    </aside>
-
-    <article class="answer" aria-live="polite">
-      <div class="answer-head">
-        <div class="eyeline" id="eyeline">Vraag 1 van 6</div>
-        <h2 id="questionTitle">Waarom is dit nodig?</h2>
-      </div>
-      <div class="modes" aria-label="Detailniveau">
-        <button class="mode" type="button" data-mode="short" aria-pressed="true">In 20 seconden</button>
-        <button class="mode" type="button" data-mode="deep" aria-pressed="false">Onderbouwd</button>
-        <button class="mode" type="button" data-mode="source" aria-pressed="false">Brontekst</button>
-      </div>
-      <div class="answer-body">
-        <section class="response" id="response"></section>
-        <aside class="trail">
-          <h3>Herleidbaar naar</h3>
-          <div id="sources"></div>
-          <div class="related">
-            <h3>Logische vervolgvraag</h3>
-            <div id="related"></div>
+    </style>
+  </head>
+  <body>
+    <section class="review-context"
+             aria-label="Beheerkaart en bronstatus"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke instructie of bron hoort bij deze gebruikersvraag?</h2>
+      <p><strong>Fictieve bron:</strong> antwoorden, passages, bewijs en pilot-/tijdwinstclaims hieronder zijn verzonnen. Deze demo bevat geen actuele FAB-instructie of goedgekeurde workaround en bewijst geen gebruikerswaarde.</p>
+      <p><strong>Gebruiker en moment:</strong> FAB en kerngebruikers bij ondersteuning en kennisoverdracht. <strong>Uitkomst:</strong> passende, gecontroleerde instructie met toepassingsvoorwaarden en concrete vervolgactie in de bestaande kennisbank. Gericht kennispatroon; vergelijk met <a href="vraagdossier.html">Vraagdossier</a> op dezelfde vraag en bron. <a href="incident-onepager.html">Incidentingang</a> laat zien waar actuele kennis nodig is.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische vraagroutes, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Kennis-/proceseigenaar bewaakt inhoud en geldigheid, FAB ondersteunt en adviseert; bevoegde zorg-/privacydeskundigen beoordelen hun eigen inhoud. Geldigheid: presentatieprototype, geen lokaal gevalideerde werkinstructie.</p>
+      <p><strong>Vervolg en onderhoud:</strong> eerst bronhouder, hoofdvraag en vervolgactie aanwijzen; herzie bij bronwijziging. Verwijs naar actuele kennisitems met versie, datum, beoordelaar en uitkomst, geen tweede administratie. Een omweg vraagt voorwaarden, risico, eigenaar en herbeoordelingsdatum; onbekend is niet goedgekeurd. Deel geen cliëntgegevens, vertrouwelijke documenten of volledige logs in HTML. Vergelijk met het bestaande kennisitem op juist antwoord, zoektijd en onderhoudslast; technische werking is geen gebruikersvalidatie.</p>
+    </section>
+    <main class="page" id="app">
+      <header class="mast">
+        <div>
+          <h1>VraagKompas</h1>
+          <p>Begin niet bij de inhoudsopgave, maar bij wat je wilt weten. Kies een vraag en de bron wordt opnieuw geordend rond het antwoord, inclusief bewijs, nuance en relevante vervolgvragen.</p>
+        </div>
+        <div class="source-stamp">
+          <strong>Demo-bron</strong>
+          Programma informatievoorziening 2026
+          <br>
+          42 pagina’s · 31 verwijzingen · fictieve inhoud
+        </div>
+      </header>
+      <section class="board">
+        <aside class="compass">
+          <h2>Waar wil je antwoord op?</h2>
+          <p class="hint">Zes leesroutes door dezelfde bron.</p>
+          <div class="question-ring" id="questions">
+            <button class="q"
+                    type="button"
+                    data-id="why"><b>Waarom is dit nodig?</b><span>Aanleiding, problemen, context</span></button>
+            <button class="q"
+                    type="button"
+                    data-id="what"><b>Wat verandert er?</b><span>Kernkeuzes en nieuwe werkwijze</span></button>
+            <button class="q"
+                    type="button"
+                    data-id="evidence"><b>Waar blijkt dat uit?</b><span>Onderbouwing en bronkwaliteit</span></button>
+            <button class="q"
+                    type="button"
+                    data-id="risk"><b>Wat kan misgaan?</b><span>Risico’s, onzekerheden, grenzen</span></button>
+            <button class="q"
+                    type="button"
+                    data-id="action"><b>Wat moeten we doen?</b><span>Vervolgstappen en voorwaarden</span></button>
+            <button class="q"
+                    type="button"
+                    data-id="who"><b>Wie merkt dit?</b><span>Rollen, gebruikers, impact</span></button>
+            <div class="center"><strong>Dezelfde bron, andere ingang</strong></div>
           </div>
         </aside>
-      </div>
-    </article>
-  </section>
-
-  <label class="askbar">
-    <strong>Zoekvraag</strong>
-    <input id="search" type="search" placeholder="Typ bijvoorbeeld ‘onzekerheid’, ‘rollen’ of ‘pilot’…">
-  </label>
-
-  <section class="note">
-    <h2>Ontwerprichting</h2>
-    <p>Dit concept keert de gebruikelijke documentlogica om. De gebruiker hoeft niet te weten in welk hoofdstuk iets staat, maar begint bij een herkenbare vraag. De interface maakt vervolgens transparant welke delen van de bron samen het antwoord vormen.</p>
-    <p>De ronde vraagstructuur is het enige expressieve element; de antwoordzijde blijft rustig en leesbaar. Met drie detailniveaus kan dezelfde informatie snel worden gescand, onderbouwd worden bekeken of als bronpassage worden gecontroleerd. Alle inhoud is fictieve demo-inhoud.</p>
-  </section>
-</main>
-
-<script>
+        <article class="answer" aria-live="polite">
+          <div class="answer-head">
+            <div class="eyeline" id="eyeline">Vraag 1 van 6</div>
+            <h2 id="questionTitle">Waarom is dit nodig?</h2>
+          </div>
+          <div class="modes" aria-label="Detailniveau">
+            <button class="mode"
+                    type="button"
+                    data-mode="short"
+                    aria-pressed="true">In 20 seconden</button>
+            <button class="mode"
+                    type="button"
+                    data-mode="deep"
+                    aria-pressed="false">Onderbouwd</button>
+            <button class="mode"
+                    type="button"
+                    data-mode="source"
+                    aria-pressed="false">Brontekst</button>
+          </div>
+          <div class="answer-body">
+            <section class="response" id="response">
+            </section>
+            <aside class="trail">
+              <h3>Herleidbaar naar</h3>
+              <div id="sources"></div>
+              <div class="related">
+                <h3>Logische vervolgvraag</h3>
+                <div id="related"></div>
+              </div>
+            </aside>
+          </div>
+        </article>
+      </section>
+      <label class="askbar">
+        <strong>Zoekvraag</strong>
+        <input id="search"
+               type="search"
+               placeholder="Typ bijvoorbeeld ‘onzekerheid’, ‘rollen’ of ‘pilot’…">
+      </label>
+      <section class="note">
+        <h2>Ontwerprichting</h2>
+        <p>Dit concept keert de gebruikelijke documentlogica om. De gebruiker hoeft niet te weten in welk hoofdstuk iets staat, maar begint bij een herkenbare vraag. De interface maakt vervolgens transparant welke delen van de bron samen het antwoord vormen.</p>
+        <p>De ronde vraagstructuur is het enige expressieve element; de antwoordzijde blijft rustig en leesbaar. Met drie detailniveaus kan dezelfde informatie snel worden gescand, onderbouwd worden bekeken of als bronpassage worden gecontroleerd. Alle inhoud is fictieve demo-inhoud.</p>
+      </section>
+    </main>
+    <script>
 (() => {
   const items = {
     why:{
@@ -492,6 +520,6 @@ button{cursor:pointer}
 
   render();
 })();
-</script>
-</body>
+    </script>
+  </body>
 </html>

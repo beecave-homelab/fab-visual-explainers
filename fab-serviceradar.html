@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Serviceradar · Functioneel applicatiebeheer</title>
-<style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Serviceradar · Functioneel applicatiebeheer</title>
+    <style>
 :root{
   --plum:#611750;
   --berry:#9D3293;
@@ -57,57 +57,66 @@ button{font:inherit;color:inherit}
 </head>
 <body>
 <main class="shell">
-  <aside class="panel left">
-    <div class="brand"><div class="brandmark">A</div><div><strong>Attent</strong><span>functioneel applicatiebeheer</span></div></div>
-    <p class="kicker">Concept · incidentregie</p>
-    <h1>Service radar</h1>
-    <p class="intro">Gebruik dit ontwerp wanneer je bij een verstoring snel van losse meldingen naar een gedeeld ketenbeeld wilt. De dienst staat centraal; daaromheen klik je op de perspectieven die nodig zijn om impact, oorzaak en eigenaarschap scherp te krijgen.</p>
-    <div class="design-note">
-      <p>De richting is bewust donker en geconcentreerd: een regiescherm in plaats van een dashboard met losse kaarten.</p>
-      <p>De Attent-kleuren zijn hier ingezet als diepe werkruimte met helder wit als actieve selectie. De radiale navigatie blijft op desktop leidend, maar valt op mobiel terug naar klikbare perspectiefkaarten zodat het geheel prettig leesbaar blijft.</p>
-    </div>
-    <div class="left-bottom">
-      <div class="statusline">
-        <div class="statusrow"><span class="dot" style="background:var(--danger)"></span><span>Impact op roosterproces</span><strong>hoog</strong></div>
-        <div class="statusrow"><span class="dot" style="background:var(--warn)"></span><span>Workaround beschikbaar</span><strong>deels</strong></div>
-        <div class="statusrow"><span class="dot" style="background:var(--good)"></span><span>Eigenaar benoemd</span><strong>ja</strong></div>
-      </div>
-    </div>
-  </aside>
-
-  <section class="panel center">
-    <header class="center-head">
-      <div><h2>Ketenbeeld</h2><p>Klik op een perspectief om de uitvraag en het volgende beslismoment te zien.</p></div>
-      <div class="incident"><span>INC-2741</span><strong>Roosterportaal</strong><span>08:42</span></div>
-    </header>
-    <p class="mobile-prompt">Op mobiel werken de perspectieven als duidelijke selectiekaarten. De witte kaart is actief.</p>
-    <div class="radar-wrap">
-      <div class="radar" aria-label="Interactieve serviceradar">
-        <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div><div class="axis"></div>
-        <div class="core"><div><strong>Roosterportaal</strong><span>dienst in verstoring</span></div></div>
-        <button class="node n1 active" data-key="melder" aria-pressed="true"><span><strong>Melder</strong><small>wat wordt ervaren?</small></span></button>
-        <button class="node n2" data-key="proces" aria-pressed="false"><span><strong>Proces</strong><small>wat valt stil?</small></span></button>
-        <button class="node n3" data-key="applicatie" aria-pressed="false"><span><strong>Applicatie</strong><small>wat doet het systeem?</small></span></button>
-        <button class="node n4" data-key="data" aria-pressed="false"><span><strong>Data</strong><small>kloppen de gegevens?</small></span></button>
-        <button class="node n5" data-key="koppeling" aria-pressed="false"><span><strong>Koppeling</strong><small>waar breekt de keten?</small></span></button>
-        <button class="node n6" data-key="leverancier" aria-pressed="false"><span><strong>Leverancier</strong><small>wat moet worden opgeschaald?</small></span></button>
-      </div>
-    </div>
-    <footer class="legend">
-      <div><strong>1 bron</strong><span>Uitvraag, besluiten en voortgang blijven bij hetzelfde incident.</span></div>
-      <div><strong>6 blikken</strong><span>Je onderzoekt dezelfde verstoring vanuit verschillende functionele perspectieven.</span></div>
-      <div><strong>1 volgende stap</strong><span>Per perspectief wordt zichtbaar welke functionele vraag of escalatie nu nodig is.</span></div>
-    </footer>
-  </section>
-
-  <aside class="panel right" aria-live="polite">
-    <div class="stepcode" id="stepCode">01</div>
-    <p class="kicker" id="detailKicker">Geselecteerd perspectief · melder</p>
-    <h2 id="detailTitle">De melding maakt het probleem navolgbaar</h2>
-    <p class="lead" id="detailLead">Begin bij wat de gebruiker ervaart. Niet bij aannames over de techniek, maar bij zichtbaar gedrag, context en impact op het werk.</p>
-    <div class="questions" id="detailQuestions"></div>
-    <div class="gate" id="detailGate"></div>
-  </aside>
+<aside class="panel left">
+<div class="brand">
+<div class="brandmark">A</div>
+<div><strong>Attent</strong><span>functioneel applicatiebeheer</span></div>
+</div>
+<p class="kicker">Concept · incidentregie</p>
+<h1>Service radar</h1>
+<p class="intro">Gebruik dit ontwerp wanneer je bij een verstoring snel van losse meldingen naar een gedeeld ketenbeeld wilt. De dienst staat centraal; daaromheen klik je op de perspectieven die nodig zijn om impact, oorzaak en eigenaarschap scherp te krijgen.</p>
+<div class="design-note">
+<p>De richting is bewust donker en geconcentreerd: een regiescherm in plaats van een dashboard met losse kaarten.</p>
+<p>De Attent-kleuren zijn hier ingezet als diepe werkruimte met helder wit als actieve selectie. De radiale navigatie blijft op desktop leidend, maar valt op mobiel terug naar klikbare perspectiefkaarten zodat het geheel prettig leesbaar blijft.</p>
+</div>
+<div class="left-bottom">
+<div class="statusline">
+<div class="statusrow"><span class="dot" style="background:var(--danger)"></span><span>Impact op roosterproces</span><strong>hoog</strong></div>
+<div class="statusrow"><span class="dot" style="background:var(--warn)"></span><span>Workaround beschikbaar</span><strong>deels</strong></div>
+<div class="statusrow"><span class="dot" style="background:var(--good)"></span><span>Eigenaar benoemd</span><strong>ja</strong></div>
+</div>
+</div>
+</aside>
+<section class="panel center">
+<header class="center-head">
+<div>
+<h2>Ketenbeeld</h2>
+<p>Klik op een perspectief om de uitvraag en het volgende beslismoment te zien.</p>
+</div>
+<div class="incident"><span>INC-2741</span><strong>Roosterportaal</strong><span>08:42</span></div>
+</header>
+<p class="mobile-prompt">Op mobiel werken de perspectieven als duidelijke selectiekaarten. De witte kaart is actief.</p>
+<div class="radar-wrap">
+<div class="radar" aria-label="Interactieve serviceradar">
+<div class="ring"></div>
+<div class="ring r2"></div>
+<div class="ring r3"></div>
+<div class="axis"></div>
+<div class="core">
+<div><strong>Roosterportaal</strong><span>dienst in verstoring</span></div>
+</div>
+<button class="node n1 active" data-key="melder" aria-pressed="true"><span><strong>Melder</strong><small>wat wordt ervaren?</small></span></button>
+<button class="node n2" data-key="proces" aria-pressed="false"><span><strong>Proces</strong><small>wat valt stil?</small></span></button>
+<button class="node n3" data-key="applicatie" aria-pressed="false"><span><strong>Applicatie</strong><small>wat doet het systeem?</small></span></button>
+<button class="node n4" data-key="data" aria-pressed="false"><span><strong>Data</strong><small>kloppen de gegevens?</small></span></button>
+<button class="node n5" data-key="koppeling" aria-pressed="false"><span><strong>Koppeling</strong><small>waar breekt de keten?</small></span></button>
+<button class="node n6" data-key="leverancier" aria-pressed="false"><span><strong>Leverancier</strong><small>wat moet worden opgeschaald?</small></span></button>
+</div>
+</div>
+<footer class="legend">
+<div><strong>1 bron</strong><span>Uitvraag, besluiten en voortgang blijven bij hetzelfde incident.</span></div>
+<div><strong>6 blikken</strong><span>Je onderzoekt dezelfde verstoring vanuit verschillende functionele perspectieven.</span></div>
+<div><strong>1 volgende stap</strong><span>Per perspectief wordt zichtbaar welke functionele vraag of escalatie nu nodig is.</span></div>
+</footer>
+</section>
+<aside class="panel right" aria-live="polite">
+<div class="stepcode" id="stepCode">01</div>
+<p class="kicker" id="detailKicker">Geselecteerd perspectief · melder</p>
+<h2 id="detailTitle">De melding maakt het probleem navolgbaar</h2>
+<p class="lead" id="detailLead">Begin bij wat de gebruiker ervaart. Niet bij aannames over de techniek, maar bij zichtbaar gedrag, context en impact op het werk.</p>
+<div class="questions" id="detailQuestions"></div>
+<div class="gate" id="detailGate"></div>
+</aside>
 </main>
 <script>
 const data={
@@ -141,13 +150,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <section class="review-context" aria-label="Beheerkaart en incidentanalyse" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Incidentanalyse vanuit zes perspectieven</h2>
-  <p><strong>Hoofdvraag:</strong> welk proces, gegeven of ketenonderdeel moet ik nu controleren? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en overleg bij triage; geen actuele monitor of meldingenregistratie. <strong>Uitkomst:</strong> controlepunt, zorgimpact, eigenaar en veilig escalatiepakket in de bestaande melding.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische INC-2741, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De gekleurde statussen zijn illustraties, geen uitgevoerde of geaccepteerde controles. Geldigheid: demonstratie, niet lokaal gevalideerd. De proceseigenaar beoordeelt zorgimpact en noodwerkwijze; ICT en leverancier voeren technische acties uit; FAB onderzoekt, signaleert en adviseert.</p>
-  <nav aria-label="Incidentviews"><a href="incident-onepager.html#continuity">Incidentingang en continuïteit</a> · <a href="fab-oorzaakopsporing.html">Hypothesen onderzoeken (andere casus)</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a></nav>
-  <p>Bij stilgevallen zorgondersteuning: start direct het goedgekeurde lokale continuïteitsproces via de afgesproken contactroute, ook voordat de oorzaak bekend is. Geen leveranciermelding is geen bewijs dat de leverancier werkt. Deel via de bevoegde route alleen noodzakelijke, beveiligde meldinformatie; geen cliëntgegevens of volledige logs in deze HTML.</p>
-  <details id="readableRadar"><summary>Alle zes perspectieven als leesbare checklist</summary><ol id="radarChecklist"><li>Melder: gedrag, verwachting, context, moment en frequentie.</li><li>Proces: zorgimpact, privacy, veilige lokaal goedgekeurde omweg en prioriteit.</li><li>Applicatie: wat werkt nog, recente wijzigingen en gecontroleerde reproductie.</li><li>Data: volledigheid, plausibiliteit, actualiteit en gecontroleerde herstelroute.</li><li>Koppeling: ontvangst, inhoudelijke verwerking, aantallen en eigenaar per overdracht.</li><li>Leverancier: bestaand contactpunt, bevoegdheid, beveiligd escalatiepakket en interne opvolging.</li></ol></details>
-  <p><strong>Onderhoud en toelating:</strong> herzie bij proces- of bronwijziging; wijs eerst bronhouder en vervolgactie aan. Leg datum, versie, beoordelaar en uitkomst in de bestaande melding vast, niet in een extra administratie. Vergelijk radar en checklist op juiste controle, zoekwerk en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
+<h2>Incidentanalyse vanuit zes perspectieven</h2>
+<p><strong>Hoofdvraag:</strong> welk proces, gegeven of ketenonderdeel moet ik nu controleren? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en overleg bij triage; geen actuele monitor of meldingenregistratie. <strong>Uitkomst:</strong> controlepunt, zorgimpact, eigenaar en veilig escalatiepakket in de bestaande melding.</p>
+<p><strong>Bron en eigenaar:</strong> synthetische INC-2741, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De gekleurde statussen zijn illustraties, geen uitgevoerde of geaccepteerde controles. Geldigheid: demonstratie, niet lokaal gevalideerd. De proceseigenaar beoordeelt zorgimpact en noodwerkwijze; ICT en leverancier voeren technische acties uit; FAB onderzoekt, signaleert en adviseert.</p>
+<nav aria-label="Incidentviews">
+<a href="incident-onepager.html#continuity">Incidentingang en continuïteit</a> · <a href="fab-oorzaakopsporing.html">Hypothesen onderzoeken (andere casus)</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a>
+</nav>
+<p>Bij stilgevallen zorgondersteuning: start direct het goedgekeurde lokale continuïteitsproces via de afgesproken contactroute, ook voordat de oorzaak bekend is. Geen leveranciermelding is geen bewijs dat de leverancier werkt. Deel via de bevoegde route alleen noodzakelijke, beveiligde meldinformatie; geen cliëntgegevens of volledige logs in deze HTML.</p>
+<details id="readableRadar">
+<summary>Alle zes perspectieven als leesbare checklist</summary>
+<ol id="radarChecklist">
+<li>Melder: gedrag, verwachting, context, moment en frequentie.</li>
+<li>Proces: zorgimpact, privacy, veilige lokaal goedgekeurde omweg en prioriteit.</li>
+<li>Applicatie: wat werkt nog, recente wijzigingen en gecontroleerde reproductie.</li>
+<li>Data: volledigheid, plausibiliteit, actualiteit en gecontroleerde herstelroute.</li>
+<li>Koppeling: ontvangst, inhoudelijke verwerking, aantallen en eigenaar per overdracht.</li>
+<li>Leverancier: bestaand contactpunt, bevoegdheid, beveiligd escalatiepakket en interne opvolging.</li>
+</ol>
+</details>
+<p><strong>Onderhoud en toelating:</strong> herzie bij proces- of bronwijziging; wijs eerst bronhouder en vervolgactie aan. Leg datum, versie, beoordelaar en uitkomst in de bestaande melding vast, niet in een extra administratie. Vergelijk radar en checklist op juiste controle, zoekwerk en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
 </section>
 </body>
 </html>

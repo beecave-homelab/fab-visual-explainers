@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Joiner-Mover-Leaver — wie krijgt wanneer toegang, en wanneer verdwijnt die?</title>
-<link rel="icon" href="data:,">
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Joiner-Mover-Leaver — wie krijgt wanneer toegang, en wanneer verdwijnt die?</title>
+    <link rel="icon" href="data:,">
+    <style>
 :root {
   --paper: #e1eee7;
   --surface: #f8fcf9;
@@ -130,49 +130,46 @@ footer { padding: 26px 0 6px; font-size: 13.5px; color: var(--muted); max-width:
 .now-list li span:last-child { min-width: 0; }
 @media (max-width: 900px) { .panels { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .panel dl { grid-template-columns: 1fr; gap: 3px; } .panel dd { margin-bottom: 8px; } }
-</style>
-</head>
-<body>
-<a class="skip" href="#panels">Naar details</a>
-<div class="page">
-  <header class="top">
-    <h1>Wie krijgt wanneer toegang, en wanneer verdwijnt die weer?</h1>
-    <p>Eén medewerker, drie momenten. Vergelijk modelafspraken met gesimuleerde gebeurtenissen. Apparatuurbezit, fysieke toegang en applicatierechten zijn afzonderlijke controles; lokale termijnen zijn nog niet vastgesteld.</p>
-  </header>
-  <p>Bron: synthetische HR-, IAM- en applicatiegebeurtenissen, demo v2. Dit is geen feitelijke toegangscontrole. Dagintervallen zijn inclusief: de laatste actieve dag staat in de balk, stoppen gebeurt aan het begin van de volgende dag. HR-registratie toont het dienstverband, geen verwijdering van het HR-dossier.</p>
-
-  <div class="who" role="group" aria-label="Kies een situatie" id="who"></div>
-
-  <div class="controls">
-    <div class="seg" role="group" aria-label="Weergave">
-      <button type="button" id="v-plan" aria-pressed="true">Modelafspraak (demo)</button>
-      <button type="button" id="v-real" aria-pressed="false">Gesimuleerd verloop</button>
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#panels">Naar details</a>
+    <div class="page">
+      <header class="top">
+        <h1>Wie krijgt wanneer toegang, en wanneer verdwijnt die weer?</h1>
+        <p>Eén medewerker, drie momenten. Vergelijk modelafspraken met gesimuleerde gebeurtenissen. Apparatuurbezit, fysieke toegang en applicatierechten zijn afzonderlijke controles; lokale termijnen zijn nog niet vastgesteld.</p>
+      </header>
+      <p>Bron: synthetische HR-, IAM- en applicatiegebeurtenissen, demo v2. Dit is geen feitelijke toegangscontrole. Dagintervallen zijn inclusief: de laatste actieve dag staat in de balk, stoppen gebeurt aan het begin van de volgende dag. HR-registratie toont het dienstverband, geen verwijdering van het HR-dossier.</p>
+      <div class="who" role="group" aria-label="Kies een situatie" id="who"></div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Weergave">
+          <button type="button" id="v-plan" aria-pressed="true">Modelafspraak (demo)</button>
+          <button type="button" id="v-real" aria-pressed="false">Gesimuleerd verloop</button>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="sw-auto"></i>automatisch</span>
+          <span><i class="sw-man"></i>handmatig door beheer</span>
+          <span><i class="sw-late"></i>te laat</span>
+          <span><i class="sw-over"></i>te lang actief</span>
+        </div>
+      </div>
+      <div class="roll-wrap">
+        <div class="roll" id="roll"></div>
+        <div class="scrub">
+          <label for="day" id="daylabel">Dag</label>
+          <input type="range" id="day" step="1" aria-describedby="dayout">
+          <output id="dayout" for="day"></output>
+        </div>
+      </div>
+      <section class="panels" id="panels" aria-live="polite">
+        <div class="panel" id="nowpanel"></div>
+        <div class="panel" id="rowpanel"></div>
+      </section>
+      <footer>
+        Personen, systemen en afwijkingen zijn fictief. De balken tonen of toegang actief is op één dag, niet hoeveel rechten iemand heeft. Controleer in de eigen omgeving wie de rechten daadwerkelijk toekent.
+      </footer>
     </div>
-    <div class="legend" aria-hidden="true">
-      <span><i class="sw-auto"></i>automatisch</span>
-      <span><i class="sw-man"></i>handmatig door beheer</span>
-      <span><i class="sw-late"></i>te laat</span>
-      <span><i class="sw-over"></i>te lang actief</span>
-    </div>
-  </div>
-
-  <div class="roll-wrap">
-    <div class="roll" id="roll"></div>
-    <div class="scrub">
-      <label for="day" id="daylabel">Dag</label>
-      <input type="range" id="day" step="1" aria-describedby="dayout">
-      <output id="dayout" for="day"></output>
-    </div>
-  </div>
-
-  <section class="panels" id="panels" aria-live="polite">
-    <div class="panel" id="nowpanel"></div>
-    <div class="panel" id="rowpanel"></div>
-  </section>
-  <footer>Personen, systemen en afwijkingen zijn fictief. De balken tonen of toegang actief is op één dag, niet hoeveel rechten iemand heeft. Controleer in de eigen omgeving wie de rechten daadwerkelijk toekent.</footer>
-</div>
-
-<script>
+    <script>
 const OPEN = 99, FROM = -99;
 const S = {
   joiner: {
@@ -311,14 +308,24 @@ document.addEventListener('click', async e => {
 });
 $('#day').addEventListener('input', e => { day = +e.target.value; update(); });
 build();
-</script>
-<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke toegang is te laat beschikbaar of te lang actief?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB met HR, IAM en rol-/proceseigenaren bij instroom, teamwisseling en vertrek. <strong>Uitkomst:</strong> controles en goedgekeurde uitzonderingen per HR-trigger → IAM → applicatie, inclusief scope en afzonderlijke eindmomenten voor apparatuur, fysieke toegang en applicatierechten.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische gebeurtenissen en modeltermijnen, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. HR beheert de personeelsbron, de bevoegde roleigenaar keurt rechten goed, IAM/applicatiebeheer voert uit; FAB controleert en bewaakt opvolging. Geldigheid: demonstratie, geen feitelijke controle of lokaal vastgesteld overgangsbeleid.</p>
-  <nav aria-label="JML-views"><a href="fab-autorisatielandschap.html">Model en feitelijke toegang vergelijken</a> · <a href="fab-releaseatelier.html#test-coverage">Negatieve autorisatietests</a></nav>
-  <p>Een tijdvak bewijst geen feitelijke scope of intrekking. Leg bron, versie, controledatum, beoordelaar en uitkomst vast; onbekend is niet groen. Toets tijdelijke medewerkers, meerdere teamrollen en externe portalen waar relevant. Ontbrekende toegang kan zorgondersteuning stilleggen; te ruime toegang kan privacy schaden. Geen automatische verbreding zonder begrensde, bevoegde goedkeuring.</p>
-  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie vooraf aanwijzen; herzie bij HR-, rol- of proceswijziging. Leg echte acties in de bestaande IAM-/autorisatieregistratie vast, geen tweede administratie. Gebruik geen echte account- of cliëntgegevens in deze HTML. Vergelijk met de huidige JML-checklist op juiste eindmomenten en gemiste toegang. Technische werking bewijst geen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke toegang is te laat beschikbaar of te lang actief?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB met HR, IAM en rol-/proceseigenaren bij instroom, teamwisseling en vertrek. <strong>Uitkomst:</strong> controles en goedgekeurde uitzonderingen per HR-trigger → IAM → applicatie, inclusief scope en afzonderlijke eindmomenten voor apparatuur, fysieke toegang en applicatierechten.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische gebeurtenissen en modeltermijnen, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. HR beheert de personeelsbron, de bevoegde roleigenaar keurt rechten goed, IAM/applicatiebeheer voert uit; FAB controleert en bewaakt opvolging. Geldigheid: demonstratie, geen feitelijke controle of lokaal vastgesteld overgangsbeleid.</p>
+      <nav aria-label="JML-views">
+        <a href="fab-autorisatielandschap.html">Model en feitelijke toegang vergelijken</a> · <a href="fab-releaseatelier.html#test-coverage">Negatieve autorisatietests</a>
+      </nav>
+      <p>Een tijdvak bewijst geen feitelijke scope of intrekking. Leg bron, versie, controledatum, beoordelaar en uitkomst vast; onbekend is niet groen. Toets tijdelijke medewerkers, meerdere teamrollen en externe portalen waar relevant. Ontbrekende toegang kan zorgondersteuning stilleggen; te ruime toegang kan privacy schaden. Geen automatische verbreding zonder begrensde, bevoegde goedkeuring.</p>
+      <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie vooraf aanwijzen; herzie bij HR-, rol- of proceswijziging. Leg echte acties in de bestaande IAM-/autorisatieregistratie vast, geen tweede administratie. Gebruik geen echte account- of cliëntgegevens in deze HTML. Vergelijk met de huidige JML-checklist op juiste eindmomenten en gemiste toegang. Technische werking bewijst geen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>

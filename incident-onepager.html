@@ -1,15 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b2239" />
-  <title>Van melding naar oplossing</title>
-  <meta name="description" content="Interactieve one-pager over incidentafhandeling in applicatiebeheer." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
-  <style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b2239" />
+    <title>Van melding naar oplossing</title>
+    <meta name="description"
+          content="Interactieve one-pager over incidentafhandeling in applicatiebeheer." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap"
+          rel="stylesheet">
+    <style>
     :root {
       --ink: #0b2239;
       --ink-2: #314a61;
@@ -493,98 +495,139 @@
       * { scroll-behavior: auto !important; transition: none !important; }
     }
     @media print { body { background:white;color:black; } .shell { width:100%; } .shell main,.view-switch { display:none; } .review-context details > :not(summary) { display:block!important; } .review-context { border:0!important;margin:0!important; } }
-  </style>
-</head>
-<body>
-  <div class="shell" id="pageShell">
-    <header>
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h8M4 12h12M4 17h7"/><circle cx="17" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg>
-        </div>
-        <div class="brand-text">
-          <strong>Incidentbeeld</strong>
-          <span>Interactieve proces-one-pager</span>
-        </div>
-      </div>
-      <div class="view-switch" aria-label="Weergave">
-        <button id="storyBtn" aria-pressed="true">Met context</button>
-        <button id="focusBtn" aria-pressed="false">Focusmodus</button>
-      </div>
-    </header>
-
-    <main>
-      <section class="panel intro" aria-labelledby="page-title">
-        <div>
-          <div class="kicker"><span class="kicker-dot"></span> Van signaal naar herstel</div>
-          <h1 id="page-title">Van melding naar oplossing.</h1>
-          <p>Een incident is geen lijst tickets. Het is een keten van beslissingen. Klik op een stap om te zien wat daar nodig is, wie aan zet is en wat een goede overdracht oplevert.</p>
-        </div>
-        <div class="legend" aria-label="Legenda">
-          <span><i class="l1"></i> Ontvangst en urgentie</span>
-          <span><i class="l2"></i> Analyse en uitvoering</span>
-          <span><i class="l3"></i> Afronding en leren</span>
-        </div>
-      </section>
-
-      <section class="panel map-panel" aria-labelledby="map-title">
-        <div class="map-head">
-          <div>
-            <h2 id="map-title">Proceslijn</h2>
-            <p>Gebruik de vijf knooppunten als navigatie.</p>
+    </style>
+  </head>
+  <body>
+    <div class="shell" id="pageShell">
+      <header>
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8">
+              <path d="M4 7h8M4 12h12M4 17h7" />
+              <circle cx="17" cy="7" r="3" /><circle cx="15" cy="17" r="3" />
+            </svg>
           </div>
-          <div class="mini-status">5 stappen · 1 keten</div>
+          <div class="brand-text">
+            <strong>Incidentbeeld</strong>
+            <span>Interactieve proces-one-pager</span>
+          </div>
         </div>
-
-        <div class="process" id="process" aria-label="Incidentproces">
-          <button class="node active" data-step="0" aria-pressed="true">
-            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v12H8l-3 3V4Z"/><path d="M8 8h8M8 12h5"/></svg></span>
-            <span class="name">Melding</span><span class="meta">signaal binnen</span>
-          </button>
-          <button class="node" data-step="1" aria-pressed="false">
-            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/><circle cx="18" cy="6" r="2"/></svg></span>
-            <span class="name">Triage</span><span class="meta">impact bepalen</span>
-          </button>
-          <button class="node" data-step="2" aria-pressed="false">
-            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="5"/><path d="m15 15 5 5M11 8v6M8 11h6"/></svg></span>
-            <span class="name">Analyse</span><span class="meta">oorzaak vinden</span>
-          </button>
-          <button class="node" data-step="3" aria-pressed="false">
-            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 13 5 5L20 7"/><path d="M6 6h7"/></svg></span>
-            <span class="name">Herstel</span><span class="meta">werking herstellen</span>
-          </button>
-          <button class="node" data-step="4" aria-pressed="false">
-            <span class="orb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>
-            <span class="name">Leren</span><span class="meta">herhaling voorkomen</span>
-          </button>
+        <div class="view-switch" aria-label="Weergave">
+          <button id="storyBtn" aria-pressed="true">Met context</button>
+          <button id="focusBtn" aria-pressed="false">Focusmodus</button>
         </div>
-
-        <div class="facts" aria-label="Kernprincipes">
-          <div class="fact"><strong>1 bron</strong><span>Leg besluiten en voortgang op één herkenbare plek vast.</span></div>
-          <div class="fact"><strong>1 eigenaar</strong><span>Maak per fase duidelijk wie de volgende actie bewaakt.</span></div>
-          <div class="fact"><strong>1 einde</strong><span>Sluit pas af als werking én terugkoppeling zijn bevestigd.</span></div>
-        </div>
-      </section>
-
-      <aside class="panel detail" aria-live="polite" aria-labelledby="detail-title">
-        <div class="detail-index" id="detailIndex">01</div>
-        <h2 id="detail-title">De melding maakt het probleem reproduceerbaar</h2>
-        <p class="detail-lead" id="detailLead">De eerste vastlegging moet genoeg context bevatten om te begrijpen wat de gebruiker ervaart, zonder direct naar een technische oorzaak te springen.</p>
-        <div class="detail-list" id="detailList"></div>
-        <div class="detail-foot">
-          <span class="label">Door naar de volgende stap wanneer</span>
-          <span class="answer"><i class="answer-dot"></i><span id="detailReady">impact en context duidelijk genoeg zijn voor triage.</span></span>
-        </div>
-      </aside>
-    </main>
-
-    <footer>
-      <span>Demo-inhoud · bedoeld als interactief informatiedesign-patroon</span>
-      <span>Toetsenbord: Tab + Enter/Spatie</span>
-    </footer>
-  </div>
-
-  <script>
+      </header>
+      <main>
+        <section class="panel intro" aria-labelledby="page-title">
+          <div>
+            <div class="kicker"><span class="kicker-dot"></span> Van signaal naar herstel</div>
+            <h1 id="page-title">Van melding naar oplossing.</h1>
+            <p>Een incident is geen lijst tickets. Het is een keten van beslissingen. Klik op een stap om te zien wat daar nodig is, wie aan zet is en wat een goede overdracht oplevert.</p>
+          </div>
+          <div class="legend" aria-label="Legenda">
+            <span><i class="l1"></i> Ontvangst en urgentie</span>
+            <span><i class="l2"></i> Analyse en uitvoering</span>
+            <span><i class="l3"></i> Afronding en leren</span>
+          </div>
+        </section>
+        <section class="panel map-panel" aria-labelledby="map-title">
+          <div class="map-head">
+            <div>
+              <h2 id="map-title">Proceslijn</h2>
+              <p>Gebruik de vijf knooppunten als navigatie.</p>
+            </div>
+            <div class="mini-status">5 stappen · 1 keten</div>
+          </div>
+          <div class="process" id="process" aria-label="Incidentproces">
+            <button class="node active" data-step="0" aria-pressed="true">
+              <span class="orb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8">
+                  <path d="M5 4h14v12H8l-3 3V4Z" />
+                  <path d="M8 8h8M8 12h5" />
+                </svg>
+              </span>
+              <span class="name">Melding</span><span class="meta">signaal binnen</span>
+            </button>
+            <button class="node" data-step="1" aria-pressed="false">
+              <span class="orb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8">
+                  <path d="M4 6h16M7 12h10M10 18h4" />
+                  <circle cx="18" cy="6" r="2" />
+                </svg>
+              </span>
+              <span class="name">Triage</span><span class="meta">impact bepalen</span>
+            </button>
+            <button class="node" data-step="2" aria-pressed="false">
+              <span class="orb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8">
+                  <circle cx="11" cy="11" r="5" />
+                  <path d="m15 15 5 5M11 8v6M8 11h6" />
+                </svg>
+              </span>
+              <span class="name">Analyse</span><span class="meta">oorzaak vinden</span>
+            </button>
+            <button class="node" data-step="3" aria-pressed="false">
+              <span class="orb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8">
+                  <path d="m4 13 5 5L20 7" />
+                  <path d="M6 6h7" />
+                </svg>
+              </span>
+              <span class="name">Herstel</span><span class="meta">werking herstellen</span>
+            </button>
+            <button class="node" data-step="4" aria-pressed="false">
+              <span class="orb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8">
+                  <path d="M5 19V9M12 19V5M19 19v-7" />
+                  <path d="M3 19h18" />
+                </svg>
+              </span>
+              <span class="name">Leren</span><span class="meta">herhaling voorkomen</span>
+            </button>
+          </div>
+          <div class="facts" aria-label="Kernprincipes">
+            <div class="fact"><strong>1 bron</strong><span>Leg besluiten en voortgang op één herkenbare plek vast.</span></div>
+            <div class="fact"><strong>1 eigenaar</strong><span>Maak per fase duidelijk wie de volgende actie bewaakt.</span></div>
+            <div class="fact"><strong>1 einde</strong><span>Sluit pas af als werking én terugkoppeling zijn bevestigd.</span></div>
+          </div>
+        </section>
+        <aside class="panel detail"
+               aria-live="polite"
+               aria-labelledby="detail-title">
+          <div class="detail-index" id="detailIndex">01</div>
+          <h2 id="detail-title">De melding maakt het probleem reproduceerbaar</h2>
+          <p class="detail-lead" id="detailLead">De eerste vastlegging moet genoeg context bevatten om te begrijpen wat de gebruiker ervaart, zonder direct naar een technische oorzaak te springen.</p>
+          <div class="detail-list" id="detailList"></div>
+          <div class="detail-foot">
+            <span class="label">Door naar de volgende stap wanneer</span>
+            <span class="answer"><i class="answer-dot"></i><span id="detailReady">impact en context duidelijk genoeg zijn voor triage.</span></span>
+          </div>
+        </aside>
+      </main>
+      <footer>
+        <span>Demo-inhoud · bedoeld als interactief informatiedesign-patroon</span>
+        <span>Toetsenbord: Tab + Enter/Spatie</span>
+      </footer>
+    </div>
+    <script>
     const steps = [
       {
         title: 'De melding maakt het probleem reproduceerbaar',
@@ -678,27 +721,46 @@
     }
     storyBtn.addEventListener('click', () => setMode(false));
     focusBtn.addEventListener('click', () => setMode(true));
-  </script>
-<section class="review-context" aria-label="Beheerkaart en incidentingang" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Incident en continuïteit</h2>
-  <p><strong>Hoofdvraag:</strong> welke controle, eigenaar en overdracht zijn nu nodig? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en incidentoverleg; geen actueel incidentdossier. <strong>Uitkomst:</strong> prioriteit op basis van zorgimpact, een veilig escalatiepakket en bevestigde herstelcontrole in de bestaande melding.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische incidentroute, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: demonstratie, niet lokaal gevalideerd. FAB onderzoekt en bewaakt opvolging; ICT/leverancier voeren technische acties uit; bevoegde proces- en zorginhoudelijke rollen bepalen noodwerkwijze en acceptatie van herstel. Leg bron, versie, controledatum, beoordelaar en uitkomst in de melding vast. Een geplande actie is geen uitgevoerde of geaccepteerde controle.</p>
-  <nav aria-label="Incidentviews"><a href="fab-serviceradar.html">Zes analyseperspectieven</a> · <a href="fab-oorzaakopsporing.html">Hypothesen en bewijs</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a> · <a href="vraagkompas.html">Kennispatroon</a></nav>
-  <p>Deze links verbinden presentatiepatronen, niet dezelfde melding. Voor een bekende fout: gebruik het actuele kennisitem met toepassingsvoorwaarden, risico, eigenaar en herbeoordelingsdatum. De kennisdemo bevat geen goedgekeurde workaround. Gebruik de bestaande meldingen- en kennisregistratie, geen tweede administratie; deel geen cliëntgegevens, accounts of volledige logs in HTML.</p>
-  <details id="readableIncident"><summary>Alle vijf stappen als leesbare checklist</summary><ol id="incidentChecklist"><li>Melding: leg zichtbaar gedrag, verwachte werking, rol, processtap, moment en recente wijziging vast.</li><li>Triage: onderscheid hinder, stilgevallen zorgondersteuning, privacyrisico en financiële gevolgen. Start bij zorgimpact direct de goedgekeurde continuïteitsroute; wacht niet op diagnose.</li><li>Analyse: toets hypothesen met bron, datum en beoordelaar; onbekend is niet uitgesloten.</li><li>Herstel: alleen bevoegde wijzigingen; controleer oorspronkelijke fout, keten, dubbele verwerking en normale werking met de gebruiker.</li><li>Leren: registreer terugkoppeling, restpunten, eigenaar, datum en herbeoordeling van kennis.</li></ol></details>
-  <section id="continuity" aria-labelledby="continuityTitle">
-    <h3 id="continuityTitle">Continuïteitscasus: ECD-uitval op een woonzorglocatie</h3>
-    <p><strong>INC-DEMO-LOC-02:</strong> medewerkers op een fictieve woonzorglocatie kunnen het ECD niet openen tijdens een overdracht. Zorgondersteuning kan stilvallen; omvang alleen bepaalt niet de prioriteit. Dit is een oefencasus, geen zorgprotocol. <strong>Gereedheid: niet aangetoond</strong> — lokaal noodplan, contactroute, bevoegde goedkeuring en bereikbaarheidstest ontbreken.</p>
-    <ol>
-      <li><strong>Direct melden en opschalen:</strong> gebruik de lokaal afgesproken contactroute voor zorgcoördinatie en servicedesk. De bevoegde zorg-/proceseigenaar beoordeelt cliëntveiligheid en activeert het bestaande continuïteitsplan. FAB legt tijdstip, getroffen functies en de volgende verantwoordelijke vast. Start dit naast de analyse, niet pas erna.</li>
-      <li><strong>Veilige noodwerkwijze:</strong> volg uitsluitend het actuele, goedgekeurde lokale plan. Vul vóór gebruik documentreferentie, versie, goedkeuringsdatum, eigenaar, toepassingsgrenzen en herbeoordelingsdatum in de afgesproken bron aan. Deze demo schrijft geen medicatie-, zorg- of papieren registratiewijze voor en autoriseert geen ruimere toegang.</li>
-      <li><strong>Bereikbaar zonder ECD:</strong> bewaar een gecontroleerde offline of afdrukbare versie van het lokale plan en contactroute op de afgesproken beveiligde plek. Test ook uitval van netwerk, IAM en stroom waar relevant. Dit HTML-bestand is zelfstandig offline leesbaar, maar bevat geen daadwerkelijk noodplan of contactpersonen; een afdruk bewijst geen bereikbaarheid van de juiste informatie.</li>
-      <li><strong>Escalatiepakket:</strong> meld incidentreferentie, tijd/tijdzone, proces- en zorgimpact, getroffen locatie/functie, wat nog werkt, toegepaste goedgekeurde noodmaatregel en interne eigenaar. Gebruik alleen noodzakelijke gegevens via de beveiligde supportroute; geen volledige logs of cliëntgegevens in de vrij deelbare samenvatting.</li>
-      <li><strong>Herstel bevestigen:</strong> ICT/leverancier bevestigt technische werking; FAB en kerngebruiker toetsen toegang met juiste scope, inhoudelijke verwerking, aantallen en actualiteit. Vergelijk eventuele achterstanden en tijdelijke registraties op dezelfde peildatum; herverwerk pas na goedkeuring en controle op dubbelen. De bevoegde proceseigenaar bevestigt hervatting van het normale proces.</li>
-    </ol>
-    <p><strong>Vervolgstap:</strong> oefen met proceseigenaar, zorginhoudelijke deskundige, FAB en ICT. Leg bron/versie, datum, uitvoerder, beoordelaar, uitkomst en open actie vast bij INC-DEMO-LOC-02 in een synthetisch oefendossier. Werkelijk gebruik vraagt echte, gecontroleerde contactroutes en een goedgekeurd noodplan.</p>
-  </section>
-  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete overdracht eerst vaststellen; herzie bij proces-, contact- of systeemwijziging. Vergelijk met het bestaande noodplan en de meldchecklist op juiste escalatie, gemiste veiligheidsinformatie, bereikbaarheid en dubbele invoer. Technische werking is geen lokale validatie of bewezen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart en incidentingang"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Incident en continuïteit</h2>
+      <p><strong>Hoofdvraag:</strong> welke controle, eigenaar en overdracht zijn nu nodig? <strong>Gebruiker:</strong> FAB met servicedesk en proceseigenaar. <strong>Gebruik:</strong> opleiding en incidentoverleg; geen actueel incidentdossier. <strong>Uitkomst:</strong> prioriteit op basis van zorgimpact, een veilig escalatiepakket en bevestigde herstelcontrole in de bestaande melding.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische incidentroute, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: demonstratie, niet lokaal gevalideerd. FAB onderzoekt en bewaakt opvolging; ICT/leverancier voeren technische acties uit; bevoegde proces- en zorginhoudelijke rollen bepalen noodwerkwijze en acceptatie van herstel. Leg bron, versie, controledatum, beoordelaar en uitkomst in de melding vast. Een geplande actie is geen uitgevoerde of geaccepteerde controle.</p>
+      <nav aria-label="Incidentviews">
+        <a href="fab-serviceradar.html">Zes analyseperspectieven</a> · <a href="fab-oorzaakopsporing.html">Hypothesen en bewijs</a> · <a href="fab-ketenkaart.html#data-quality">Keten en gegevenskwaliteit</a> · <a href="vraagkompas.html">Kennispatroon</a>
+      </nav>
+      <p>Deze links verbinden presentatiepatronen, niet dezelfde melding. Voor een bekende fout: gebruik het actuele kennisitem met toepassingsvoorwaarden, risico, eigenaar en herbeoordelingsdatum. De kennisdemo bevat geen goedgekeurde workaround. Gebruik de bestaande meldingen- en kennisregistratie, geen tweede administratie; deel geen cliëntgegevens, accounts of volledige logs in HTML.</p>
+      <details id="readableIncident">
+        <summary>Alle vijf stappen als leesbare checklist</summary>
+        <ol id="incidentChecklist">
+          <li>Melding: leg zichtbaar gedrag, verwachte werking, rol, processtap, moment en recente wijziging vast.</li>
+          <li>Triage: onderscheid hinder, stilgevallen zorgondersteuning, privacyrisico en financiële gevolgen. Start bij zorgimpact direct de goedgekeurde continuïteitsroute; wacht niet op diagnose.</li>
+          <li>Analyse: toets hypothesen met bron, datum en beoordelaar; onbekend is niet uitgesloten.</li>
+          <li>Herstel: alleen bevoegde wijzigingen; controleer oorspronkelijke fout, keten, dubbele verwerking en normale werking met de gebruiker.</li>
+          <li>Leren: registreer terugkoppeling, restpunten, eigenaar, datum en herbeoordeling van kennis.</li>
+        </ol>
+      </details>
+      <section id="continuity" aria-labelledby="continuityTitle">
+        <h3 id="continuityTitle">Continuïteitscasus: ECD-uitval op een woonzorglocatie</h3>
+        <p><strong>INC-DEMO-LOC-02:</strong> medewerkers op een fictieve woonzorglocatie kunnen het ECD niet openen tijdens een overdracht. Zorgondersteuning kan stilvallen; omvang alleen bepaalt niet de prioriteit. Dit is een oefencasus, geen zorgprotocol. <strong>Gereedheid: niet aangetoond</strong> — lokaal noodplan, contactroute, bevoegde goedkeuring en bereikbaarheidstest ontbreken.</p>
+        <ol>
+          <li><strong>Direct melden en opschalen:</strong> gebruik de lokaal afgesproken contactroute voor zorgcoördinatie en servicedesk. De bevoegde zorg-/proceseigenaar beoordeelt cliëntveiligheid en activeert het bestaande continuïteitsplan. FAB legt tijdstip, getroffen functies en de volgende verantwoordelijke vast. Start dit naast de analyse, niet pas erna.</li>
+          <li><strong>Veilige noodwerkwijze:</strong> volg uitsluitend het actuele, goedgekeurde lokale plan. Vul vóór gebruik documentreferentie, versie, goedkeuringsdatum, eigenaar, toepassingsgrenzen en herbeoordelingsdatum in de afgesproken bron aan. Deze demo schrijft geen medicatie-, zorg- of papieren registratiewijze voor en autoriseert geen ruimere toegang.</li>
+          <li><strong>Bereikbaar zonder ECD:</strong> bewaar een gecontroleerde offline of afdrukbare versie van het lokale plan en contactroute op de afgesproken beveiligde plek. Test ook uitval van netwerk, IAM en stroom waar relevant. Dit HTML-bestand is zelfstandig offline leesbaar, maar bevat geen daadwerkelijk noodplan of contactpersonen; een afdruk bewijst geen bereikbaarheid van de juiste informatie.</li>
+          <li><strong>Escalatiepakket:</strong> meld incidentreferentie, tijd/tijdzone, proces- en zorgimpact, getroffen locatie/functie, wat nog werkt, toegepaste goedgekeurde noodmaatregel en interne eigenaar. Gebruik alleen noodzakelijke gegevens via de beveiligde supportroute; geen volledige logs of cliëntgegevens in de vrij deelbare samenvatting.</li>
+          <li><strong>Herstel bevestigen:</strong> ICT/leverancier bevestigt technische werking; FAB en kerngebruiker toetsen toegang met juiste scope, inhoudelijke verwerking, aantallen en actualiteit. Vergelijk eventuele achterstanden en tijdelijke registraties op dezelfde peildatum; herverwerk pas na goedkeuring en controle op dubbelen. De bevoegde proceseigenaar bevestigt hervatting van het normale proces.</li>
+        </ol>
+        <p><strong>Vervolgstap:</strong> oefen met proceseigenaar, zorginhoudelijke deskundige, FAB en ICT. Leg bron/versie, datum, uitvoerder, beoordelaar, uitkomst en open actie vast bij INC-DEMO-LOC-02 in een synthetisch oefendossier. Werkelijk gebruik vraagt echte, gecontroleerde contactroutes en een goedgekeurd noodplan.</p>
+      </section>
+      <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete overdracht eerst vaststellen; herzie bij proces-, contact- of systeemwijziging. Vergelijk met het bestaande noodplan en de meldchecklist op juiste escalatie, gemiste veiligheidsinformatie, bereikbaarheid en dubbele invoer. Technische werking is geen lokale validatie of bewezen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>

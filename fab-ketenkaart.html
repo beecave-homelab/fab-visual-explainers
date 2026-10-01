@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Ketenkaart — van cliëntmutatie naar verwerking</title>
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Ketenkaart — van cliëntmutatie naar verwerking</title>
+    <style>
 :root {
   --paper: #edf4f7;
   --surface: #ffffff;
@@ -216,132 +216,369 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 }
 .review-context th,.review-context td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid currentColor; }
 .review-context p { margin:14px 0; }
-</style>
-</head>
-<body>
-<a class="skip" href="#inspector">Naar de ketendetails</a>
-<main class="page">
-  <header class="mast">
-    <div>
-      <h1>Ketenkaart</h1>
-      <p>Een wijziging in het cliëntdossier stopt niet bij het ECD. Volg de overdrachten en zie waar de verwerking verdergaat, of juist vastloopt.</p>
-    </div>
-    <div class="case">
-      <strong>Cliënt krijgt een ander zorgteam</strong>
-      <span>Voorbeeldbericht MUT-2026-1042</span>
-      <span>Fictieve casus voor functioneel beheer</span>
-    </div>
-  </header>
-  <noscript><p class="nojs">JavaScript staat uit. Je ziet de volledige voorbeeldketen en de basisuitleg. Zet JavaScript aan om onderdelen te selecteren en de afwijzingscasus te bekijken.</p></noscript>
-  <div class="toolbar" aria-label="Keten verkennen">
-    <div class="control">
-      <span class="control-label" id="scenarioLabel">Voorbeeld</span>
-      <div class="segment" role="group" aria-labelledby="scenarioLabel">
-        <button type="button" data-scenario="normal" aria-pressed="true" disabled>Normale stroom</button>
-        <button type="button" data-scenario="failure" aria-pressed="false" disabled>Onbekend team</button>
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#inspector">Naar de ketendetails</a>
+    <main class="page">
+      <header class="mast">
+        <div>
+          <h1>Ketenkaart</h1>
+          <p>Een wijziging in het cliëntdossier stopt niet bij het ECD. Volg de overdrachten en zie waar de verwerking verdergaat, of juist vastloopt.</p>
+        </div>
+        <div class="case">
+          <strong>Cliënt krijgt een ander zorgteam</strong>
+          <span>Voorbeeldbericht MUT-2026-1042</span>
+          <span>Fictieve casus voor functioneel beheer</span>
+        </div>
+      </header>
+      <noscript>
+        <p class="nojs">JavaScript staat uit. Je ziet de volledige voorbeeldketen en de basisuitleg. Zet JavaScript aan om onderdelen te selecteren en de afwijzingscasus te bekijken.</p>
+      </noscript>
+      <div class="toolbar" aria-label="Keten verkennen">
+        <div class="control">
+          <span class="control-label" id="scenarioLabel">Voorbeeld</span>
+          <div class="segment" role="group" aria-labelledby="scenarioLabel">
+            <button type="button"
+                    data-scenario="normal"
+                    aria-pressed="true"
+                    disabled>Normale stroom</button>
+            <button type="button"
+                    data-scenario="failure"
+                    aria-pressed="false"
+                    disabled>Onbekend team</button>
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="routeSelect">Volg naar</label>
+          <select id="routeSelect" disabled>
+            <option value="all">Alle afnemers</option>
+            <option value="finance">Financieel</option>
+            <option value="bi">BI-rapportage</option>
+          </select>
+        </div>
+        <button type="button"
+                class="quiet-button"
+                id="resetButton"
+                disabled>Herstel overzicht</button>
       </div>
-    </div>
-    <div class="control">
-      <label class="control-label" for="routeSelect">Volg naar</label>
-      <select id="routeSelect" disabled>
-        <option value="all">Alle afnemers</option>
-        <option value="finance">Financieel</option>
-        <option value="bi">BI-rapportage</option>
-      </select>
-    </div>
-    <button type="button" class="quiet-button" id="resetButton" disabled>Herstel overzicht</button>
-  </div>
-  <section class="chain-board" aria-labelledby="boardTitle">
-    <div class="board-head">
-      <h2 id="boardTitle">Van registratie naar gebruik</h2>
-      <p>Selecteer een systeem of een overdracht naast de lijn.</p>
-    </div>
-    <div class="stage">
-      <svg class="diagram diagram-desktop" viewBox="0 0 1320 492" role="img" aria-labelledby="keten-title keten-desc">
-        <title id="keten-title">Cliëntmutatie van ECD naar financiën en BI</title>
-        <desc id="keten-desc">Het ECD verstuurt een mutatie naar de koppelservice; na controle gaat die naar financiën en het datawarehouse, dat de BI-rapportage voedt.</desc>
-        <defs>
-          <marker id="keten-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#526775"/></marker>
-          <marker id="keten-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#006c70"/></marker>
-          <marker id="keten-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#a33453"/></marker>
-        </defs>
-        <path class="wire" data-wire="send" d="M200 264 H280"/>
-        <path class="wire" data-wire="validate" d="M440 264 H520"/>
-        <path class="wire" data-wire="book" d="M680 240 H728 Q736 240 736 232 V156 Q736 148 744 148 H800"/>
-        <path class="wire" data-wire="load" d="M680 288 H728 Q736 288 736 296 V372 Q736 380 744 380 H800"/>
-        <path class="wire" data-wire="report" d="M980 380 H1100"/>
-        <circle class="port" cx="200" cy="264" r="5"/><circle class="port" cx="440" cy="264" r="5"/>
-        <circle class="port" cx="680" cy="240" r="5"/><circle class="port" cx="680" cy="288" r="5"/><circle class="port" cx="980" cy="380" r="5"/>
-      </svg>
-      <svg class="diagram diagram-mobile" viewBox="0 0 400 1088" role="img" aria-labelledby="keten-mobile-title keten-mobile-desc">
-        <title id="keten-mobile-title">Cliëntmutatie van ECD naar financiën en BI</title>
-        <desc id="keten-mobile-desc">Na ontvangst controleert de koppelservice de cliëntmutatie; de goedgekeurde gegevens gaan naar financiën en het datawarehouse en daarna naar BI.</desc>
-        <defs>
-          <marker id="keten-mobile-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#526775"/></marker>
-          <marker id="keten-mobile-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#006c70"/></marker>
-          <marker id="keten-mobile-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#a33453"/></marker>
-        </defs>
-        <path class="wire" data-wire="send" d="M200 160 V216"/>
-        <path class="wire" data-wire="validate" d="M200 344 V400"/>
-        <path class="wire" data-wire="book" d="M144 528 V600 Q144 608 136 608 H112 Q104 608 104 616 V656"/>
-        <path class="wire" data-wire="load" d="M256 528 V600 Q256 608 264 608 H288 Q296 608 296 616 V656"/>
-        <path class="wire" data-wire="report" d="M296 784 V944"/>
-      </svg>
-      <button type="button" class="node source" data-node="ecd" aria-pressed="false" aria-controls="inspector" style="--x:40;--y:212;--w:160;--h:104;--mx:80;--my:32;--mw:240;--mh:128" disabled><span class="node-role">Registratie</span><strong>Cliëntdossier</strong><span class="node-state">Mutatie vastgelegd</span></button>
-      <button type="button" class="node" data-node="receive" aria-pressed="false" aria-controls="inspector" style="--x:280;--y:212;--w:160;--h:104;--mx:80;--my:216;--mw:240;--mh:128" disabled><span class="node-role">Koppelservice</span><strong>Ontvangst</strong><span class="node-state">Bericht ontvangen</span></button>
-      <button type="button" class="node" data-node="check" aria-pressed="false" aria-controls="inspector" style="--x:520;--y:212;--w:160;--h:104;--mx:80;--my:400;--mw:240;--mh:128" disabled><span class="node-role">Koppelservice</span><strong>Controle</strong><span class="node-state">Team herkend</span></button>
-      <button type="button" class="node" data-node="finance" aria-pressed="false" aria-controls="inspector" style="--x:800;--y:96;--w:180;--h:104;--mx:24;--my:656;--mw:160;--mh:128" disabled><span class="node-role">Financiële verwerking</span><strong>Financieel</strong><span class="node-state">Mutatie verwerkt</span></button>
-      <button type="button" class="node store" data-node="dwh" aria-pressed="false" aria-controls="inspector" style="--x:800;--y:328;--w:180;--h:104;--mx:216;--my:656;--mw:160;--mh:128" disabled><span class="node-role">Gegevensopslag</span><strong>Datawarehouse</strong><span class="node-state">Mutatie geladen</span></button>
-      <button type="button" class="node" data-node="bi" aria-pressed="false" aria-controls="inspector" style="--x:1100;--y:328;--w:160;--h:104;--mx:216;--my:944;--mw:160;--mh:128" disabled><span class="node-role">Rapportage</span><strong>BI-rapportage</strong><span class="node-state">Dataset vernieuwd</span></button>
-      <button type="button" class="handoff" data-edge="send" aria-pressed="false" aria-controls="inspector" style="--x:204;--y:208;--w:72;--h:36;--mx:212;--my:168;--mw:124;--mh:36" disabled>Mutatie</button>
-      <button type="button" class="handoff" data-edge="validate" aria-pressed="false" aria-controls="inspector" style="--x:440;--y:208;--w:80;--h:36;--mx:212;--my:352;--mw:124;--mh:36" disabled>Controle</button>
-      <button type="button" class="handoff" data-edge="book" aria-pressed="false" aria-controls="inspector" style="--x:696;--y:104;--w:100;--h:36;--mx:16;--my:536;--mw:112;--mh:36" disabled>Boeking</button>
-      <button type="button" class="handoff" data-edge="load" aria-pressed="false" aria-controls="inspector" style="--x:696;--y:404;--w:100;--h:36;--mx:264;--my:536;--mw:120;--mh:36" disabled>Dataset</button>
-      <button type="button" class="handoff" data-edge="report" aria-pressed="false" aria-controls="inspector" style="--x:992;--y:324;--w:96;--h:36;--mx:64;--my:840;--mw:220;--mh:36" disabled>Laadset</button>
-    </div>
-    <div class="board-foot">
-      <div class="legend" aria-label="Legenda"><span><i class="muted-key"></i>Overdracht</span><span><i></i>Gevolgd pad</span><span><i class="blocked-key"></i>Niet verwerkt</span></div>
-      <p id="pathText">Hele keten zichtbaar</p>
-    </div>
-  </section>
-  <div class="route-summary" id="routeSummary" role="status">
-    <strong id="summaryTitle">Bericht verwerkt</strong>
-    <p id="summaryText">De teamcode is herkend. Financiën en het datawarehouse ontvangen de mutatie; BI gebruikt de vernieuwde dataset na de volgende verversing.</p>
-  </div>
-  <p class="sr-only" id="selectionStatus" role="status"></p>
-  <a class="selection-jump" id="selectionJump" href="#inspector" hidden><span id="jumpText">Bekijk ketendetails</span></a>
-  <section class="inspector" id="inspector" aria-labelledby="selectionTitle" tabindex="-1">
-    <div class="selection-head">
-      <span class="selection-kind" id="selectionKind">De volledige keten</span>
-      <h2 id="selectionTitle">Eén mutatie, twee afnemers</h2>
-      <p id="selectionIntro">Dezelfde teamwijziging voedt de financiële verwerking en rapportage. Elke overdracht heeft een eigen controle en eigenaar. Selecteer een onderdeel om die afspraken te bekijken.</p>
-      <div class="owner"><span>Regie</span><strong id="selectionOwner">FAB Zorg &amp; Integratiebeheer</strong></div>
-    </div>
-    <div>
-      <div class="detail-tabs" role="tablist" aria-label="Ketendetails">
-        <button type="button" id="tab-data" role="tab" data-tab="data" aria-selected="true" aria-controls="panel-data" tabindex="0" disabled>Gegevens</button>
-        <button type="button" id="tab-care" role="tab" data-tab="care" aria-selected="false" aria-controls="panel-care" tabindex="-1" disabled>Beheer &amp; herstel</button>
-        <button type="button" id="tab-proof" role="tab" data-tab="proof" aria-selected="false" aria-controls="panel-proof" tabindex="-1" disabled>Bewijs</button>
+      <section class="chain-board" aria-labelledby="boardTitle">
+        <div class="board-head">
+          <h2 id="boardTitle">Van registratie naar gebruik</h2>
+          <p>Selecteer een systeem of een overdracht naast de lijn.</p>
+        </div>
+        <div class="stage">
+          <svg class="diagram diagram-desktop"
+               viewBox="0 0 1320 492"
+               role="img"
+               aria-labelledby="keten-title keten-desc">
+            <title id="keten-title">Cliëntmutatie van ECD naar financiën en BI</title>
+            <desc id="keten-desc">Het ECD verstuurt een mutatie naar de koppelservice; na controle gaat die naar financiën en het datawarehouse, dat de BI-rapportage voedt.</desc>
+            <defs>
+            <marker id="keten-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#526775" />
+            </marker>
+            <marker id="keten-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#006c70" />
+            </marker>
+            <marker id="keten-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#a33453" />
+            </marker>
+            </defs>
+            <path class="wire" data-wire="send" d="M200 264 H280" />
+            <path class="wire" data-wire="validate" d="M440 264 H520" />
+            <path class="wire" data-wire="book" d="M680 240 H728 Q736 240 736 232 V156 Q736 148 744 148 H800" />
+            <path class="wire" data-wire="load" d="M680 288 H728 Q736 288 736 296 V372 Q736 380 744 380 H800" />
+            <path class="wire" data-wire="report" d="M980 380 H1100" />
+            <circle class="port" cx="200" cy="264" r="5" /><circle class="port" cx="440" cy="264" r="5" />
+            <circle class="port" cx="680" cy="240" r="5" /><circle class="port" cx="680" cy="288" r="5" /><circle class="port" cx="980" cy="380" r="5" />
+          </svg>
+          <svg class="diagram diagram-mobile"
+               viewBox="0 0 400 1088"
+               role="img"
+               aria-labelledby="keten-mobile-title keten-mobile-desc">
+            <title id="keten-mobile-title">Cliëntmutatie van ECD naar financiën en BI</title>
+            <desc id="keten-mobile-desc">Na ontvangst controleert de koppelservice de cliëntmutatie; de goedgekeurde gegevens gaan naar financiën en het datawarehouse en daarna naar BI.</desc>
+            <defs>
+            <marker id="keten-mobile-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#526775" />
+            </marker>
+            <marker id="keten-mobile-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#006c70" />
+            </marker>
+            <marker id="keten-mobile-arrow-danger" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0 0 L8 3 L0 6 Z" fill="#a33453" />
+            </marker>
+            </defs>
+            <path class="wire" data-wire="send" d="M200 160 V216" />
+            <path class="wire" data-wire="validate" d="M200 344 V400" />
+            <path class="wire" data-wire="book" d="M144 528 V600 Q144 608 136 608 H112 Q104 608 104 616 V656" />
+            <path class="wire" data-wire="load" d="M256 528 V600 Q256 608 264 608 H288 Q296 608 296 616 V656" />
+            <path class="wire" data-wire="report" d="M296 784 V944" />
+          </svg>
+          <button type="button"
+                  class="node source"
+                  data-node="ecd"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:40;
+                         --y:212;
+                         --w:160;
+                         --h:104;
+                         --mx:80;
+                         --my:32;
+                         --mw:240;
+                         --mh:128"
+                  disabled><span class="node-role">Registratie</span><strong>Cliëntdossier</strong><span class="node-state">Mutatie vastgelegd</span></button>
+          <button type="button"
+                  class="node"
+                  data-node="receive"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:280;
+                         --y:212;
+                         --w:160;
+                         --h:104;
+                         --mx:80;
+                         --my:216;
+                         --mw:240;
+                         --mh:128"
+                  disabled><span class="node-role">Koppelservice</span><strong>Ontvangst</strong><span class="node-state">Bericht ontvangen</span></button>
+          <button type="button"
+                  class="node"
+                  data-node="check"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:520;
+                         --y:212;
+                         --w:160;
+                         --h:104;
+                         --mx:80;
+                         --my:400;
+                         --mw:240;
+                         --mh:128"
+                  disabled><span class="node-role">Koppelservice</span><strong>Controle</strong><span class="node-state">Team herkend</span></button>
+          <button type="button"
+                  class="node"
+                  data-node="finance"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:800;
+                         --y:96;
+                         --w:180;
+                         --h:104;
+                         --mx:24;
+                         --my:656;
+                         --mw:160;
+                         --mh:128"
+                  disabled><span class="node-role">Financiële verwerking</span><strong>Financieel</strong><span class="node-state">Mutatie verwerkt</span></button>
+          <button type="button"
+                  class="node store"
+                  data-node="dwh"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:800;
+                         --y:328;
+                         --w:180;
+                         --h:104;
+                         --mx:216;
+                         --my:656;
+                         --mw:160;
+                         --mh:128"
+                  disabled><span class="node-role">Gegevensopslag</span><strong>Datawarehouse</strong><span class="node-state">Mutatie geladen</span></button>
+          <button type="button"
+                  class="node"
+                  data-node="bi"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:1100;
+                         --y:328;
+                         --w:160;
+                         --h:104;
+                         --mx:216;
+                         --my:944;
+                         --mw:160;
+                         --mh:128"
+                  disabled><span class="node-role">Rapportage</span><strong>BI-rapportage</strong><span class="node-state">Dataset vernieuwd</span></button>
+          <button type="button"
+                  class="handoff"
+                  data-edge="send"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:204;
+                         --y:208;
+                         --w:72;
+                         --h:36;
+                         --mx:212;
+                         --my:168;
+                         --mw:124;
+                         --mh:36"
+                  disabled>Mutatie</button>
+          <button type="button"
+                  class="handoff"
+                  data-edge="validate"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:440;
+                         --y:208;
+                         --w:80;
+                         --h:36;
+                         --mx:212;
+                         --my:352;
+                         --mw:124;
+                         --mh:36"
+                  disabled>Controle</button>
+          <button type="button"
+                  class="handoff"
+                  data-edge="book"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:696;
+                         --y:104;
+                         --w:100;
+                         --h:36;
+                         --mx:16;
+                         --my:536;
+                         --mw:112;
+                         --mh:36"
+                  disabled>Boeking</button>
+          <button type="button"
+                  class="handoff"
+                  data-edge="load"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:696;
+                         --y:404;
+                         --w:100;
+                         --h:36;
+                         --mx:264;
+                         --my:536;
+                         --mw:120;
+                         --mh:36"
+                  disabled>Dataset</button>
+          <button type="button"
+                  class="handoff"
+                  data-edge="report"
+                  aria-pressed="false"
+                  aria-controls="inspector"
+                  style="--x:992;
+                         --y:324;
+                         --w:96;
+                         --h:36;
+                         --mx:64;
+                         --my:840;
+                         --mw:220;
+                         --mh:36"
+                  disabled>Laadset</button>
+        </div>
+        <div class="board-foot">
+          <div class="legend" aria-label="Legenda"><span><i class="muted-key"></i>Overdracht</span><span><i></i>Gevolgd pad</span><span><i class="blocked-key"></i>Niet verwerkt</span></div>
+          <p id="pathText">Hele keten zichtbaar</p>
+        </div>
+      </section>
+      <div class="route-summary" id="routeSummary" role="status">
+        <strong id="summaryTitle">Bericht verwerkt</strong>
+        <p id="summaryText">De teamcode is herkend. Financiën en het datawarehouse ontvangen de mutatie; BI gebruikt de vernieuwde dataset na de volgende verversing.</p>
       </div>
-      <div class="detail-panel" id="panel-data" role="tabpanel" aria-labelledby="tab-data" tabindex="0">
-        <dl class="facts"><dt>Wat verandert</dt><dd>Het zorgteam van een fictieve cliënt, per ingangsdatum.</dd><dt>Route</dt><dd>ECD → koppelservice → financiën en datawarehouse → BI.</dd><dt>Let op</dt><dd>Ontvangst, verwerking en rapportageverversing zijn drie verschillende bevestigingen.</dd></dl>
-        <div class="payload"><code>clientId</code><code>teamCode</code><code>effectiveDate</code><code>messageId</code></div>
-      </div>
-      <div class="detail-panel" id="panel-care" role="tabpanel" aria-labelledby="tab-care" tabindex="0" hidden></div>
-      <div class="detail-panel" id="panel-proof" role="tabpanel" aria-labelledby="tab-proof" tabindex="0" hidden></div>
-      <div class="copy-row"><button type="button" class="copy-button" id="copyButton" disabled>Kopieer ketensamenvatting</button><span id="copyStatus" role="status"></span></div>
-      <textarea id="copyFallback" aria-label="Ketensamenvatting om handmatig te kopiëren" readonly hidden></textarea>
-    </div>
-  </section>
-  <details class="about">
-    <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
-    <p>De keten is een schakelbord: systemen zijn onderdelen, lijnen zijn gerichte overdrachten en elke aansluiting heeft een eigen verantwoordelijkheid. Ontvangst en controle zijn twee functies van dezelfde koppelservice, geen twee aparte applicaties. De kaart toont een vereenvoudigde integratie, geen volledige infrastructuur.</p>
-    <p>Alle systemen, teamcodes, berichtnummers, tijden en bewijsfragmenten zijn fictief. Er worden geen cliëntgegevens opgehaald of verstuurd. De afwijzingscasus houdt de laatst verwerkte stand bij de afnemers intact; een gestippelde lijn betekent dat deze mutatie daar niet is verwerkt, niet dat het hele systeem uitstaat.</p>
-    <p>De selectie licht alle routes door het gekozen onderdeel uit, of alleen de gekozen afnemer. Na een correctie moet beheer de mutatie gecontroleerd opnieuw aanbieden en bevestigingen vergelijken. De demo voert geen herstelactie uit.</p>
-  </details>
-  <footer><span>FAB Ketenkaart — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span></footer>
-</main>
-<script>
+      <p class="sr-only" id="selectionStatus" role="status"></p>
+      <a class="selection-jump"
+         id="selectionJump"
+         href="#inspector"
+         hidden><span id="jumpText">Bekijk ketendetails</span></a>
+      <section class="inspector"
+               id="inspector"
+               aria-labelledby="selectionTitle"
+               tabindex="-1">
+        <div class="selection-head">
+          <span class="selection-kind" id="selectionKind">De volledige keten</span>
+          <h2 id="selectionTitle">Eén mutatie, twee afnemers</h2>
+          <p id="selectionIntro">Dezelfde teamwijziging voedt de financiële verwerking en rapportage. Elke overdracht heeft een eigen controle en eigenaar. Selecteer een onderdeel om die afspraken te bekijken.</p>
+          <div class="owner"><span>Regie</span><strong id="selectionOwner">FAB Zorg &amp; Integratiebeheer</strong></div>
+        </div>
+        <div>
+          <div class="detail-tabs" role="tablist" aria-label="Ketendetails">
+            <button type="button"
+                    id="tab-data"
+                    role="tab"
+                    data-tab="data"
+                    aria-selected="true"
+                    aria-controls="panel-data"
+                    tabindex="0"
+                    disabled>Gegevens</button>
+            <button type="button"
+                    id="tab-care"
+                    role="tab"
+                    data-tab="care"
+                    aria-selected="false"
+                    aria-controls="panel-care"
+                    tabindex="-1"
+                    disabled>Beheer &amp; herstel</button>
+            <button type="button"
+                    id="tab-proof"
+                    role="tab"
+                    data-tab="proof"
+                    aria-selected="false"
+                    aria-controls="panel-proof"
+                    tabindex="-1"
+                    disabled>Bewijs</button>
+          </div>
+          <div class="detail-panel"
+               id="panel-data"
+               role="tabpanel"
+               aria-labelledby="tab-data"
+               tabindex="0">
+            <dl class="facts">
+              <dt>Wat verandert</dt>
+              <dd>
+                Het zorgteam van een fictieve cliënt, per ingangsdatum.
+              </dd>
+              <dt>Route</dt>
+              <dd>
+                ECD → koppelservice → financiën en datawarehouse → BI.
+              </dd>
+              <dt>Let op</dt>
+              <dd>
+                Ontvangst, verwerking en rapportageverversing zijn drie verschillende bevestigingen.
+              </dd>
+            </dl>
+            <div class="payload"><code>clientId</code><code>teamCode</code><code>effectiveDate</code><code>messageId</code></div>
+          </div>
+          <div class="detail-panel"
+               id="panel-care"
+               role="tabpanel"
+               aria-labelledby="tab-care"
+               tabindex="0"
+               hidden></div>
+          <div class="detail-panel"
+               id="panel-proof"
+               role="tabpanel"
+               aria-labelledby="tab-proof"
+               tabindex="0"
+               hidden></div>
+          <div class="copy-row">
+            <button type="button"
+                    class="copy-button"
+                    id="copyButton"
+                    disabled>Kopieer ketensamenvatting</button>
+            <span id="copyStatus" role="status"></span>
+          </div>
+          <textarea id="copyFallback"
+                    aria-label="Ketensamenvatting om handmatig te kopiëren"
+                    readonly
+                    hidden></textarea>
+        </div>
+      </section>
+      <details class="about">
+        <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
+        <p>De keten is een schakelbord: systemen zijn onderdelen, lijnen zijn gerichte overdrachten en elke aansluiting heeft een eigen verantwoordelijkheid. Ontvangst en controle zijn twee functies van dezelfde koppelservice, geen twee aparte applicaties. De kaart toont een vereenvoudigde integratie, geen volledige infrastructuur.</p>
+        <p>Alle systemen, teamcodes, berichtnummers, tijden en bewijsfragmenten zijn fictief. Er worden geen cliëntgegevens opgehaald of verstuurd. De afwijzingscasus houdt de laatst verwerkte stand bij de afnemers intact; een gestippelde lijn betekent dat deze mutatie daar niet is verwerkt, niet dat het hele systeem uitstaat.</p>
+        <p>De selectie licht alle routes door het gekozen onderdeel uit, of alleen de gekozen afnemer. Na een correctie moet beheer de mutatie gecontroleerd opnieuw aanbieden en bevestigingen vergelijken. De demo voert geen herstelactie uit.</p>
+      </details>
+      <footer>
+        <span>FAB Ketenkaart — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span>
+      </footer>
+    </main>
+    <script>
 (() => {
   const nodes = {
     ecd: { name: 'Cliëntdossier', kind: 'Bronsysteem', owner: 'FAB Zorg', intro: 'Een zorgteamwijziging ontstaat in het ECD. Het dossier blijft de bron; afnemers krijgen alleen de afgesproken mutatievelden.', data: [['Invoer', 'Teamwijziging door een bevoegde medewerker.'], ['Uitvoer', 'Cliëntsleutel, teamcode, ingangsdatum en berichtnummer.'], ['Controle', 'De cliëntsleutel blijft gelijk; alleen de teamtoewijzing wijzigt.']], care: ['Controleer de teamtoewijzing en ingangsdatum in het dossier.', 'Corrigeer een fout in de bron. Wijzig niet afzonderlijk dezelfde gegevens bij iedere afnemer.', 'Laat Integratiebeheer na correctie een gecontroleerde herverwerking uitvoeren.'], proof: ['Mutatiehistorie ECD', 'De wijzigingshistorie verbindt de bronregistratie met het uitgaande bericht.'], log: '08:42:00  teamwijziging vastgelegd\nmessageId: MUT-2026-1042\nclientId: DEMO-017' },
@@ -517,23 +754,60 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   document.querySelectorAll('button:disabled, select:disabled').forEach(el => el.disabled = false);
   updateMap(); renderDetails();
 })();
-</script>
-<section class="review-context" aria-label="Beheerkaart en gegevenskwaliteit" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Een ketenafwijking herleiden en veilig overdragen</h2>
-  <p><strong>Hoofdvraag:</strong> waar bleef de mutatie steken en wie controleert de volgende stap? <strong>Gebruiker:</strong> FAB en Integratiebeheer, bij meldingen en wijzigingen. <strong>Uitkomst:</strong> een escalatiepakket met berichtreferentie, bron-, ontvangst-, verwerkings- en aansluitcontrole; herstel uitsluitend via het bevoegde proces.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische ketencasus, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen; FAB bewaakt functionele afspraken, Integratiebeheer de uitvoering, gegevens- en rapportage-eigenaren de betekenis en acceptatie. Geldigheid: demonstratie, niet lokaal gevalideerd of live gemeten. De logfragmenten zijn geen echt gecontroleerd bewijs. Leg echte bron, versie, controledatum, beoordelaar en uitkomst in de melding vast; gebruik geen cliëntgegevens of volledige logs in deze deelbare HTML.</p>
-  <nav aria-label="Ketenviews"><a href="incident-onepager.html">Incident en continuïteit</a> · <a href="fab-rapportage-lineage.html">Rapportageherkomst</a> · <a href="fab-proces-applicatie-map.html">Proces en registraties</a></nav>
-  <section id="data-quality" aria-labelledby="qualityTitle">
-    <h3 id="qualityTitle">Gegevenskwaliteit: overdrachten naar een woonzorglocatie</h3>
-    <p><strong>DQ-DEMO-LOC-02, gerelateerd aan CHG-DEMO-LOC-02:</strong> 120 synthetische overdrachtsberichten aangeboden op 2 november 2026 tussen 08:00 en 09:00 Europe/Amsterdam; aansluitcontrole op 09:15. Dit zijn vaste illustraties, geen gemeten kwaliteitsscore. De populatie telt berichten, niet unieke cliënten. De kwaliteitsregels en termijnen vragen lokale goedkeuring.</p>
-    <div style="overflow-x:auto" tabindex="0" role="region" aria-label="Gegevenskwaliteitstabel"><table style="width:100%;border-collapse:collapse"><caption>Kwaliteitsregel, gecontroleerde populatie, afwijking en veilige herstelroute</caption><thead><tr><th scope="col">Regel / bronveld / populatie</th><th scope="col">Illustratieve afwijking / gevolg</th><th scope="col">Eigenaar / herstel en controle</th></tr></thead><tbody>
-      <tr><td>DQ-01 · locationCode bestaat en is geldig op effectiveDate. Alle 120 berichten; mapping demo 0.2.</td><td>3 berichten met onbekende locatiecode; ontvangend dossier mist de overdracht. Zorgimpact door proceseigenaar te beoordelen.</td><td>Gegevenseigenaar cliëntadministratie bevestigt bron/mapping; FAB onderzoekt; Integratiebeheer herverwerkt pas na goedkeuring met dezelfde berichtsleutel. Controleer inhoudelijke ontvangst en verwerking.</td></tr>
-      <tr><td>DQ-02 · transferId is uniek per overdracht. 120 berichten vergelijken op sleutel én bronhistorie.</td><td>2 herhaalde sleutels; 118 verschillende sleutels. Geen bewijs van dubbele zorg of twee extra cliënten. Mogelijk dubbele registratie bij afnemer.</td><td>Integratiebeheer controleert herhaalgedrag; proceseigenaar beoordeelt gevolgen. Niet blind opnieuw aanbieden of records verwijderen; verifieer één inhoudelijke verwerking per sleutel.</td></tr>
-      <tr><td>DQ-03 · verwerking bevestigd binnen 15 minuten na sentAt (demotermijn). Alle 120 aangeboden berichten op peildatum 09:15.</td><td>5 berichten zonder tijdige processedAt-bevestiging. Afwijkingen kunnen overlappen met DQ-01/02; aantallen niet optellen tot één kwaliteitspercentage.</td><td>FAB en ontvangende applicatiebeheerder controleren tijdzone, ontvangst en eindverwerking; leverancier via bestaande contactroute. Na herstel bron en afnemer op dezelfde peildatum vergelijken.</td></tr>
-    </tbody></table></div>
-    <p><strong>Vervolgstap:</strong> registreer per regel gecontroleerde populatie, mappingversie, bronreferentie, datum, beoordelaar, uitkomst en herstelactie in de bestaande melding of kwaliteitsregistratie. De illustraties zijn niet uitgevoerd, gecontroleerd of geaccepteerd. Bij zorguitval start de afgesproken continuïteitsroute direct; wacht niet op volledige oorzaakanalyse.</p>
-  </section>
-  <p><strong>Onderhoud:</strong> herzie bij koppeling-, mapping- of proceswijziging; benut bestaande logs en dossiers, geen tweede administratie. Selecteer de view pas met bronhouder en concrete vervolgactie. Vergelijk met de huidige koppeldocumentatie op juiste eigenaar, gemiste controles en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart en gegevenskwaliteit"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Een ketenafwijking herleiden en veilig overdragen</h2>
+      <p><strong>Hoofdvraag:</strong> waar bleef de mutatie steken en wie controleert de volgende stap? <strong>Gebruiker:</strong> FAB en Integratiebeheer, bij meldingen en wijzigingen. <strong>Uitkomst:</strong> een escalatiepakket met berichtreferentie, bron-, ontvangst-, verwerkings- en aansluitcontrole; herstel uitsluitend via het bevoegde proces.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische ketencasus, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen; FAB bewaakt functionele afspraken, Integratiebeheer de uitvoering, gegevens- en rapportage-eigenaren de betekenis en acceptatie. Geldigheid: demonstratie, niet lokaal gevalideerd of live gemeten. De logfragmenten zijn geen echt gecontroleerd bewijs. Leg echte bron, versie, controledatum, beoordelaar en uitkomst in de melding vast; gebruik geen cliëntgegevens of volledige logs in deze deelbare HTML.</p>
+      <nav aria-label="Ketenviews">
+        <a href="incident-onepager.html">Incident en continuïteit</a> · <a href="fab-rapportage-lineage.html">Rapportageherkomst</a> · <a href="fab-proces-applicatie-map.html">Proces en registraties</a>
+      </nav>
+      <section id="data-quality" aria-labelledby="qualityTitle">
+        <h3 id="qualityTitle">Gegevenskwaliteit: overdrachten naar een woonzorglocatie</h3>
+        <p><strong>DQ-DEMO-LOC-02, gerelateerd aan CHG-DEMO-LOC-02:</strong> 120 synthetische overdrachtsberichten aangeboden op 2 november 2026 tussen 08:00 en 09:00 Europe/Amsterdam; aansluitcontrole op 09:15. Dit zijn vaste illustraties, geen gemeten kwaliteitsscore. De populatie telt berichten, niet unieke cliënten. De kwaliteitsregels en termijnen vragen lokale goedkeuring.</p>
+        <div style="overflow-x:auto"
+             tabindex="0"
+             role="region"
+             aria-label="Gegevenskwaliteitstabel">
+          <table style="width:100%;border-collapse:collapse">
+            <caption>Kwaliteitsregel, gecontroleerde populatie, afwijking en veilige herstelroute</caption>
+            <thead>
+              <tr>
+                <th scope="col">Regel / bronveld / populatie</th>
+                <th scope="col">Illustratieve afwijking / gevolg</th>
+                <th scope="col">Eigenaar / herstel en controle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>DQ-01 · locationCode bestaat en is geldig op effectiveDate. Alle 120 berichten; mapping demo 0.2.</td>
+                <td>3 berichten met onbekende locatiecode; ontvangend dossier mist de overdracht. Zorgimpact door proceseigenaar te beoordelen.</td>
+                <td>Gegevenseigenaar cliëntadministratie bevestigt bron/mapping; FAB onderzoekt; Integratiebeheer herverwerkt pas na goedkeuring met dezelfde berichtsleutel. Controleer inhoudelijke ontvangst en verwerking.</td>
+              </tr>
+              <tr>
+                <td>DQ-02 · transferId is uniek per overdracht. 120 berichten vergelijken op sleutel én bronhistorie.</td>
+                <td>2 herhaalde sleutels; 118 verschillende sleutels. Geen bewijs van dubbele zorg of twee extra cliënten. Mogelijk dubbele registratie bij afnemer.</td>
+                <td>Integratiebeheer controleert herhaalgedrag; proceseigenaar beoordeelt gevolgen. Niet blind opnieuw aanbieden of records verwijderen; verifieer één inhoudelijke verwerking per sleutel.</td>
+              </tr>
+              <tr>
+                <td>DQ-03 · verwerking bevestigd binnen 15 minuten na sentAt (demotermijn). Alle 120 aangeboden berichten op peildatum 09:15.</td>
+                <td>5 berichten zonder tijdige processedAt-bevestiging. Afwijkingen kunnen overlappen met DQ-01/02; aantallen niet optellen tot één kwaliteitspercentage.</td>
+                <td>FAB en ontvangende applicatiebeheerder controleren tijdzone, ontvangst en eindverwerking; leverancier via bestaande contactroute. Na herstel bron en afnemer op dezelfde peildatum vergelijken.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>Vervolgstap:</strong> registreer per regel gecontroleerde populatie, mappingversie, bronreferentie, datum, beoordelaar, uitkomst en herstelactie in de bestaande melding of kwaliteitsregistratie. De illustraties zijn niet uitgevoerd, gecontroleerd of geaccepteerd. Bij zorguitval start de afgesproken continuïteitsroute direct; wacht niet op volledige oorzaakanalyse.</p>
+      </section>
+      <p><strong>Onderhoud:</strong> herzie bij koppeling-, mapping- of proceswijziging; benut bestaande logs en dossiers, geen tweede administratie. Selecteer de view pas met bronhouder en concrete vervolgactie. Vergelijk met de huidige koppeldocumentatie op juiste eigenaar, gemiste controles en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>

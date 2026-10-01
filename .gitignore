@@ -58,3 +58,10 @@ docs/_build/
 # PyBuilder
 target/
 
+# Lokale ontwikkelomgeving en pytest-cache
+.venv/
+.pytest_cache/
+
+# Toolcache en macOS-metadata
+.ruff_cache/
+.DS_Store

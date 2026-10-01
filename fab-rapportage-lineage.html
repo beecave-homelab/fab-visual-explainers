@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Rapportage Lineage — waar komt dit getal vandaan?</title>
-<link rel="icon" href="data:,">
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Rapportage Lineage — waar komt dit getal vandaan?</title>
+    <link rel="icon" href="data:,">
+    <style>
 :root {
   --paper: #f3e6e1;
   --surface: #fffaf7;
@@ -118,34 +118,37 @@ footer { padding: 28px 0 8px; font-size: 13.5px; color: var(--muted); max-width:
   .detail h2 { font-size: 18px; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
-</style>
-</head>
-<body>
-<a class="skip" href="#detail">Naar details</a>
-<div class="page">
-  <header class="head">
-    <div>
-      <h1>Waar komt dit getal vandaan?</h1>
-      <p>Kies een getal op het dashboard en volg het naar de bron. Kies een bronveld en zie welke getallen meeverschuiven als dat veld verandert.</p>
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#detail">Naar details</a>
+    <div class="page">
+      <header class="head">
+        <div>
+          <h1>Waar komt dit getal vandaan?</h1>
+          <p>Kies een getal op het dashboard en volg het naar de bron. Kies een bronveld en zie welke getallen meeverschuiven als dat veld verandert.</p>
+        </div>
+        <div class="case"><strong>Wachttijd tot eerste geplande afspraak</strong>Vier illustratieve dashboardgetallen, vier bronnen. Geen meting van eerste werkelijk verleende zorg. Definities: demo v2; peildatum 2 november 2026, 08:00 Europe/Amsterdam. Rapportage-eigenaar en BI moeten de definities en berekening nog lokaal valideren; FAB toetst bronregistraties. Een actuele bron bewijst geen juiste KPI.</div>
+      </header>
+      <div class="toolbar" role="group" aria-label="Simulatie">
+        <span>Wat als een bron achterloopt?</span>
+        <span id="chips" style="display:contents"></span>
+        <button class="quiet" id="reset" type="button">Alles herstellen</button>
+        <button class="quiet push" id="clear" type="button">Selectie wissen</button>
+      </div>
+      <div class="layout">
+        <main class="strata"
+              id="strata"
+              aria-label="Doorsnede van dashboard tot bron">
+        </main>
+        <aside class="detail" id="detail" aria-live="polite" tabindex="-1">
+        </aside>
+      </div>
+      <footer>
+        Fictieve demo v2. Een bronachterstandsimulatie verandert alleen de onzekerheidsmarkering, niet de illustratieve cijfers. Definities en perioden zijn demo-afspraken, geen VVT-standaard. Laat de rapportage-eigenaar en BI betekenis en berekening goedkeuren; FAB toetst de bronregistraties. Niet gebruiken als gevalideerde stuurinformatie.
+      </footer>
     </div>
-    <div class="case"><strong>Wachttijd tot eerste geplande afspraak</strong>Vier illustratieve dashboardgetallen, vier bronnen. Geen meting van eerste werkelijk verleende zorg. Definities: demo v2; peildatum 2 november 2026, 08:00 Europe/Amsterdam. Rapportage-eigenaar en BI moeten de definities en berekening nog lokaal valideren; FAB toetst bronregistraties. Een actuele bron bewijst geen juiste KPI.</div>
-  </header>
-
-  <div class="toolbar" role="group" aria-label="Simulatie">
-    <span>Wat als een bron achterloopt?</span>
-    <span id="chips" style="display:contents"></span>
-    <button class="quiet" id="reset" type="button">Alles herstellen</button>
-    <button class="quiet push" id="clear" type="button">Selectie wissen</button>
-  </div>
-
-  <div class="layout">
-    <main class="strata" id="strata" aria-label="Doorsnede van dashboard tot bron"></main>
-    <aside class="detail" id="detail" aria-live="polite" tabindex="-1"></aside>
-  </div>
-  <footer>Fictieve demo v2. Een bronachterstandsimulatie verandert alleen de onzekerheidsmarkering, niet de illustratieve cijfers. Definities en perioden zijn demo-afspraken, geen VVT-standaard. Laat de rapportage-eigenaar en BI betekenis en berekening goedkeuren; FAB toetst de bronregistraties. Niet gebruiken als gevalideerde stuurinformatie.</footer>
-</div>
-
-<script>
+    <script>
 const LAYERS = [
   { l: 1, name: 'Wat je ziet', sub: 'Getallen op het dashboard' },
   { l: 2, name: 'Hoe het wordt berekend', sub: 'Regels en telling' },
@@ -299,14 +302,24 @@ addEventListener('beforeprint', drawVeins);
 sel = 'k1';
 paint();
 requestAnimationFrame(drawVeins);
-</script>
-<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welk bronveld of welke berekening verklaart een rapportageafwijking?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB voor bronregistraties, samen met BI en rapportage-eigenaar bij een afwijkend getal. <strong>Uitkomst:</strong> herleidbare definitie- en aansluitcontrole met getroffen afnemers, bewijs en herstelactie. Gericht inzetten wanneer rapportageketens tot het takenpakket behoren, niet als dagelijkse kerntaak voor iedere FAB’er.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische KPI-definities en afhankelijkheden, demo v3, revisie 2026-10-01. De aparte demopeildatum staat in de casus. Echte bronhouder nog niet aangewezen; rapportage-eigenaar stelt definitie/populatie vast, BI beoordeelt berekening en perioden, FAB bronregistraties en functionele gevolgen. Geldigheid: niet lokaal gevalideerd of geschikt als echte stuurinformatie.</p>
-  <nav aria-label="Gegevensviews"><a href="fab-ketenkaart.html#data-quality">Keten en kwaliteitsregels</a> · <a href="fab-proces-applicatie-map.html">Bronregistraties</a></nav>
-  <p>Een actuele bron bewijst geen juiste KPI. Leg teller, noemer, tijdseenheid, populatie, uitsluitingen, peildatum en bronvelden vast; bron/versie, controledatum, beoordelaar en uitkomst horen bij echte controles. Ontbrekende beoordeling is onbekend. Let op zorg-, privacy- en financiële gevolgen van onjuiste informatie.</p>
-  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete controlevraag eerst aanwijzen; herzie bij definities, bronnen of mapping. Gebruik alleen synthetische data, geen cliëntgegevens of volledige logs. Bevindingen horen in het bestaande BI-/meldingsdossier, geen tweede administratie. Vergelijk met huidige definitiedocumentatie op juistheid en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welk bronveld of welke berekening verklaart een rapportageafwijking?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB voor bronregistraties, samen met BI en rapportage-eigenaar bij een afwijkend getal. <strong>Uitkomst:</strong> herleidbare definitie- en aansluitcontrole met getroffen afnemers, bewijs en herstelactie. Gericht inzetten wanneer rapportageketens tot het takenpakket behoren, niet als dagelijkse kerntaak voor iedere FAB’er.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische KPI-definities en afhankelijkheden, demo v3, revisie 2026-10-01. De aparte demopeildatum staat in de casus. Echte bronhouder nog niet aangewezen; rapportage-eigenaar stelt definitie/populatie vast, BI beoordeelt berekening en perioden, FAB bronregistraties en functionele gevolgen. Geldigheid: niet lokaal gevalideerd of geschikt als echte stuurinformatie.</p>
+      <nav aria-label="Gegevensviews">
+        <a href="fab-ketenkaart.html#data-quality">Keten en kwaliteitsregels</a> · <a href="fab-proces-applicatie-map.html">Bronregistraties</a>
+      </nav>
+      <p>Een actuele bron bewijst geen juiste KPI. Leg teller, noemer, tijdseenheid, populatie, uitsluitingen, peildatum en bronvelden vast; bron/versie, controledatum, beoordelaar en uitkomst horen bij echte controles. Ontbrekende beoordeling is onbekend. Let op zorg-, privacy- en financiële gevolgen van onjuiste informatie.</p>
+      <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete controlevraag eerst aanwijzen; herzie bij definities, bronnen of mapping. Gebruik alleen synthetische data, geen cliëntgegevens of volledige logs. Bevindingen horen in het bestaande BI-/meldingsdossier, geen tweede administratie. Vergelijk met huidige definitiedocumentatie op juistheid en onderhoudslast. Technische werking is geen bewezen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>

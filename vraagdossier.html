@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vraagdossier — interactieve informatie-onepager</title>
-  <style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vraagdossier — interactieve informatie-onepager</title>
+    <style>
 
     :root{
       color-scheme: light;
@@ -225,15 +225,15 @@ body{background:#cfd3ca;color:#171819}
 #dossier.design{display:block;min-height:100vh}
 #dossier .dossier-wrap{min-height:100vh}
 
-  </style>
+</style>
 </head>
 <body>
 <section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Wat moet ik onderbouwen of besluiten over één beheervraag?</h2>
-  <p><strong>Fictieve bron:</strong> antwoorden, citaten, bewijsstroken en pilot-/tijdwinstclaims hieronder zijn verzonnen. Een bewijslabel is geen beoordeeld document of uitgevoerd onderzoek; geen aangetoonde gebruikerswaarde.</p>
-  <p><strong>Gebruiker en moment:</strong> FAB bij kennisoverdracht of voorbereiding van een advies. <strong>Uitkomst:</strong> antwoord met controleerbare onderbouwing, voorwaarden, onzekerheden en vervolgactie in het bestaande kennis- of wijzigingsdossier. Gericht kennispatroon; vergelijk met <a href="vraagkompas.html">VraagKompas</a> op hetzelfde dossier, niet beide doorontwikkelen zonder aantoonbaar verschil.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetisch vraagdossier, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Kennis-/proceseigenaar bewaakt inhoud en geldigheid, FAB beheeruitleg; de bevoegde beslisser neemt een echt besluit. Geldigheid: presentatieprototype, geen lokaal gevalideerde werkinstructie of formeel besluit.</p>
-  <p><strong>Vervolg en onderhoud:</strong> eerst bronhouder, concrete vraag en vervolgstap aanwijzen; herzie bij bronwijziging. Gebruik de bestaande kennisbank als bron met versie, datum, beoordelaar en uitkomst, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen cliëntgegevens, vertrouwelijke documenten of volledige logs in HTML. Vergelijk met het bestaande kennisitem op juistheid, zoektijd en onderhoudslast; technische werking bewijst geen gebruikerswaarde.</p>
+<h2>Wat moet ik onderbouwen of besluiten over één beheervraag?</h2>
+<p><strong>Fictieve bron:</strong> antwoorden, citaten, bewijsstroken en pilot-/tijdwinstclaims hieronder zijn verzonnen. Een bewijslabel is geen beoordeeld document of uitgevoerd onderzoek; geen aangetoonde gebruikerswaarde.</p>
+<p><strong>Gebruiker en moment:</strong> FAB bij kennisoverdracht of voorbereiding van een advies. <strong>Uitkomst:</strong> antwoord met controleerbare onderbouwing, voorwaarden, onzekerheden en vervolgactie in het bestaande kennis- of wijzigingsdossier. Gericht kennispatroon; vergelijk met <a href="vraagkompas.html">VraagKompas</a> op hetzelfde dossier, niet beide doorontwikkelen zonder aantoonbaar verschil.</p>
+<p><strong>Bron en eigenaar:</strong> synthetisch vraagdossier, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Kennis-/proceseigenaar bewaakt inhoud en geldigheid, FAB beheeruitleg; de bevoegde beslisser neemt een echt besluit. Geldigheid: presentatieprototype, geen lokaal gevalideerde werkinstructie of formeel besluit.</p>
+<p><strong>Vervolg en onderhoud:</strong> eerst bronhouder, concrete vraag en vervolgstap aanwijzen; herzie bij bronwijziging. Gebruik de bestaande kennisbank als bron met versie, datum, beoordelaar en uitkomst, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen cliëntgegevens, vertrouwelijke documenten of volledige logs in HTML. Vergelijk met het bestaande kennisitem op juistheid, zoektijd en onderhoudslast; technische werking bewijst geen gebruikerswaarde.</p>
 </section>
 <section aria-label="Ontwerp B: Vraagdossier" class="design active" id="dossier">
 <div class="dossier-wrap">
@@ -266,14 +266,19 @@ body{background:#cfd3ca;color:#171819}
 <p class="brief-deck" id="briefDeck">De bron wijst steeds in dezelfde richting: eerst een compacte betekenislaag, daarna gericht kunnen doorklikken naar bewijs en nuance.</p>
 <div class="brief-body" id="briefBody">
 <p>In plaats van een document van boven naar beneden te lezen, werkt een vraaggestuurde ingang beter voor lezers die snel willen bepalen wat relevant is. De volledigheid verdwijnt niet, maar verhuist naar een tweede of derde laag.</p>
-<aside class="margin-note"><strong>Wat je hiervan onthoudt</strong>De interface moet keuzes maken vóór de gebruiker dat zelf moet doen.</aside>
+<aside class="margin-note">
+<strong>Wat je hiervan onthoudt</strong>De interface moet keuzes maken vóór de gebruiker dat zelf moet doen.
+</aside>
 </div>
 </article>
 <div class="source-strip">
 <b>Bronpad</b><span id="sourceTrail">Samenvatting → hoofdstuk 3 → bevinding 4 → bijlage B</span>
 </div>
 <div aria-labelledby="evidenceTitle" aria-modal="false" class="detail-popover" id="evidencePopover" role="dialog">
-<header><h3 id="evidenceTitle">Bewijsstuk</h3><button aria-label="Sluit bewijsstuk" id="closeEvidence" type="button">×</button></header>
+<header>
+<h3 id="evidenceTitle">Bewijsstuk</h3>
+<button aria-label="Sluit bewijsstuk" id="closeEvidence" type="button">×</button>
+</header>
 <p id="evidenceDetail"></p>
 </div>
 </section>
