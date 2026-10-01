@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Autorisatielandschap — rollen, rechten en uitzonderingen</title>
-<link rel="icon" href="data:,">
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Autorisatielandschap — rollen, rechten en uitzonderingen</title>
+    <link rel="icon" href="data:,">
+    <style>
 :root {
   --paper: #241a27;
   --surface: #2f2333;
@@ -246,176 +246,626 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .evidence code { font-size: 10px; }
   footer { margin-top: 12px; font-size: 10px; }
 }
-</style>
-</head>
-<body>
-<a class="skip" href="#inspector">Naar de rechtdetails</a>
-<main class="page">
-  <header class="mast">
-    <div>
-      <h1>Autorisatielandschap</h1>
-      <p>Wie mag wat, in welke applicatie — en waar zitten de gevoelige gegevens? De uitzonderingen vertellen waar de hercertificering hapert.</p>
-    </div>
-    <div class="case">
-      <strong>Kwartaalhercertificering Q4 2026</strong>
-      <span>Autorisatiematrix versie 5.2</span>
-      <span>Fictieve casus voor functioneel beheer</span>
-    </div>
-  </header>
-  <noscript><p class="nojs">JavaScript staat uit. Je ziet de hele matrix, maar geen selectie of filters. Zet JavaScript aan om uitzonderingen en grondslagen te bekijken.</p></noscript>
-  <div class="toolbar" aria-label="Autorisaties verkennen">
-    <div class="control">
-      <span class="control-label" id="viewLabel">Beeld</span>
-      <div class="segment" role="group" aria-labelledby="viewLabel">
-        <button type="button" data-view="alle" aria-pressed="true" disabled>Alle rechten</button>
-        <button type="button" data-view="exc" aria-pressed="false" disabled>Uitzonderingen en onbekend</button>
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#inspector">Naar de rechtdetails</a>
+    <main class="page">
+      <header class="mast">
+        <div>
+          <h1>Autorisatielandschap</h1>
+          <p>Wie mag wat, in welke applicatie — en waar zitten de gevoelige gegevens? De uitzonderingen vertellen waar de hercertificering hapert.</p>
+        </div>
+        <div class="case">
+          <strong>Kwartaalhercertificering Q4 2026</strong>
+          <span>Autorisatiematrix versie 5.2</span>
+          <span>Fictieve casus voor functioneel beheer</span>
+        </div>
+      </header>
+      <noscript>
+        <p class="nojs">JavaScript staat uit. Je ziet de hele matrix, maar geen selectie of filters. Zet JavaScript aan om uitzonderingen en grondslagen te bekijken.</p>
+      </noscript>
+      <div class="toolbar" aria-label="Autorisaties verkennen">
+        <div class="control">
+          <span class="control-label" id="viewLabel">Beeld</span>
+          <div class="segment" role="group" aria-labelledby="viewLabel">
+            <button type="button"
+                    data-view="alle"
+                    aria-pressed="true"
+                    disabled>Alle rechten</button>
+            <button type="button"
+                    data-view="exc"
+                    aria-pressed="false"
+                    disabled>Uitzonderingen en onbekend</button>
+          </div>
+        </div>
+        <div class="control">
+          <label class="control-label" for="sensSelect">Gevoeligheid</label>
+          <select id="sensSelect" disabled>
+            <option value="alle">Alle gegevens</option>
+            <option value="Medisch">Medisch</option>
+            <option value="BSN">BSN</option>
+            <option value="Financieel">Financieel</option>
+          </select>
+        </div>
+        <button type="button"
+                class="quiet-button"
+                id="resetButton"
+                disabled>Herstel overzicht</button>
       </div>
-    </div>
-    <div class="control">
-      <label class="control-label" for="sensSelect">Gevoeligheid</label>
-      <select id="sensSelect" disabled>
-        <option value="alle">Alle gegevens</option>
-        <option value="Medisch">Medisch</option>
-        <option value="BSN">BSN</option>
-        <option value="Financieel">Financieel</option>
-      </select>
-    </div>
-    <button type="button" class="quiet-button" id="resetButton" disabled>Herstel overzicht</button>
-  </div>
-  <section class="auth-board" aria-labelledby="boardTitle">
-    <div class="board-head">
-      <h2 id="boardTitle">Rol × applicatie</h2>
-      <p>Klik op een rol, een applicatie of een recht. De badges tonen lopende uitzonderingen.</p>
-    </div>
-    <div class="matrix-wrap">
-      <table class="matrix" aria-label="Autorisatiematrix rollen tegen applicaties">
-        <thead>
-          <tr>
-            <th class="corner">Rol \ applicatie</th>
-            <th><button type="button" class="app-head" data-app="portaal" aria-pressed="false" aria-controls="inspector" disabled><strong>Cliëntportaal</strong><span class="sens"><span class="tag tag-medisch">Medisch</span></span></button></th>
-            <th><button type="button" class="app-head" data-app="ecd" aria-pressed="false" aria-controls="inspector" disabled><strong>ECD</strong><span class="sens"><span class="tag tag-medisch">Medisch</span><span class="tag tag-bsn">BSN</span></span></button></th>
-            <th><button type="button" class="app-head" data-app="rooster" aria-pressed="false" aria-controls="inspector" disabled><strong>Planning &amp; Rooster</strong><span class="sens"><span class="tag">Contact</span></span></button></th>
-            <th><button type="button" class="app-head" data-app="medicatie" aria-pressed="false" aria-controls="inspector" disabled><strong>Medicatiesysteem</strong><span class="sens"><span class="tag tag-medisch">Medisch</span></span></button></th>
-            <th><button type="button" class="app-head" data-app="financieel" aria-pressed="false" aria-controls="inspector" disabled><strong>Financieel</strong><span class="sens"><span class="tag tag-fin">Financieel</span><span class="tag tag-bsn">BSN</span></span></button></th>
-            <th><button type="button" class="app-head" data-app="dwh" aria-pressed="false" aria-controls="inspector" disabled><strong>Datawarehouse/BI</strong><span class="sens"><span class="tag tag-medisch">Medisch</span><span class="tag tag-fin">Financieel</span></span></button></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-row="wvk">
-            <th><button type="button" class="rol-head" data-rol="wvk" aria-pressed="false" aria-controls="inspector" disabled><strong>Wijkverpleegkundige</strong><span class="rol-meta">± 85 accounts · wijkteams</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="wvk-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="wvk-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="wvk-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="wvk-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span><span class="exc-badge exc-btg">spoed</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="wvk-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="wvk-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-          </tr>
-          <tr data-row="vig">
-            <th><button type="button" class="rol-head" data-rol="vig" aria-pressed="false" aria-controls="inspector" disabled><strong>Verzorgende IG</strong><span class="rol-meta">± 110 accounts · wijkteams</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="vig-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="vig-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="vig-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-verlopen">verlopen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="vig-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="vig-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="vig-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-          </tr>
-          <tr data-row="tl">
-            <th><button type="button" class="rol-head" data-rol="tl" aria-pressed="false" aria-controls="inspector" disabled><strong>Teamleider</strong><span class="rol-meta">12 accounts · per wijk</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="tl-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="tl-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="tl-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="tl-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="tl-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="tl-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-          </tr>
-          <tr data-row="pl">
-            <th><button type="button" class="rol-head" data-rol="pl" aria-pressed="false" aria-controls="inspector" disabled><strong>Planner</strong><span class="rol-meta">9 accounts · planbureau</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="pl-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="pl-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="pl-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="pl-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="pl-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="pl-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-          </tr>
-          <tr data-row="zb">
-            <th><button type="button" class="rol-head" data-rol="zb" aria-pressed="false" aria-controls="inspector" disabled><strong>Zorgbemiddelaar</strong><span class="rol-meta">7 accounts · intakebureau</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="zb-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="zb-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="zb-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="zb-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="zb-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="zb-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-tijdelijk">tijdelijk</span></button></td>
-          </tr>
-          <tr data-row="adm">
-            <th><button type="button" class="rol-head" data-rol="adm" aria-pressed="false" aria-controls="inspector" disabled><strong>Administratie</strong><span class="rol-meta">14 accounts · backoffice</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="adm-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="adm-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="adm-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="adm-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-2" data-cell="adm-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="adm-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-          </tr>
-          <tr data-row="fb">
-            <th><button type="button" class="rol-head" data-rol="fb" aria-pressed="false" aria-controls="inspector" disabled><strong>Functioneel beheerder</strong><span class="rol-meta">6 accounts · beheerteam</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="fb-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-3" data-cell="fb-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-3" data-cell="fb-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-3" data-cell="fb-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-3" data-cell="fb-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span><span class="exc-badge exc-conflict">conflict</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-3" data-cell="fb-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button></td>
-          </tr>
-          <tr data-row="sup">
-            <th><button type="button" class="rol-head" data-rol="sup" aria-pressed="false" aria-controls="inspector" disabled><strong>Leverancier support</strong><span class="rol-meta">4 accounts · extern</span></button></th>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="sup-portaal" aria-pressed="false" disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-1" data-cell="sup-ecd" aria-pressed="false" disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-tijdelijk">tijdelijk</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="sup-rooster" aria-pressed="false" disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="sup-medicatie" aria-pressed="false" disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="sup-financieel" aria-pressed="false" disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-            <td><button type="button" class="lvl-btn lvl-0" data-cell="sup-dwh" aria-pressed="false" disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="board-foot">
-      <div class="legend" aria-label="Legenda"><span><span class="lvl-bars" style="--fill:0%"></span>Geen</span><span><span class="lvl-bars" style="--fill:25%"></span>Lezen</span><span><span class="lvl-bars" style="--fill:50%"></span>Muteren</span><span><span class="lvl-bars" style="--fill:100%"></span>Beheer</span><span><span class="exc-badge exc-tijdelijk">tijdelijk</span>tijdelijk recht</span><span><span class="exc-badge exc-btg">spoed</span>break-the-glass</span><span><span class="exc-badge exc-conflict">conflict</span>functiescheiding</span><span><span class="exc-badge exc-verlopen">verlopen</span>hercertificering verlopen</span></div>
-      <p id="pathText">Alle rechten zichtbaar</p>
-    </div>
-  </section>
-  <div class="auth-summary" id="authSummary" role="status">
-    <strong id="summaryTitle">5 open uitzonderingen</strong>
-    <p id="summaryText">2× tijdelijk recht · 1× break-the-glass · 1× functiescheidingsconflict · 1× verlopen hercertificering.</p>
-  </div>
-  <p class="sr-only" id="selectionStatus" role="status"></p>
-  <a class="selection-jump" id="selectionJump" href="#inspector" hidden><span id="jumpText">Bekijk rechtdetails</span></a>
-  <section class="inspector" id="inspector" aria-labelledby="selectionTitle" tabindex="-1">
-    <div class="selection-head">
-      <span class="selection-kind" id="selectionKind">De hele matrix</span>
-      <h2 id="selectionTitle">Acht rollen, zes applicaties</h2>
-      <p id="selectionIntro">De matrix volgt autorisatiematrix v5.2. Selecteer een rol om te zien welke gevoelige gegevens die rol in totaal kan bereiken, of een cel voor het concrete recht en de bijbehorende uitzondering.</p>
-      <div class="owner"><span>Regie</span><strong id="selectionOwner">Informatiebeveiliging &amp; FAB Zorg</strong></div>
-    </div>
-    <div>
-      <div class="detail-tabs" role="tablist" aria-label="Rechtdetails">
-        <button type="button" id="tab-recht" role="tab" data-tab="recht" aria-selected="true" aria-controls="panel-recht" tabindex="0" disabled>Recht</button>
-        <button type="button" id="tab-exc" role="tab" data-tab="exc" aria-selected="false" aria-controls="panel-exc" tabindex="-1" disabled>Uitzondering</button>
-        <button type="button" id="tab-bewijs" role="tab" data-tab="bewijs" aria-selected="false" aria-controls="panel-bewijs" tabindex="-1" disabled>Bewijs</button>
+      <section class="auth-board" aria-labelledby="boardTitle">
+        <div class="board-head">
+          <h2 id="boardTitle">Rol × applicatie</h2>
+          <p>Klik op een rol, een applicatie of een recht. De badges tonen lopende uitzonderingen.</p>
+        </div>
+        <div class="matrix-wrap">
+          <table class="matrix"
+                 aria-label="Autorisatiematrix rollen tegen applicaties">
+            <thead>
+              <tr>
+                <th class="corner">Rol \ applicatie</th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="portaal"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Cliëntportaal</strong><span class="sens"><span class="tag tag-medisch">Medisch</span></span></button>
+                </th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="ecd"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>ECD</strong><span class="sens"><span class="tag tag-medisch">Medisch</span><span class="tag tag-bsn">BSN</span></span></button>
+                </th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="rooster"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Planning &amp; Rooster</strong><span class="sens"><span class="tag">Contact</span></span></button>
+                </th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="medicatie"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Medicatiesysteem</strong><span class="sens"><span class="tag tag-medisch">Medisch</span></span></button>
+                </th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="financieel"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Financieel</strong><span class="sens"><span class="tag tag-fin">Financieel</span><span class="tag tag-bsn">BSN</span></span></button>
+                </th>
+                <th>
+                  <button type="button"
+                          class="app-head"
+                          data-app="dwh"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Datawarehouse/BI</strong><span class="sens"><span class="tag tag-medisch">Medisch</span><span class="tag tag-fin">Financieel</span></span></button>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row="wvk">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="wvk"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Wijkverpleegkundige</strong><span class="rol-meta">± 85 accounts · wijkteams</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="wvk-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="wvk-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="wvk-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="wvk-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span><span class="exc-badge exc-btg">spoed</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="wvk-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="wvk-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+              </tr>
+              <tr data-row="vig">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="vig"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Verzorgende IG</strong><span class="rol-meta">± 110 accounts · wijkteams</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="vig-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="vig-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="vig-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-verlopen">verlopen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="vig-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="vig-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="vig-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+              </tr>
+              <tr data-row="tl">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="tl"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Teamleider</strong><span class="rol-meta">12 accounts · per wijk</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="tl-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="tl-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="tl-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="tl-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="tl-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="tl-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+              </tr>
+              <tr data-row="pl">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="pl"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Planner</strong><span class="rol-meta">9 accounts · planbureau</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="pl-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="pl-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="pl-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="pl-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="pl-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="pl-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+              </tr>
+              <tr data-row="zb">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="zb"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Zorgbemiddelaar</strong><span class="rol-meta">7 accounts · intakebureau</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="zb-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="zb-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="zb-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="zb-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="zb-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="zb-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-tijdelijk">tijdelijk</span></button>
+                </td>
+              </tr>
+              <tr data-row="adm">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="adm"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Administratie</strong><span class="rol-meta">14 accounts · backoffice</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="adm-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="adm-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="adm-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="adm-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-2"
+                          data-cell="adm-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i></i></span><span class="lvl-txt">Muteren</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="adm-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+              </tr>
+              <tr data-row="fb">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="fb"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Functioneel beheerder</strong><span class="rol-meta">6 accounts · beheerteam</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="fb-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-3"
+                          data-cell="fb-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-3"
+                          data-cell="fb-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-3"
+                          data-cell="fb-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-3"
+                          data-cell="fb-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span><span class="exc-badge exc-conflict">conflict</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-3"
+                          data-cell="fb-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="lvl-txt">Beheer</span></button>
+                </td>
+              </tr>
+              <tr data-row="sup">
+                <th>
+                  <button type="button"
+                          class="rol-head"
+                          data-rol="sup"
+                          aria-pressed="false"
+                          aria-controls="inspector"
+                          disabled><strong>Leverancier support</strong><span class="rol-meta">4 accounts · extern</span></button>
+                </th>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="sup-portaal"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Cliëntportaal</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-1"
+                          data-cell="sup-ecd"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">ECD</span><span class="lvl-bars"><i class="on"></i><i></i><i></i></span><span class="lvl-txt">Lezen</span><span class="exc-badge exc-tijdelijk">tijdelijk</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="sup-rooster"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Planning &amp; Rooster</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="sup-medicatie"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Medicatiesysteem</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="sup-financieel"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Financieel</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+                <td>
+                  <button type="button"
+                          class="lvl-btn lvl-0"
+                          data-cell="sup-dwh"
+                          aria-pressed="false"
+                          disabled><span class="cell-app">Datawarehouse/BI</span><span class="lvl-bars"><i></i><i></i><i></i></span><span class="lvl-txt">Geen</span></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="board-foot">
+          <div class="legend" aria-label="Legenda"><span><span class="lvl-bars" style="--fill:0%"></span>Geen</span><span><span class="lvl-bars" style="--fill:25%"></span>Lezen</span><span><span class="lvl-bars" style="--fill:50%"></span>Muteren</span><span><span class="lvl-bars" style="--fill:100%"></span>Beheer</span><span><span class="exc-badge exc-tijdelijk">tijdelijk</span>tijdelijk recht</span><span><span class="exc-badge exc-btg">spoed</span>break-the-glass</span><span><span class="exc-badge exc-conflict">conflict</span>functiescheiding</span><span><span class="exc-badge exc-verlopen">verlopen</span>hercertificering verlopen</span></div>
+          <p id="pathText">Alle rechten zichtbaar</p>
+        </div>
+      </section>
+      <div class="auth-summary" id="authSummary" role="status">
+        <strong id="summaryTitle">5 open uitzonderingen</strong>
+        <p id="summaryText">2× tijdelijk recht · 1× break-the-glass · 1× functiescheidingsconflict · 1× verlopen hercertificering.</p>
       </div>
-      <div class="detail-panel" id="panel-recht" role="tabpanel" aria-labelledby="tab-recht" tabindex="0"></div>
-      <div class="detail-panel" id="panel-exc" role="tabpanel" aria-labelledby="tab-exc" tabindex="0" hidden></div>
-      <div class="detail-panel" id="panel-bewijs" role="tabpanel" aria-labelledby="tab-bewijs" tabindex="0" hidden></div>
-      <div class="copy-row"><button type="button" class="copy-button" id="copyButton" disabled>Kopieer hercertificeringslijst</button><span id="copyStatus" role="status"></span></div>
-      <textarea id="copyFallback" aria-label="Hercertificeringslijst om handmatig te kopiëren" readonly hidden></textarea>
-    </div>
-  </section>
-  <details class="about">
-    <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
-    <p>De matrix zet rollen tegen applicaties. De oplopende balkjes tonen het toegangsniveau (Geen, Lezen, Muteren, Beheer); de kolomkoppen tonen welke gevoelige gegevens in die applicatie zitten. Uitzonderingen staan als badge in de cel: tijdelijk recht, break-the-glass, functiescheidingsconflict of een verlopen hercertificering.</p>
-    <p>Selecteer een rol voor modelrechten en afzonderlijke controles van feitelijke toegang. Ook zonder badge kan toegang te ruim, te beperkt of onbekend zijn. Het uitzonderingenbeeld houdt daarom ook onbekende en afwijkende toekenningen in beeld. Tijdelijke project- en supportrechten horen niet in het reguliere rolmodel; toets steeds noodzakelijkheid, scope, goedkeuring, eindmoment en intrekking.</p>
-    <p>Alle rollen, rechten, groepsnamen, datums en logfragmenten zijn fictief. De matrix bewijst niets over echte accounts; hij laat zien hoe een FAB de hercertificering voorbereidt.</p>
-  </details>
-  <footer><span>FAB Autorisatielandschap — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span></footer>
-</main>
-<script>
+      <p class="sr-only" id="selectionStatus" role="status"></p>
+      <a class="selection-jump"
+         id="selectionJump"
+         href="#inspector"
+         hidden><span id="jumpText">Bekijk rechtdetails</span></a>
+      <section class="inspector"
+               id="inspector"
+               aria-labelledby="selectionTitle"
+               tabindex="-1">
+        <div class="selection-head">
+          <span class="selection-kind" id="selectionKind">De hele matrix</span>
+          <h2 id="selectionTitle">Acht rollen, zes applicaties</h2>
+          <p id="selectionIntro">De matrix volgt autorisatiematrix v5.2. Selecteer een rol om te zien welke gevoelige gegevens die rol in totaal kan bereiken, of een cel voor het concrete recht en de bijbehorende uitzondering.</p>
+          <div class="owner"><span>Regie</span><strong id="selectionOwner">Informatiebeveiliging &amp; FAB Zorg</strong></div>
+        </div>
+        <div>
+          <div class="detail-tabs" role="tablist" aria-label="Rechtdetails">
+            <button type="button"
+                    id="tab-recht"
+                    role="tab"
+                    data-tab="recht"
+                    aria-selected="true"
+                    aria-controls="panel-recht"
+                    tabindex="0"
+                    disabled>Recht</button>
+            <button type="button"
+                    id="tab-exc"
+                    role="tab"
+                    data-tab="exc"
+                    aria-selected="false"
+                    aria-controls="panel-exc"
+                    tabindex="-1"
+                    disabled>Uitzondering</button>
+            <button type="button"
+                    id="tab-bewijs"
+                    role="tab"
+                    data-tab="bewijs"
+                    aria-selected="false"
+                    aria-controls="panel-bewijs"
+                    tabindex="-1"
+                    disabled>Bewijs</button>
+          </div>
+          <div class="detail-panel"
+               id="panel-recht"
+               role="tabpanel"
+               aria-labelledby="tab-recht"
+               tabindex="0"></div>
+          <div class="detail-panel"
+               id="panel-exc"
+               role="tabpanel"
+               aria-labelledby="tab-exc"
+               tabindex="0"
+               hidden></div>
+          <div class="detail-panel"
+               id="panel-bewijs"
+               role="tabpanel"
+               aria-labelledby="tab-bewijs"
+               tabindex="0"
+               hidden></div>
+          <div class="copy-row">
+            <button type="button"
+                    class="copy-button"
+                    id="copyButton"
+                    disabled>Kopieer hercertificeringslijst</button>
+            <span id="copyStatus" role="status"></span>
+          </div>
+          <textarea id="copyFallback"
+                    aria-label="Hercertificeringslijst om handmatig te kopiëren"
+                    readonly
+                    hidden></textarea>
+        </div>
+      </section>
+      <details class="about">
+        <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
+        <p>De matrix zet rollen tegen applicaties. De oplopende balkjes tonen het toegangsniveau (Geen, Lezen, Muteren, Beheer); de kolomkoppen tonen welke gevoelige gegevens in die applicatie zitten. Uitzonderingen staan als badge in de cel: tijdelijk recht, break-the-glass, functiescheidingsconflict of een verlopen hercertificering.</p>
+        <p>Selecteer een rol voor modelrechten en afzonderlijke controles van feitelijke toegang. Ook zonder badge kan toegang te ruim, te beperkt of onbekend zijn. Het uitzonderingenbeeld houdt daarom ook onbekende en afwijkende toekenningen in beeld. Tijdelijke project- en supportrechten horen niet in het reguliere rolmodel; toets steeds noodzakelijkheid, scope, goedkeuring, eindmoment en intrekking.</p>
+        <p>Alle rollen, rechten, groepsnamen, datums en logfragmenten zijn fictief. De matrix bewijst niets over echte accounts; hij laat zien hoe een FAB de hercertificering voorbereidt.</p>
+      </details>
+      <footer>
+        <span>FAB Autorisatielandschap — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span>
+      </footer>
+    </main>
+    <script>
 (() => {
   const ROLES = {
     wvk: { name: 'Wijkverpleegkundige', meta: '± 85 accounts · wijkteams', owner: 'Teamleider Wijk Noord' },
@@ -674,14 +1124,24 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   document.querySelectorAll('button:disabled, select:disabled').forEach(el => el.disabled = false);
   updateMap(); renderDetails();
 })();
-</script>
-<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke feitelijke toegang wijkt af van het afgesproken model?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB met rol-/proceseigenaar, IAM en privacy-/beveiligingsdeskundige bij hercertificering en personeelsmutaties. <strong>Uitkomst:</strong> beoordeelde uitzonderings- en controlelijst in de bestaande autorisatieregistratie; noodzakelijk recht, scope, bevoegde goedkeuring, einddatum en intrekking apart vastleggen.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetisch rolmodel en toegangscontroles, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De bevoegde rol-/proceseigenaar keurt rechten goed; IAM/technisch beheer voert uit; FAB vergelijkt, signaleert en adviseert. Bij externe portalen voert de aangewezen platformbeheerder uit. Geldigheid: demonstratie, geen feitelijke IAM-controle of lokale validatie.</p>
-  <nav aria-label="Toegangsviews"><a href="fab-joiner-mover-leaver.html">JML: overgang, intrekking en aparte eindmomenten</a> · <a href="fab-change-impact-map.html">Wijzigingsimpact</a> · <a href="fab-releaseatelier.html#test-coverage">Negatieve autorisatietests</a></nav>
-  <p>Controleer tijdelijke medewerkers, meerdere teamrollen, noodtoegang en externe portalen volgens lokale afspraken. “Onbekend” is niet goedgekeurd. Bewijs vraagt bron, versie, datum, beoordelaar en uitkomst; een collega’s rechten kopiëren is geen autorisatie. Beoordeel zowel privacyrisico als ontbrekende toegang voor zorgondersteuning.</p>
-  <p><strong>Onderhoud en toelating:</strong> wijs eerst bronhouder en vervolgactie aan; herzie bij rol-, proces- en personeelswijziging. Gebruik alleen synthetische gegevens; ook account- en systeemoverzichten zijn mogelijk vertrouwelijk. Acties horen in de afgesproken bron, geen tweede administratie. Vergelijk met bestaande matrix/JML-checklist op herkende overmatige toegang, juist akkoord en onderhoudslast. Gebruikerswaarde is nog niet bewezen.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke feitelijke toegang wijkt af van het afgesproken model?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB met rol-/proceseigenaar, IAM en privacy-/beveiligingsdeskundige bij hercertificering en personeelsmutaties. <strong>Uitkomst:</strong> beoordeelde uitzonderings- en controlelijst in de bestaande autorisatieregistratie; noodzakelijk recht, scope, bevoegde goedkeuring, einddatum en intrekking apart vastleggen.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetisch rolmodel en toegangscontroles, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De bevoegde rol-/proceseigenaar keurt rechten goed; IAM/technisch beheer voert uit; FAB vergelijkt, signaleert en adviseert. Bij externe portalen voert de aangewezen platformbeheerder uit. Geldigheid: demonstratie, geen feitelijke IAM-controle of lokale validatie.</p>
+      <nav aria-label="Toegangsviews">
+        <a href="fab-joiner-mover-leaver.html">JML: overgang, intrekking en aparte eindmomenten</a> · <a href="fab-change-impact-map.html">Wijzigingsimpact</a> · <a href="fab-releaseatelier.html#test-coverage">Negatieve autorisatietests</a>
+      </nav>
+      <p>Controleer tijdelijke medewerkers, meerdere teamrollen, noodtoegang en externe portalen volgens lokale afspraken. “Onbekend” is niet goedgekeurd. Bewijs vraagt bron, versie, datum, beoordelaar en uitkomst; een collega’s rechten kopiëren is geen autorisatie. Beoordeel zowel privacyrisico als ontbrekende toegang voor zorgondersteuning.</p>
+      <p><strong>Onderhoud en toelating:</strong> wijs eerst bronhouder en vervolgactie aan; herzie bij rol-, proces- en personeelswijziging. Gebruik alleen synthetische gegevens; ook account- en systeemoverzichten zijn mogelijk vertrouwelijk. Acties horen in de afgesproken bron, geen tweede administratie. Vergelijk met bestaande matrix/JML-checklist op herkende overmatige toegang, juist akkoord en onderhoudslast. Gebruikerswaarde is nog niet bewezen.</p>
+    </section>
+  </body>
 </html>

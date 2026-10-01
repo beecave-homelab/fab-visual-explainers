@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Beheerbaarheid Scan</title>
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Beheerbaarheid Scan</title>
+    <style>
   :root {
     --ink: #15232a;
     --muted: #5c6c73;
@@ -364,138 +364,211 @@
   .review-context a { color:inherit; text-underline-offset:3px; }
   .summary-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
   @media(max-width:760px) { .summary-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-</style>
-</head>
-<body>
-<main class="page">
-  <header class="topbar">
-    <div class="heading">
-      <p class="context">Beheerbaarheid Scan · voorbeeldcasus cliëntportaalrelease</p>
-      <h1>Kan FAB dit morgen beheren?</h1>
-      <p class="lede">Klik op een deel van de beheerring om te zien wat nog ontbreekt. De scan beoordeelt niet of de oplossing technisch “af” is, maar of functioneel beheer voldoende grip heeft op configuratie, testen, monitoring, ondersteuning en borging.</p>
-    </div>
-    <div class="actions" aria-label="Acties">
-      <button class="btn" id="resetBtn" type="button">Herstel voorbeeld</button>
-      <button class="btn primary" id="copyBtn" type="button">Kopieer samenvatting</button>
-    </div>
-  </header>
-
-  <section class="workspace" aria-label="Beheerbaarheid Scan">
-    <article class="panel overview">
-      <div class="overview-head">
-        <div>
-          <h2>Beheerring</h2>
-          <p>Kies een domein. De kleur volgt automatisch uit de onderliggende controles.</p>
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="heading">
+          <p class="context">Beheerbaarheid Scan · voorbeeldcasus cliëntportaalrelease</p>
+          <h1>Kan FAB dit morgen beheren?</h1>
+          <p class="lede">Klik op een deel van de beheerring om te zien wat nog ontbreekt. De scan beoordeelt niet of de oplossing technisch “af” is, maar of functioneel beheer voldoende grip heeft op configuratie, testen, monitoring, ondersteuning en borging.</p>
         </div>
-        <div class="legend" aria-label="Legenda">
-          <span><i class="dot ready"></i>Geaccepteerd</span>
-          <span><i class="dot" style="background:var(--unknown)"></i>Niet getoetst</span>
-          <span><i class="dot attention"></i>Aandacht</span>
-          <span><i class="dot blocker"></i>Blocker</span>
+        <div class="actions" aria-label="Acties">
+          <button class="btn" id="resetBtn" type="button">Herstel voorbeeld</button>
+          <button class="btn primary" id="copyBtn" type="button">Kopieer samenvatting</button>
         </div>
-      </div>
-
-      <div class="ring-wrap">
-        <div class="ring-stage">
-          <svg id="ring" viewBox="0 0 600 600" role="list" aria-label="Klikbare domeinen van de beheerbaarheidsscan">
-<g class="segment" role="button" tabindex="0" aria-label="Configureren: Blocker" aria-current="true" data-id="config">
-      <path d="M 307.539 30.105 A 270 270 0 0 1 554.356 209.428 L 465.802 240.961 A 176 176 0 0 0 304.914 124.069 Z" fill="#b94e4c" fill-opacity="1"></path>
-      <text x="430.49" y="116.40" text-anchor="middle"><tspan x="430.49" dy="0" fill="#ffffff">Configureren</tspan><tspan x="430.49" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
-    </g>
-<g class="segment" role="button" tabindex="0" aria-label="Testen: Aandacht" aria-current="false" data-id="test">
-      <path d="M 559.015 223.768 A 270 270 0 0 1 464.739 513.918 L 407.386 439.443 A 176 176 0 0 0 468.839 250.308 Z" fill="#bd7c1f" fill-opacity=".84"></path>
-      <text x="511.13" y="364.60" text-anchor="middle"><tspan x="511.13" dy="0" fill="#ffffff">Testen</tspan><tspan x="511.13" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
-    </g>
-<g class="segment" role="button" tabindex="0" aria-label="Monitoren: Aandacht" aria-current="false" data-id="monitor">
-      <path d="M 452.541 522.781 A 270 270 0 0 1 147.459 522.781 L 200.566 445.220 A 176 176 0 0 0 399.434 445.220 Z" fill="#bd7c1f" fill-opacity=".84"></path>
-      <text x="300.00" y="518.00" text-anchor="middle"><tspan x="300.00" dy="0" fill="#ffffff">Monitoren</tspan><tspan x="300.00" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
-    </g>
-<g class="segment" role="button" tabindex="0" aria-label="Ondersteunen: Gereed" aria-current="false" data-id="support">
-      <path d="M 135.261 513.918 A 270 270 0 0 1 40.985 223.768 L 131.161 250.308 A 176 176 0 0 0 192.614 439.443 Z" fill="#25806d" fill-opacity=".84"></path>
-      <text x="88.87" y="364.60" text-anchor="middle"><tspan x="88.87" dy="0" fill="#ffffff">Support</tspan><tspan x="88.87" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Gereed</tspan></text>
-    </g>
-<g class="segment" role="button" tabindex="0" aria-label="Borgen: Blocker" aria-current="false" data-id="assure">
-      <path d="M 45.644 209.428 A 270 270 0 0 1 292.461 30.105 L 295.086 124.069 A 176 176 0 0 0 134.198 240.961 Z" fill="#b94e4c" fill-opacity=".84"></path>
-      <text x="169.51" y="116.40" text-anchor="middle"><tspan x="169.51" dy="0" fill="#ffffff">Borgen</tspan><tspan x="169.51" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
-    </g>
-</svg>
-          <div class="ring-center" aria-live="polite">
+      </header>
+      <section class="workspace" aria-label="Beheerbaarheid Scan">
+        <article class="panel overview">
+          <div class="overview-head">
             <div>
-              <div class="kicker">Overdrachtsbeeld</div>
-              <strong id="score">0/15</strong>
-              <div class="center-status" id="centerStatus">Overdracht nog niet verantwoord: er zijn blockers.</div>
+              <h2>Beheerring</h2>
+              <p>Kies een domein. De kleur volgt automatisch uit de onderliggende controles.</p>
+            </div>
+            <div class="legend" aria-label="Legenda">
+              <span><i class="dot ready"></i>Geaccepteerd</span>
+              <span><i class="dot" style="background:var(--unknown)"></i>Niet getoetst</span>
+              <span><i class="dot attention"></i>Aandacht</span>
+              <span><i class="dot blocker"></i>Blocker</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="summary-strip" aria-label="Samenvatting">
-        <div class="summary-cell"><b id="readyCount">0</b><span>geaccepteerd</span></div>
-        <div class="summary-cell"><b id="attentionCount">5</b><span>aandacht</span></div>
-        <div class="summary-cell"><b id="blockerCount">2</b><span>blockers</span></div>
-        <div class="summary-cell"><b id="unknownCount">8</b><span>niet getoetst</span></div>
-        <div class="summary-cell"><b id="evidenceCount">0</b><span>beoordeeld akkoord</span></div>
-      </div>
-    </article>
-
-    <aside class="panel detail" aria-live="polite">
-      <div class="detail-head">
-        <div class="detail-titleline">
-          <h2 id="domainTitle">Configureren</h2>
-          <span class="status-pill blocker" id="domainStatus">Blocker</span>
-        </div>
-        <p id="domainIntro">Kan FAB de functionele inrichting begrijpen, wijzigen en gecontroleerd terugzetten?</p>
-      </div>
-
-      <div class="checks" id="checks">
-        <div class="check active" tabindex="0" role="button" aria-label="Beheerbare instellingen zijn beschreven. Status Gereed."><div class="state-icon ready" aria-hidden="true">✓</div><div><div class="check-title">Beheerbare instellingen zijn beschreven</div><div class="check-note">Inclusief doel, eigenaar en effect van een wijziging.</div></div><div class="evidence">Config-register</div></div>
-        <div class="check" tabindex="0" role="button" aria-label="Veilige standaardwaarden zijn afgesproken. Status Aandacht."><div class="state-icon attention" aria-hidden="true">!</div><div><div class="check-title">Veilige standaardwaarden zijn afgesproken</div><div class="check-note">FAB weet welke instelling als basis geldt en wanneer daarvan mag worden afgeweken.</div></div><div class="evidence">Werkinstructie</div></div>
-        <div class="check" tabindex="0" role="button" aria-label="Herstelpad voor foutieve configuratie is bekend. Status Blocker."><div class="state-icon blocker" aria-hidden="true">×</div><div><div class="check-title">Herstelpad voor foutieve configuratie is bekend</div><div class="check-note">Terugzetten, rollback of herstelactie is praktisch uitvoerbaar.</div></div><div class="evidence">Nog ontbrekend</div></div>
-      </div>
-
-      <div class="inspector" id="inspector">
-        <div class="inspector-grid">
-          <div>
-            <h3 id="checkInspectorTitle">Beheerbare instellingen zijn beschreven</h3>
-            <p id="checkInspectorText">Bewijs: Config-register. Inclusief doel, eigenaar en effect van een wijziging.</p>
+          <div class="ring-wrap">
+            <div class="ring-stage">
+              <svg id="ring"
+                   viewBox="0 0 600 600"
+                   role="list"
+                   aria-label="Klikbare domeinen van de beheerbaarheidsscan">
+                <g class="segment" role="button" tabindex="0" aria-label="Configureren: Blocker" aria-current="true" data-id="config">
+                <path d="M 307.539 30.105 A 270 270 0 0 1 554.356 209.428 L 465.802 240.961 A 176 176 0 0 0 304.914 124.069 Z" fill="#b94e4c" fill-opacity="1">
+                </path>
+                <text x="430.49" y="116.40" text-anchor="middle"><tspan x="430.49" dy="0" fill="#ffffff">Configureren</tspan><tspan x="430.49" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
+                </g>
+                <g class="segment" role="button" tabindex="0" aria-label="Testen: Aandacht" aria-current="false" data-id="test">
+                <path d="M 559.015 223.768 A 270 270 0 0 1 464.739 513.918 L 407.386 439.443 A 176 176 0 0 0 468.839 250.308 Z" fill="#bd7c1f" fill-opacity=".84">
+                </path>
+                <text x="511.13" y="364.60" text-anchor="middle"><tspan x="511.13" dy="0" fill="#ffffff">Testen</tspan><tspan x="511.13" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
+                </g>
+                <g class="segment" role="button" tabindex="0" aria-label="Monitoren: Aandacht" aria-current="false" data-id="monitor">
+                <path d="M 452.541 522.781 A 270 270 0 0 1 147.459 522.781 L 200.566 445.220 A 176 176 0 0 0 399.434 445.220 Z" fill="#bd7c1f" fill-opacity=".84">
+                </path>
+                <text x="300.00" y="518.00" text-anchor="middle"><tspan x="300.00" dy="0" fill="#ffffff">Monitoren</tspan><tspan x="300.00" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Aandacht</tspan></text>
+                </g>
+                <g class="segment" role="button" tabindex="0" aria-label="Ondersteunen: Gereed" aria-current="false" data-id="support">
+                <path d="M 135.261 513.918 A 270 270 0 0 1 40.985 223.768 L 131.161 250.308 A 176 176 0 0 0 192.614 439.443 Z" fill="#25806d" fill-opacity=".84">
+                </path>
+                <text x="88.87" y="364.60" text-anchor="middle"><tspan x="88.87" dy="0" fill="#ffffff">Support</tspan><tspan x="88.87" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Gereed</tspan></text>
+                </g>
+                <g class="segment" role="button" tabindex="0" aria-label="Borgen: Blocker" aria-current="false" data-id="assure">
+                <path d="M 45.644 209.428 A 270 270 0 0 1 292.461 30.105 L 295.086 124.069 A 176 176 0 0 0 134.198 240.961 Z" fill="#b94e4c" fill-opacity=".84">
+                </path>
+                <text x="169.51" y="116.40" text-anchor="middle"><tspan x="169.51" dy="0" fill="#ffffff">Borgen</tspan><tspan x="169.51" dy="18" class="small" fill="#ffffff" fill-opacity=".84">Blocker</tspan></text>
+                </g>
+              </svg>
+              <div class="ring-center" aria-live="polite">
+                <div>
+                  <div class="kicker">Overdrachtsbeeld</div>
+                  <strong id="score">0/15</strong>
+                  <div class="center-status"
+                       id="centerStatus">Overdracht nog niet verantwoord: er zijn blockers.</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="state-buttons" aria-label="Status wijzigen">
-            <button class="state-btn" type="button" data-state="ready" aria-pressed="false">Geaccepteerd</button>
-            <button class="state-btn" type="button" data-state="attention" aria-pressed="false">Aandacht</button>
-            <button class="state-btn" type="button" data-state="blocker" aria-pressed="false">Blocker</button>
-            <button class="state-btn" type="button" data-state="unknown" aria-pressed="true">Niet getoetst</button>
+          <div class="summary-strip" aria-label="Samenvatting">
+            <div class="summary-cell"><b id="readyCount">0</b><span>geaccepteerd</span></div>
+            <div class="summary-cell"><b id="attentionCount">5</b><span>aandacht</span></div>
+            <div class="summary-cell"><b id="blockerCount">2</b><span>blockers</span></div>
+            <div class="summary-cell"><b id="unknownCount">8</b><span>niet getoetst</span></div>
+            <div class="summary-cell"><b id="evidenceCount">0</b><span>beoordeeld akkoord</span></div>
           </div>
+        </article>
+        <aside class="panel detail" aria-live="polite">
+          <div class="detail-head">
+            <div class="detail-titleline">
+              <h2 id="domainTitle">Configureren</h2>
+              <span class="status-pill blocker" id="domainStatus">Blocker</span>
+            </div>
+            <p id="domainIntro">Kan FAB de functionele inrichting begrijpen, wijzigen en gecontroleerd terugzetten?</p>
+          </div>
+          <div class="checks" id="checks">
+            <div class="check active"
+                 tabindex="0"
+                 role="button"
+                 aria-label="Beheerbare instellingen zijn beschreven. Status Gereed.">
+              <div class="state-icon ready" aria-hidden="true">✓</div>
+              <div>
+                <div class="check-title">Beheerbare instellingen zijn beschreven</div>
+                <div class="check-note">Inclusief doel, eigenaar en effect van een wijziging.</div>
+              </div>
+              <div class="evidence">Config-register</div>
+            </div>
+            <div class="check"
+                 tabindex="0"
+                 role="button"
+                 aria-label="Veilige standaardwaarden zijn afgesproken. Status Aandacht.">
+              <div class="state-icon attention" aria-hidden="true">!</div>
+              <div>
+                <div class="check-title">Veilige standaardwaarden zijn afgesproken</div>
+                <div class="check-note">FAB weet welke instelling als basis geldt en wanneer daarvan mag worden afgeweken.</div>
+              </div>
+              <div class="evidence">Werkinstructie</div>
+            </div>
+            <div class="check"
+                 tabindex="0"
+                 role="button"
+                 aria-label="Herstelpad voor foutieve configuratie is bekend. Status Blocker.">
+              <div class="state-icon blocker" aria-hidden="true">×</div>
+              <div>
+                <div class="check-title">Herstelpad voor foutieve configuratie is bekend</div>
+                <div class="check-note">Terugzetten, rollback of herstelactie is praktisch uitvoerbaar.</div>
+              </div>
+              <div class="evidence">Nog ontbrekend</div>
+            </div>
+          </div>
+          <div class="inspector" id="inspector">
+            <div class="inspector-grid">
+              <div>
+                <h3 id="checkInspectorTitle">Beheerbare instellingen zijn beschreven</h3>
+                <p id="checkInspectorText">Bewijs: Config-register. Inclusief doel, eigenaar en effect van een wijziging.</p>
+              </div>
+              <div class="state-buttons" aria-label="Status wijzigen">
+                <button class="state-btn"
+                        type="button"
+                        data-state="ready"
+                        aria-pressed="false">Geaccepteerd</button>
+                <button class="state-btn"
+                        type="button"
+                        data-state="attention"
+                        aria-pressed="false">Aandacht</button>
+                <button class="state-btn"
+                        type="button"
+                        data-state="blocker"
+                        aria-pressed="false">Blocker</button>
+                <button class="state-btn"
+                        type="button"
+                        data-state="unknown"
+                        aria-pressed="true">Niet getoetst</button>
+              </div>
+            </div>
+            <form id="checkAssessment">
+              <p>Beoordeling simuleren — alleen synthetische referenties. Een bronlabel is geen beoordeeld bewijs. Wijziging van de beoordeling maakt eerder akkoord ongeldig.</p>
+              <label>
+                Fase
+                <select name="stage">
+                  <option>voorgenomen</option>
+                  <option>uitgevoerd</option>
+                  <option>gecontroleerd</option>
+                  <option>geaccepteerd</option>
+                </select>
+              </label>
+              <label>
+                Bron
+                <input name="source" maxlength="240">
+              </label>
+              <label>
+                Versie
+                <input name="version" maxlength="80">
+              </label>
+              <label>
+                Controledatum
+                <input name="date" type="date">
+              </label>
+              <label>
+                Bevoegde beoordelaar
+                <input name="reviewer" maxlength="120">
+              </label>
+              <label>
+                Uitkomst
+                <select name="outcome">
+                  <option value="onbekend">Niet getoetst</option>
+                  <option value="akkoord">Akkoord</option>
+                  <option value="afgekeurd">Afgekeurd</option>
+                </select>
+              </label>
+              <button type="submit">Bewaar beoordeling</button>
+              <p id="assessmentStatus" role="status"></p>
+            </form>
+          </div>
+          <div class="note-box" id="domainNote">Voor livegang hoeft niet iedere instelling dagelijks gebruikt te worden. Wel moet duidelijk zijn welke configuratie beheerbaar is, wie eigenaar is en hoe wijzigingen worden vastgelegd.</div>
+        </aside>
+      </section>
+      <details class="about">
+        <summary>Over deze visual</summary>
+        <div class="copy">
+          <p>De interface is opgebouwd als een beheerring, omdat beheerbaarheid geen lineair projectstapje is maar een samenhangend geheel. De vijf domeinen blijven tegelijk zichtbaar; een klik zoomt in zonder het overzicht kwijt te raken.</p>
+          <p>De kleuren zijn functioneel en spaarzaam gebruikt: groen betekent geaccepteerd bewijs in de simulatie, grijs niet getoetst, amber vraagt aandacht en rood blokkeert beheer. Groen is geen formeel overdrachtsbesluit. De rest van de pagina blijft bewust rustig, zodat de relatie tussen totaalbeeld, onderliggende controle en bewijs centraal staat.</p>
         </div>
-        <form id="checkAssessment">
-          <p>Beoordeling simuleren — alleen synthetische referenties. Een bronlabel is geen beoordeeld bewijs. Wijziging van de beoordeling maakt eerder akkoord ongeldig.</p>
-          <label>Fase <select name="stage"><option>voorgenomen</option><option>uitgevoerd</option><option>gecontroleerd</option><option>geaccepteerd</option></select></label>
-          <label>Bron <input name="source" maxlength="240"></label>
-          <label>Versie <input name="version" maxlength="80"></label>
-          <label>Controledatum <input name="date" type="date"></label>
-          <label>Bevoegde beoordelaar <input name="reviewer" maxlength="120"></label>
-          <label>Uitkomst <select name="outcome"><option value="onbekend">Niet getoetst</option><option value="akkoord">Akkoord</option><option value="afgekeurd">Afgekeurd</option></select></label>
-          <button type="submit">Bewaar beoordeling</button>
-          <p id="assessmentStatus" role="status"></p>
-        </form>
-      </div>
-
-      <div class="note-box" id="domainNote">Voor livegang hoeft niet iedere instelling dagelijks gebruikt te worden. Wel moet duidelijk zijn welke configuratie beheerbaar is, wie eigenaar is en hoe wijzigingen worden vastgelegd.</div>
-    </aside>
-  </section>
-
-  <details class="about">
-    <summary>Over deze visual</summary>
-    <div class="copy">
-      <p>De interface is opgebouwd als een beheerring, omdat beheerbaarheid geen lineair projectstapje is maar een samenhangend geheel. De vijf domeinen blijven tegelijk zichtbaar; een klik zoomt in zonder het overzicht kwijt te raken.</p>
-      <p>De kleuren zijn functioneel en spaarzaam gebruikt: groen betekent geaccepteerd bewijs in de simulatie, grijs niet getoetst, amber vraagt aandacht en rood blokkeert beheer. Groen is geen formeel overdrachtsbesluit. De rest van de pagina blijft bewust rustig, zodat de relatie tussen totaalbeeld, onderliggende controle en bewijs centraal staat.</p>
-    </div>
-  </details>
-  <textarea id="copyFallback" aria-label="Overdrachtssamenvatting om handmatig te kopiëren" readonly hidden style="width:100%;min-height:12rem"></textarea>
-</main>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<script>
+      </details>
+      <textarea id="copyFallback"
+                aria-label="Overdrachtssamenvatting om handmatig te kopiëren"
+                readonly
+                hidden
+                style="width:100%;
+                       min-height:12rem"></textarea>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>
 const INITIAL = [
   {
     id: 'config', label: 'Configureren', short: 'Instellingen',
@@ -761,15 +834,47 @@ document.getElementById('copyBtn').addEventListener('click', async()=>{
 });
 
 renderAll();
-</script>
-<section class="review-context" aria-label="Beheerkaart en overdrachtschecklist" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Kan regulier beheer de oplevering dragen?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB en dienst-/proceseigenaar bij inbeheername en overdracht. <strong>Vervolgstap:</strong> een controlelijst met bron, versie, datum, beoordelaar, uitkomst en eigenaar van open punten in het bestaande overdrachts- of wijzigingsdossier. FAB adviseert; de bevoegde dienst-/proceseigenaar accepteert overdracht en restrisico.</p>
-  <p><strong>Bron:</strong> synthetische cliëntportaal-checklist, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: prototype voor overleg, geen formele acceptatie of lokale validatie. Een referentie zoals “Config-register” is een verwachte bron, geen beoordeeld bewijs. Voorgenomen, uitgevoerd, gecontroleerd en geaccepteerd zijn afzonderlijke fasen; ontbrekend bewijs is niet getoetst. Alle invoer blijft in deze browsersessie en verdwijnt bij herladen.</p>
-  <nav aria-label="Overdrachtsviews"><a href="fab-releaseatelier.html#test-coverage">Wijziging en testdekking</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies (andere casus)</a> · <a href="incident-onepager.html#continuity">Continuïteitsvoorwaarden</a></nav>
-  <details id="scanChecklist" open><summary>Alle vijftien controles als leesbare checklist</summary><ol><li>Configuratie: doel, eigenaar, afhankelijkheden en wijzigingshistorie vastleggen.</li><li>Veilige standaardwaarden en bevoegde afwijkingen afspreken.</li><li>Herstelpad praktisch toetsen.</li><li>Kritieke gebruikersscenario’s reproduceerbaar maken.</li><li>Beheerhandelingen en fout-/negatieve autorisatiescenario’s toetsen.</li><li>Synthetische testdata en testrollen beschikbaar maken.</li><li>Functionele verstoringssignalen benoemen.</li><li>Meldroute, prioriteit en opvolging toetsen.</li><li>Ketenfouten naar bron en eindverwerking herleiden.</li><li>Diagnosevragen met bewijs en onzekerheid vastleggen.</li><li>Escalatiepad en leverancierscontact in de afgesproken bron controleren.</li><li>Workarounds voorzien van voorwaarden, risico, eigenaar en herbeoordelingsdatum.</li><li>Uitvoerder, toetser en bevoegde beslisser onderscheiden.</li><li>Beheerkennis op één vindbare, actuele bronplek houden.</li><li>Restpunten aan eigenaar, deadline en bewijs van opvolging koppelen.</li></ol><p>Deze lijst is geen volledige testdekking. Toets ook bereikbaarheid van het goedgekeurde noodplan, zorgimpact en herstelcontrole. Geen zorginhoudelijke noodwerkwijze is hier vastgesteld.</p></details>
-  <p><strong>Onderhoud en toelating:</strong> wijs eerst een bronhouder en concrete overdrachtsactie aan; herzie bij release-, proces- of bronwijziging. Gebruik alleen synthetische referenties, geen cliëntgegevens of volledige logs. Vergelijk de ring met deze checklist op juistheid, overdracht en onderhoudslast. Bronregistraties blijven leidend; deze pagina is geen tweede administratie. Gebruikerswaarde is nog niet aangetoond.</p>
-</section>
-<noscript><style>.workspace { display:none; }</style><p style="padding:24px">JavaScript staat uit. Er is geen beoordeeld overdrachtsakkoord. Gebruik de volledige checklist hierboven; de interactie en invoer zijn niet beschikbaar.</p></noscript>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart en overdrachtschecklist"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Kan regulier beheer de oplevering dragen?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB en dienst-/proceseigenaar bij inbeheername en overdracht. <strong>Vervolgstap:</strong> een controlelijst met bron, versie, datum, beoordelaar, uitkomst en eigenaar van open punten in het bestaande overdrachts- of wijzigingsdossier. FAB adviseert; de bevoegde dienst-/proceseigenaar accepteert overdracht en restrisico.</p>
+      <p><strong>Bron:</strong> synthetische cliëntportaal-checklist, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Geldigheid: prototype voor overleg, geen formele acceptatie of lokale validatie. Een referentie zoals “Config-register” is een verwachte bron, geen beoordeeld bewijs. Voorgenomen, uitgevoerd, gecontroleerd en geaccepteerd zijn afzonderlijke fasen; ontbrekend bewijs is niet getoetst. Alle invoer blijft in deze browsersessie en verdwijnt bij herladen.</p>
+      <nav aria-label="Overdrachtsviews">
+        <a href="fab-releaseatelier.html#test-coverage">Wijziging en testdekking</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies (andere casus)</a> · <a href="incident-onepager.html#continuity">Continuïteitsvoorwaarden</a>
+      </nav>
+      <details id="scanChecklist" open>
+        <summary>Alle vijftien controles als leesbare checklist</summary>
+        <ol>
+          <li>Configuratie: doel, eigenaar, afhankelijkheden en wijzigingshistorie vastleggen.</li>
+          <li>Veilige standaardwaarden en bevoegde afwijkingen afspreken.</li>
+          <li>Herstelpad praktisch toetsen.</li>
+          <li>Kritieke gebruikersscenario’s reproduceerbaar maken.</li>
+          <li>Beheerhandelingen en fout-/negatieve autorisatiescenario’s toetsen.</li>
+          <li>Synthetische testdata en testrollen beschikbaar maken.</li>
+          <li>Functionele verstoringssignalen benoemen.</li>
+          <li>Meldroute, prioriteit en opvolging toetsen.</li>
+          <li>Ketenfouten naar bron en eindverwerking herleiden.</li>
+          <li>Diagnosevragen met bewijs en onzekerheid vastleggen.</li>
+          <li>Escalatiepad en leverancierscontact in de afgesproken bron controleren.</li>
+          <li>Workarounds voorzien van voorwaarden, risico, eigenaar en herbeoordelingsdatum.</li>
+          <li>Uitvoerder, toetser en bevoegde beslisser onderscheiden.</li>
+          <li>Beheerkennis op één vindbare, actuele bronplek houden.</li>
+          <li>Restpunten aan eigenaar, deadline en bewijs van opvolging koppelen.</li>
+        </ol>
+        <p>Deze lijst is geen volledige testdekking. Toets ook bereikbaarheid van het goedgekeurde noodplan, zorgimpact en herstelcontrole. Geen zorginhoudelijke noodwerkwijze is hier vastgesteld.</p>
+      </details>
+      <p><strong>Onderhoud en toelating:</strong> wijs eerst een bronhouder en concrete overdrachtsactie aan; herzie bij release-, proces- of bronwijziging. Gebruik alleen synthetische referenties, geen cliëntgegevens of volledige logs. Vergelijk de ring met deze checklist op juistheid, overdracht en onderhoudslast. Bronregistraties blijven leidend; deze pagina is geen tweede administratie. Gebruikerswaarde is nog niet aangetoond.</p>
+    </section>
+    <noscript><style>.workspace { display:none; }</style>
+      <p style="padding:24px">JavaScript staat uit. Er is geen beoordeeld overdrachtsakkoord. Gebruik de volledige checklist hierboven; de interactie en invoer zijn niet beschikbaar.</p>
+    </noscript>
+  </body>
 </html>

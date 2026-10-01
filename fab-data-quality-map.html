@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Synthetische controlelens voor 120 overdrachtsberichten, kwaliteitsregels, overlap en veilige herstelroutes.">
-<title>FAB Data Quality Map — welke afwijking raakt de overdracht?</title>
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische controlelens voor 120 overdrachtsberichten, kwaliteitsregels, overlap en veilige herstelroutes.">
+    <title>FAB Data Quality Map — welke afwijking raakt de overdracht?</title>
+    <style>
 :root{--paper:#faf0f5;--ink:#512448;--muted:#705768;--accent:#aa2348;--line:#d3b7c6;--white:#fff;--wash:#f1dce7;--good:#285b4b;--body:"Helvetica Neue",Helvetica,Arial,sans-serif;--display:Baskerville,"Times New Roman",serif}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--body)}button,select,textarea{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}button:disabled{opacity:.5;cursor:default}[hidden]{display:none!important}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}a{color:var(--accent);text-underline-offset:4px}h1,h2,h3,p{margin:0}h1,h2{font-family:var(--display);font-weight:400}h1{font-size:clamp(40px,4.6vw,67px);line-height:1.04;max-width:13ch;letter-spacing:-.025em}h2{font-size:32px;line-height:1.15}h3{font-size:18px;line-height:1.3}p{max-width:72ch}.skip{position:absolute;left:12px;top:-100px;padding:12px;background:white;z-index:10}.skip:focus{top:12px}.page{max-width:1380px;padding:28px 40px;margin:auto}.mastline{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap;font-size:14px}.mastline strong{color:var(--accent)}.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:64px;align-items:center;margin:34px 0}.hero-copy p{margin-top:22px}.hero-copy .case{font-size:14px;padding-top:18px;border-top:1px solid var(--line)}.lens{background:var(--white);padding:28px;border-radius:90px 90px 12px 12px;border:2px solid var(--ink)}.lens-heading{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin:6px 0 22px}.lens-heading h2{font-size:28px}.lens-heading span{font-size:14px}.population{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:8px}.message-cell{aspect-ratio:1;min-width:0;background:var(--paper);border:1px solid #987387;border-radius:50%}.message-cell.flag{border:2px solid var(--accent);background:var(--wash)}.message-cell.active{background:var(--accent);border-radius:2px;border-color:var(--accent)}.message-cell.overlap{outline:2px solid var(--ink);outline-offset:2px}.legend{margin-top:24px;display:flex;gap:10px 20px;flex-wrap:wrap;font-size:12px}.legend span{display:flex;align-items:center;gap:8px}.swatch{display:inline-block;flex:0 0 auto;width:12px;height:12px;border:1px solid var(--line);border-radius:50%;background:var(--paper)}.swatch.flag{border:2px solid var(--accent);background:var(--wash)}.swatch.active{border:1px solid var(--accent);background:var(--accent);border-radius:2px}.swatch.overlap{outline:2px solid var(--ink);outline-offset:2px;background:var(--wash);border-color:var(--accent)}.lens-caption{margin-top:20px;font-size:14px}.selection{display:flex;gap:10px 28px;align-items:center;flex-wrap:wrap;padding:20px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}.selection p{font-size:14px;max-width:59ch}.selection button{background:transparent;border:1px solid var(--line);padding:9px 14px;border-radius:3px}.selection button:first-of-type{margin-left:auto}.quality{margin-top:24px}.quality-head{display:flex;justify-content:space-between;gap:30px;align-items:baseline;margin-bottom:20px}.quality-head p{font-size:14px;max-width:50ch}.rule{border-top:1px solid var(--line)}.rule:last-child{border-bottom:1px solid var(--line)}.rule-button{display:grid;grid-template-columns:100px minmax(0,1fr) 180px 25px;gap:18px;align-items:center;text-align:left;width:100%;padding:22px 16px;background:transparent;border:0}.rule-button[aria-expanded="true"]{background:var(--ink);color:white}.rule-button strong{font-size:20px;font-weight:600}.rule-button .count{font-size:14px}.rule-button .symbol{font-size:27px}.rule-detail{padding:26px 16px 30px;background:var(--white)}.rule-body{display:grid;grid-template-columns:1.1fr 1fr;gap:42px}.rule-body h3{margin:18px 0 8px}.rule-body h3:first-child{margin-top:0}.rule-body p{font-size:15px}.facts{margin:0;display:grid;grid-template-columns:130px minmax(0,1fr);gap:9px 18px;font-size:14px}.facts dt{font-weight:600}.facts dd{margin:0;overflow-wrap:anywhere}.effects{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}.effects span{border-left:3px solid var(--accent);padding:4px 12px;background:var(--paper);font-size:14px}.safe{border-left:3px solid var(--ink);padding-left:16px;margin-top:18px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.actions button{border:1px solid var(--line);border-radius:3px;background:var(--white);padding:9px 13px;font-size:14px}.actions .verify{background:var(--ink);color:white;border-color:var(--ink)}.rule-detail .state{margin-top:16px;font-weight:600;font-size:15px}.overlap-note{display:grid;grid-template-columns:1fr 1fr;gap:50px;padding:28px 0}.overlap-note h2{margin-bottom:12px}.overlap-note p{font-size:15px}.overlap-note .union{font-size:24px;font-family:var(--display);margin-bottom:10px}.register{border-top:2px solid var(--ink);padding-top:24px;margin-top:18px}.register h2{margin-bottom:14px}summary{cursor:pointer;min-height:44px;font-weight:600;padding:12px 0}.register article{padding:18px 0;border-bottom:1px solid var(--line)}.register article p{font-size:15px;margin-top:8px}.register details p{font-size:15px;margin:12px 0}nav{display:flex;gap:14px 28px;flex-wrap:wrap;font-size:15px;margin-top:24px}.foot{font-size:13px;margin-top:24px;color:var(--muted)}.status-line{min-height:26px;font-size:14px;color:var(--accent);margin-top:14px}.export{background:white;border:1px solid var(--line);padding:22px;margin-top:20px}.export textarea{display:block;width:100%;min-height:260px;padding:12px;margin-top:12px;font-size:14px;resize:vertical}.interactive{display:none!important}body.ready .interactive{display:flex!important}body:not(.ready) .quality{display:none}body:not(.ready) .population{display:none}
 @media(max-width:1000px){.hero{gap:30px}.lens{padding:24px 20px;border-radius:55px 55px 8px 8px}.population{gap:6px}.hero-copy h1{font-size:48px}.rule-body{gap:26px}.rule-button{grid-template-columns:80px minmax(0,1fr) 160px 20px;gap:12px}}
@@ -21,20 +22,87 @@
 <main class="page">
 <div class="mastline"><span>FAB / Data Quality Map</span><strong>Illustratieve aantallen, geen uitgevoerde meting</strong></div>
 <header class="hero">
-<figure class="lens" style="margin:0" aria-labelledby="lens-title lens-caption"><div class="lens-heading"><h2 id="lens-title">120 aangeboden berichten</h2><span>118 verschillende sleutels</span></div><div class="population" id="population" aria-hidden="true"></div><div class="legend"><span><i class="swatch" aria-hidden="true"></i>Geen gemarkeerde afwijking</span><span><i class="swatch flag" aria-hidden="true"></i>Afwijking in een regel</span><span><i class="swatch active" aria-hidden="true"></i>Geselecteerde regel</span><span><i class="swatch overlap" aria-hidden="true"></i>Meerdere regels (buitenrand)</span></div><figcaption class="lens-caption" id="lens-caption">Beginillustratie: 3 ongeldige locaties, 2 herhaalde sleutels en 5 ontbrekende tijdige verwerkingsbevestigingen. De afwijkingen overlappen. Geen bewezen kwaliteit.</figcaption></figure>
-<div class="hero-copy"><h1>Niet ieder bericht komt goed aan.</h1><p>Een locatiecode, herhaalde sleutel of late bevestiging vraagt een andere controle. Kies een regel en zie welke overdracht, eigenaar en herstelroute erbij horen.</p><p class="case">DQ-DEMO-LOC-02 / gerelateerd aan CHG-DEMO-LOC-02<br>2 november 2026, 08:00–09:00 aangeboden<br>Peildatum 09:15 Europe/Amsterdam / mapping 0.2</p></div>
+<figure class="lens" style="margin:0" aria-labelledby="lens-title lens-caption">
+<div class="lens-heading">
+<h2 id="lens-title">120 aangeboden berichten</h2>
+<span>118 verschillende sleutels</span>
+</div>
+<div class="population" id="population" aria-hidden="true"></div>
+<div class="legend"><span><i class="swatch" aria-hidden="true"></i>Geen gemarkeerde afwijking</span><span><i class="swatch flag" aria-hidden="true"></i>Afwijking in een regel</span><span><i class="swatch active" aria-hidden="true"></i>Geselecteerde regel</span><span><i class="swatch overlap" aria-hidden="true"></i>Meerdere regels (buitenrand)</span></div>
+<figcaption class="lens-caption" id="lens-caption">Beginillustratie: 3 ongeldige locaties, 2 herhaalde sleutels en 5 ontbrekende tijdige verwerkingsbevestigingen. De afwijkingen overlappen. Geen bewezen kwaliteit.</figcaption>
+</figure>
+<div class="hero-copy">
+<h1>Niet ieder bericht komt goed aan.</h1>
+<p>Een locatiecode, herhaalde sleutel of late bevestiging vraagt een andere controle. Kies een regel en zie welke overdracht, eigenaar en herstelroute erbij horen.</p>
+<p class="case">
+DQ-DEMO-LOC-02 / gerelateerd aan CHG-DEMO-LOC-02
+<br>
+2 november 2026, 08:00–09:00 aangeboden
+<br>
+Peildatum 09:15 Europe/Amsterdam / mapping 0.2
+</p>
+</div>
 </header>
-<div class="selection interactive"><p>De lens markeert berichtposities, geen cliënten. Zonder markering betekent niet dat alle gegevens juist zijn.</p><button id="all">Toon alle afwijkingen</button><button id="reset">Herstel beginstand</button><button id="copy">Kopieer controlepakket</button><button id="print">Druk af</button></div>
-<section class="quality" id="quality" aria-labelledby="quality-title"><div class="quality-head"><h2 id="quality-title">Welke regel vraagt opvolging?</h2><p>Alle controles beginnen als niet uitgevoerd. Herstelvoorstellen nemen geen afwijkingen weg; alleen een gesimuleerde aansluitcontrole verandert de lens.</p></div><div id="rules"></div></section>
-<section class="overlap-note" aria-labelledby="overlap-title"><div><h2 id="overlap-title">Dezelfde overdracht kan meer regels raken.</h2><p class="union" id="union">10 regelmarkeringen op 6 berichtposities (gekozen demo-overlap).</p><p id="overlap">De precieze overlap is hier bewust verzonnen om dubbeltellen zichtbaar te maken. De Ketenkaart geeft alleen aantallen en stelt de overlap niet vast. 120 berichten zijn geen 120 unieke cliënten; 118 sleutels bewijzen geen 118 geslaagde overdrachten.</p></div><div><h2>Een percentage zou te veel beloven.</h2><p>De regels meten verschillende dingen. De gecontroleerde populatie, bronhistorie, peildatum en afnemer moeten eerst overeenkomen. Tel 3, 2 en 5 dus niet op als tien verschillende foutieve overdrachten, en maak er geen algemene kwaliteitsscore van.</p></div></section>
+<div class="selection interactive">
+<p>De lens markeert berichtposities, geen cliënten. Zonder markering betekent niet dat alle gegevens juist zijn.</p>
+<button id="all">Toon alle afwijkingen</button><button id="reset">Herstel beginstand</button><button id="copy">Kopieer controlepakket</button><button id="print">Druk af</button>
+</div>
+<section class="quality" id="quality" aria-labelledby="quality-title">
+<div class="quality-head">
+<h2 id="quality-title">Welke regel vraagt opvolging?</h2>
+<p>Alle controles beginnen als niet uitgevoerd. Herstelvoorstellen nemen geen afwijkingen weg; alleen een gesimuleerde aansluitcontrole verandert de lens.</p>
+</div>
+<div id="rules"></div>
+</section>
+<section class="overlap-note" aria-labelledby="overlap-title">
+<div>
+<h2 id="overlap-title">Dezelfde overdracht kan meer regels raken.</h2>
+<p class="union" id="union">10 regelmarkeringen op 6 berichtposities (gekozen demo-overlap).</p>
+<p id="overlap">De precieze overlap is hier bewust verzonnen om dubbeltellen zichtbaar te maken. De Ketenkaart geeft alleen aantallen en stelt de overlap niet vast. 120 berichten zijn geen 120 unieke cliënten; 118 sleutels bewijzen geen 118 geslaagde overdrachten.</p>
+</div>
+<div>
+<h2>Een percentage zou te veel beloven.</h2>
+<p>De regels meten verschillende dingen. De gecontroleerde populatie, bronhistorie, peildatum en afnemer moeten eerst overeenkomen. Tel 3, 2 en 5 dus niet op als tien verschillende foutieve overdrachten, en maak er geen algemene kwaliteitsscore van.</p>
+</div>
+</section>
 <p class="status-line" id="message" role="status"></p>
-<section class="export" id="export" hidden aria-labelledby="export-title"><h2 id="export-title">Controlepakket om zelf te kopiëren</h2><label for="export-text">Samenvatting van alle regels</label><textarea id="export-text" readonly></textarea></section>
-<section class="register" aria-labelledby="register-title"><h2 id="register-title">De regels, ook zonder JavaScript</h2><p>Alle aantallen hieronder zijn vaste beginillustraties, niet uitgevoerd, gecontroleerd of geaccepteerd. De lens erboven kan een andere gesimuleerde stand tonen.</p>
-<article><h3>DQ-01 / Geldige locatie op ingangsdatum</h3><p><strong>Regel:</strong> locationCode bestaat en is geldig op effectiveDate. <strong>Populatie:</strong> alle 120 berichten; mapping demo 0.2. <strong>Illustratie:</strong> 3 berichten met onbekende locatiecode, waardoor de overdracht bij de ontvangende locatie kan ontbreken.</p><p><strong>Eigenaar en route:</strong> gegevenseigenaar cliëntadministratie bevestigt bron/mapping; FAB onderzoekt. Integratiebeheer herverwerkt pas na goedkeuring, met dezelfde berichtsleutel en controle op één inhoudelijke verwerking. Zorgimpact beoordeelt de proceseigenaar.</p><p><strong>Open:</strong> bronreferentie, uitvoeringsbewijs, controledatum, beoordelaar en feitelijke afnemeruitkomst ontbreken.</p></article>
-<article><h3>DQ-02 / Unieke overdrachtsleutel</h3><p><strong>Regel:</strong> transferId is uniek per overdracht. Vergelijk alle 120 berichten op sleutel én bronhistorie. <strong>Illustratie:</strong> 2 herhaalde sleutels, 118 verschillende sleutels. Dit bewijst geen dubbele zorg of twee extra cliënten.</p><p><strong>Eigenaar en route:</strong> Integratiebeheer onderzoekt herhaalgedrag; gegevenseigenaar en proceseigenaar beoordelen betekenis en gevolgen. Controleer precies één inhoudelijke verwerking per sleutel bij de afnemer. Niet blind opnieuw aanbieden of records verwijderen.</p><p><strong>Open:</strong> herhaalaanbod en dubbele eindverwerking zijn nog niet onderscheiden; gecontroleerd bewijs ontbreekt.</p></article>
-<article><h3>DQ-03 / Tijdige verwerkingsbevestiging</h3><p><strong>Regel:</strong> processedAt is binnen 15 minuten na sentAt bevestigd. Dit is een demotermijn, geen lokale norm. <strong>Populatie:</strong> alle 120 aangeboden berichten; controle op 09:15 Europe/Amsterdam. <strong>Illustratie:</strong> 5 zonder tijdige bevestiging.</p><p><strong>Eigenaar en route:</strong> FAB en ontvangende applicatiebeheerder toetsen tijdzone, ontvangst, verwerking en actualiteit. Geen bevestiging kan ook een ontbrekend bewijs betekenen. Na bevoegd herstel bron en afnemer op dezelfde peildatum vergelijken; leverancier via de bestaande contactroute.</p><p><strong>Open:</strong> definitieve zorgimpact, controlebewijs en lokaal akkoord op de regel/termijn ontbreken.</p></article>
-<details><summary>Taak, bewijs en onderhoud</summary><p><strong>Hoofdvraag:</strong> welke verkeerde, ontbrekende of late registratie raakt de overdracht en wie controleert de herstelroute? <strong>Gebruiker:</strong> FAB bij gegevenscontrole. <strong>Uitkomst:</strong> controlepakket per regel met scope, afwijking, zorgimpact, voorgestelde eigenaar en vervolgactie.</p><p><strong>Bron:</strong> synthetische kwaliteitscasus uit Ketenkaart, zelfstandige demo v1, revisie 1 oktober 2026. De precieze overlap van berichtposities is voor deze lens toegevoegd en is geen vastgesteld ketenbewijs. Bestanden synchroniseren niet. Beoogde bronhouder: gegevenseigenaar met FAB en proceseigenaar; echte bronhouder en bronregistratie ontbreken.</p><p><strong>Onderhoud:</strong> herzie bij wijziging in bronveld, mapping, regel, populatie, tijdzone, afnemer of proces. Gewijzigde regelversie maakt voorgaand controlebewijs ongeldig. Leg bron, versie, peildatum, uitvoerder, beoordelaar en uitkomst in de afgesproken registratie vast, niet in deze deelbare HTML.</p><p><strong>Bevoegdheid:</strong> FAB onderzoekt en adviseert. Bevoegde eigenaar keurt herstel en risicoacceptatie goed; Integratiebeheer voert uit. De simulatie veronderstelt fictieve goedkeuring van de herstelopdracht, maar geeft geen echt akkoord. Bij stilgevallen zorgondersteuning start direct de lokaal afgesproken continuïteitsroute.</p><p><strong>Praktijktoets:</strong> vergelijk met de huidige controlelijst op juiste eigenaar, veilige herstelroute, gemiste afnemers, dubbeltellen en onderhoudslast. Geen lokaal gevalideerde regels of bewezen gebruikerswaarde.</p></details>
-<nav aria-label="Gerelateerde views"><a href="fab-ketenkaart.html#data-quality">Broncasus en keten</a><a href="fab-test-coverage-map.html">Tests op validatie en herhaling</a><a href="fab-continuiteitskaart.html">Zorgregie bij ontbrekende overdracht</a><a href="fab-rapportage-lineage.html">Rapportageherkomst (andere casus)</a></nav><p class="foot">Alle gegevens zijn synthetisch; geen cliëntgegevens of echte berichtinhoud. Posities in de lens zijn geen bron-ID’s. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Externe verbindingen zijn niet nodig.</p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Controlepakket om zelf te kopiëren</h2>
+<label for="export-text">Samenvatting van alle regels</label><textarea id="export-text" readonly></textarea>
+</section>
+<section class="register" aria-labelledby="register-title">
+<h2 id="register-title">De regels, ook zonder JavaScript</h2>
+<p>Alle aantallen hieronder zijn vaste beginillustraties, niet uitgevoerd, gecontroleerd of geaccepteerd. De lens erboven kan een andere gesimuleerde stand tonen.</p>
+<article>
+<h3>DQ-01 / Geldige locatie op ingangsdatum</h3>
+<p><strong>Regel:</strong> locationCode bestaat en is geldig op effectiveDate. <strong>Populatie:</strong> alle 120 berichten; mapping demo 0.2. <strong>Illustratie:</strong> 3 berichten met onbekende locatiecode, waardoor de overdracht bij de ontvangende locatie kan ontbreken.</p>
+<p><strong>Eigenaar en route:</strong> gegevenseigenaar cliëntadministratie bevestigt bron/mapping; FAB onderzoekt. Integratiebeheer herverwerkt pas na goedkeuring, met dezelfde berichtsleutel en controle op één inhoudelijke verwerking. Zorgimpact beoordeelt de proceseigenaar.</p>
+<p><strong>Open:</strong> bronreferentie, uitvoeringsbewijs, controledatum, beoordelaar en feitelijke afnemeruitkomst ontbreken.</p>
+</article>
+<article>
+<h3>DQ-02 / Unieke overdrachtsleutel</h3>
+<p><strong>Regel:</strong> transferId is uniek per overdracht. Vergelijk alle 120 berichten op sleutel én bronhistorie. <strong>Illustratie:</strong> 2 herhaalde sleutels, 118 verschillende sleutels. Dit bewijst geen dubbele zorg of twee extra cliënten.</p>
+<p><strong>Eigenaar en route:</strong> Integratiebeheer onderzoekt herhaalgedrag; gegevenseigenaar en proceseigenaar beoordelen betekenis en gevolgen. Controleer precies één inhoudelijke verwerking per sleutel bij de afnemer. Niet blind opnieuw aanbieden of records verwijderen.</p>
+<p><strong>Open:</strong> herhaalaanbod en dubbele eindverwerking zijn nog niet onderscheiden; gecontroleerd bewijs ontbreekt.</p>
+</article>
+<article>
+<h3>DQ-03 / Tijdige verwerkingsbevestiging</h3>
+<p><strong>Regel:</strong> processedAt is binnen 15 minuten na sentAt bevestigd. Dit is een demotermijn, geen lokale norm. <strong>Populatie:</strong> alle 120 aangeboden berichten; controle op 09:15 Europe/Amsterdam. <strong>Illustratie:</strong> 5 zonder tijdige bevestiging.</p>
+<p><strong>Eigenaar en route:</strong> FAB en ontvangende applicatiebeheerder toetsen tijdzone, ontvangst, verwerking en actualiteit. Geen bevestiging kan ook een ontbrekend bewijs betekenen. Na bevoegd herstel bron en afnemer op dezelfde peildatum vergelijken; leverancier via de bestaande contactroute.</p>
+<p><strong>Open:</strong> definitieve zorgimpact, controlebewijs en lokaal akkoord op de regel/termijn ontbreken.</p>
+</article>
+<details>
+<summary>Taak, bewijs en onderhoud</summary>
+<p><strong>Hoofdvraag:</strong> welke verkeerde, ontbrekende of late registratie raakt de overdracht en wie controleert de herstelroute? <strong>Gebruiker:</strong> FAB bij gegevenscontrole. <strong>Uitkomst:</strong> controlepakket per regel met scope, afwijking, zorgimpact, voorgestelde eigenaar en vervolgactie.</p>
+<p><strong>Bron:</strong> synthetische kwaliteitscasus uit Ketenkaart, zelfstandige demo v1, revisie 1 oktober 2026. De precieze overlap van berichtposities is voor deze lens toegevoegd en is geen vastgesteld ketenbewijs. Bestanden synchroniseren niet. Beoogde bronhouder: gegevenseigenaar met FAB en proceseigenaar; echte bronhouder en bronregistratie ontbreken.</p>
+<p><strong>Onderhoud:</strong> herzie bij wijziging in bronveld, mapping, regel, populatie, tijdzone, afnemer of proces. Gewijzigde regelversie maakt voorgaand controlebewijs ongeldig. Leg bron, versie, peildatum, uitvoerder, beoordelaar en uitkomst in de afgesproken registratie vast, niet in deze deelbare HTML.</p>
+<p><strong>Bevoegdheid:</strong> FAB onderzoekt en adviseert. Bevoegde eigenaar keurt herstel en risicoacceptatie goed; Integratiebeheer voert uit. De simulatie veronderstelt fictieve goedkeuring van de herstelopdracht, maar geeft geen echt akkoord. Bij stilgevallen zorgondersteuning start direct de lokaal afgesproken continuïteitsroute.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige controlelijst op juiste eigenaar, veilige herstelroute, gemiste afnemers, dubbeltellen en onderhoudslast. Geen lokaal gevalideerde regels of bewezen gebruikerswaarde.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-ketenkaart.html#data-quality">Broncasus en keten</a><a href="fab-test-coverage-map.html">Tests op validatie en herhaling</a><a href="fab-continuiteitskaart.html">Zorgregie bij ontbrekende overdracht</a><a href="fab-rapportage-lineage.html">Rapportageherkomst (andere casus)</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch; geen cliëntgegevens of echte berichtinhoud. Posities in de lens zijn geen bron-ID’s. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Externe verbindingen zijn niet nodig.</p>
 </section>
 </main>
 <script>

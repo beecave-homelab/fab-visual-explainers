@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FAB Applicatielandschap</title>
-<style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FAB Applicatielandschap</title>
+    <style>
   :root {
     --paper: #f5f8f8;
     --panel: #edf2f3;
@@ -747,112 +747,163 @@
     .route-line { opacity: .85 !important; }
     .app-node { opacity: 1 !important; }
   }
-</style>
-</head>
-<body>
-<div class="shell">
-  <header>
-    <div class="title-wrap">
-      <div class="title-mark" aria-hidden="true"></div>
-      <div>
-        <h1>Applicatielandschap</h1>
-        <p class="subtitle">Klik een applicatie aan en zie direct welke gegevensstromen, processen en afhankelijkheden ermee samenhangen.</p>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="ghost-btn" id="resetBtn" type="button">Reset selectie</button>
-      <button class="ghost-btn" id="aboutBtn" type="button" aria-controls="aboutDrawer" aria-expanded="false">Ontwerpkeuzes</button>
-    </div>
-  </header>
-
-  <main class="workspace">
-    <aside class="left-rail" aria-label="Filters en legenda">
-      <div class="left-top">
-        <div>
-          <h2 class="section-title">Vind een applicatie</h2>
-          <div class="search-wrap">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg>
-            <input class="search" id="searchInput" type="search" placeholder="Zoek op naam of functie" autocomplete="off" />
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="title-wrap">
+          <div class="title-mark" aria-hidden="true"></div>
+          <div>
+            <h1>Applicatielandschap</h1>
+            <p class="subtitle">Klik een applicatie aan en zie direct welke gegevensstromen, processen en afhankelijkheden ermee samenhangen.</p>
           </div>
         </div>
-      </div>
-
-      <div>
-        <h2 class="section-title">Gegevensstromen</h2>
-        <p class="section-copy">Zet lijnen aan of uit om één type afhankelijkheid apart te bekijken.</p>
-      </div>
-      <div class="layers" aria-label="Gegevensstromen tonen of verbergen">
-        <button class="layer-btn" type="button" data-route="identity" aria-pressed="true" style="--route-color: var(--violet)">
-          <span class="layer-label"><span class="route-dot"></span>Identiteit & toegang</span><span class="count">3</span>
-        </button>
-        <button class="layer-btn" type="button" data-route="client" aria-pressed="true" style="--route-color: var(--teal)">
-          <span class="layer-label"><span class="route-dot"></span>Cliëntgegevens</span><span class="count">5</span>
-        </button>
-        <button class="layer-btn" type="button" data-route="operation" aria-pressed="true" style="--route-color: var(--blue)">
-          <span class="layer-label"><span class="route-dot"></span>Operationele planning</span><span class="count">4</span>
-        </button>
-        <button class="layer-btn" type="button" data-route="reporting" aria-pressed="true" style="--route-color: var(--amber)">
-          <span class="layer-label"><span class="route-dot"></span>Rapportage & sturing</span><span class="count">4</span>
-        </button>
-      </div>
-
-      <div class="key">
-        <h2 class="section-title">Type systeem</h2>
-        <div class="legend-row"><span class="legend-shape core"></span>Kernapplicatie</div>
-        <div class="legend-row"><span class="legend-shape support"></span>Ondersteunend systeem</div>
-        <div class="legend-row"><span class="legend-shape external"></span>Extern / portaal</div>
-        <p class="section-copy" style="margin-top:12px">Voorbeeldlandschap voor een zorgorganisatie. Namen en relaties zijn fictief maar realistisch opgezet.</p>
-      </div>
-    </aside>
-
-    <section class="map-zone" aria-label="Interactief applicatielandschap">
-      <div class="map-toolbar">
-        <div class="context-chip" id="contextChip"><strong>Geen selectie</strong><span>Klik een systeem om relaties te volgen</span></div>
-        <div class="impact-toggle" aria-label="Impactdiepte">
-          <button class="impact-btn" type="button" data-impact="direct" aria-pressed="true">Direct</button>
-          <button class="impact-btn" type="button" data-impact="chain" aria-pressed="false">Hele keten</button>
+        <div class="header-actions">
+          <button class="ghost-btn" id="resetBtn" type="button">Reset selectie</button>
+          <button class="ghost-btn"
+                  id="aboutBtn"
+                  type="button"
+                  aria-controls="aboutDrawer"
+                  aria-expanded="false">Ontwerpkeuzes</button>
         </div>
-      </div>
-      <div class="map-scroll">
-        <svg id="landscape" viewBox="0 0 1000 650" role="img" aria-label="Netwerkkaart van applicaties en gegevensstromen">
-          <g id="staticFallback" aria-hidden="true">
-            <path d="M283 144 C330 140 330 138 365 137" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <path d="M470 179 C470 225 470 245 470 285" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <path d="M580 333 C630 305 650 250 690 200" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <path d="M580 335 C630 335 650 350 690 357" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <path d="M470 381 C470 425 455 455 440 485" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <path d="M340 527 C300 520 260 515 275 512" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68"/>
-            <g transform="translate(105 105)"><rect width="178" height="78" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">HRM</text><text x="14" y="49" font-size="18" font-weight="700" fill="#172228">HR &amp; salaris</text><text x="14" y="66" font-size="11" fill="#64747d">Medewerkerbron</text></g>
-            <g transform="translate(365 95)"><rect width="195" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">IAM</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Identiteit &amp; toegang</text><text x="14" y="72" font-size="11" fill="#64747d">Provisioning &amp; SSO</text></g>
-            <g transform="translate(360 285)"><rect width="220" height="96" rx="14" fill="white" stroke="#203039" stroke-width="4.5"/><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228"/><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">ECD</text><text x="14" y="67" font-size="18" font-weight="700" fill="#172228">Cliëntdossier</text><text x="14" y="84" font-size="11" fill="#64747d">Zorgregistratie</text></g>
-            <g transform="translate(690 140)"><rect width="190" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="49" height="20" rx="10" fill="#172228"/><text x="37.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">PLAN</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Zorgplanning</text><text x="14" y="72" font-size="11" fill="#64747d">Roosters &amp; routes</text></g>
-            <g transform="translate(690 315)"><rect width="190" height="84" rx="22" fill="white" stroke="#203039" stroke-width="2.3" stroke-dasharray="5 4"/><rect x="13" y="12" width="42" height="20" rx="10" fill="#172228"/><text x="34" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">MED</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Medicatie</text><text x="14" y="72" font-size="11" fill="#64747d">Toedienregistratie</text></g>
-            <g transform="translate(340 485)"><rect width="200" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="44" height="20" rx="10" fill="#172228"/><text x="35" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">DWH</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Datawarehouse</text><text x="14" y="72" font-size="11" fill="#64747d">Gegevensverzameling</text></g>
-            <g transform="translate(85 470)"><rect width="190" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3"/><rect x="13" y="12" width="38" height="20" rx="10" fill="#172228"/><text x="32" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">BI</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Managementinformatie</text><text x="14" y="72" font-size="11" fill="#64747d">Dashboards &amp; KPI’s</text></g>
-            <text x="500" y="625" text-anchor="middle" font-size="11" fill="#64747d">Statische basisweergave. Interactie wordt automatisch geactiveerd wanneer JavaScript beschikbaar is.</text>
-          </g>
-        </svg>
-      </div>
-    </section>
-
-    <aside class="right-rail" aria-live="polite" aria-label="Details van geselecteerde applicatie">
-      <div class="right-rail-inner" id="detailPanel"></div>
-    </aside>
-  </main>
-</div>
-
-<div class="about-drawer" id="aboutDrawer" aria-hidden="true">
-  <div class="about-backdrop" id="aboutBackdrop"></div>
-  <section class="about-panel" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
-    <button class="ghost-btn close" id="aboutClose" type="button" aria-label="Sluit ontwerpkeuzes">Sluiten</button>
-    <h2 id="aboutTitle">Waarom dit ontwerp zo werkt</h2>
-    <p>Deze one-pager behandelt een applicatielandschap als een vervoerskaart: applicaties zijn haltes en gekleurde lijnen zijn betekenisvolle gegevensstromen. Daardoor zie je eerst het geheel en kun je daarna één systeem aanklikken om directe of ketenbrede afhankelijkheden te isoleren, zonder door een lange inventaris te hoeven scrollen.</p>
-    <p>De visuele nadruk ligt bewust op de relatiekaart, niet op KPI-kaarten. Filters laten één soort gegevensstroom tegelijk zien; de detailkolom vertaalt de gekozen applicatie vervolgens naar FAB-informatie zoals eigenaar, kritikaliteit, beheerpunten, gekoppelde systemen en mogelijke impact van een wijziging.</p>
-    <div class="about-meta">Demo-inhoud. Ontworpen als generiek patroon voor functioneel applicatiebeheer; alle CSS, JavaScript en voorbeelddata staan in dit ene HTML-bestand.</div>
-  </section>
-</div>
-
-<script>
+      </header>
+      <main class="workspace">
+        <aside class="left-rail" aria-label="Filters en legenda">
+          <div class="left-top">
+            <div>
+              <h2 class="section-title">Vind een applicatie</h2>
+              <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <path d="m20 20-3.4-3.4"></path>
+                </svg>
+                <input class="search"
+                       id="searchInput"
+                       type="search"
+                       placeholder="Zoek op naam of functie"
+                       autocomplete="off" />
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2 class="section-title">Gegevensstromen</h2>
+            <p class="section-copy">Zet lijnen aan of uit om één type afhankelijkheid apart te bekijken.</p>
+          </div>
+          <div class="layers" aria-label="Gegevensstromen tonen of verbergen">
+            <button class="layer-btn"
+                    type="button"
+                    data-route="identity"
+                    aria-pressed="true"
+                    style="--route-color: var(--violet)">
+              <span class="layer-label"><span class="route-dot"></span>Identiteit & toegang</span><span class="count">3</span>
+            </button>
+            <button class="layer-btn"
+                    type="button"
+                    data-route="client"
+                    aria-pressed="true"
+                    style="--route-color: var(--teal)">
+              <span class="layer-label"><span class="route-dot"></span>Cliëntgegevens</span><span class="count">5</span>
+            </button>
+            <button class="layer-btn"
+                    type="button"
+                    data-route="operation"
+                    aria-pressed="true"
+                    style="--route-color: var(--blue)">
+              <span class="layer-label"><span class="route-dot"></span>Operationele planning</span><span class="count">4</span>
+            </button>
+            <button class="layer-btn"
+                    type="button"
+                    data-route="reporting"
+                    aria-pressed="true"
+                    style="--route-color: var(--amber)">
+              <span class="layer-label"><span class="route-dot"></span>Rapportage & sturing</span><span class="count">4</span>
+            </button>
+          </div>
+          <div class="key">
+            <h2 class="section-title">Type systeem</h2>
+            <div class="legend-row"><span class="legend-shape core"></span>Kernapplicatie</div>
+            <div class="legend-row"><span class="legend-shape support"></span>Ondersteunend systeem</div>
+            <div class="legend-row"><span class="legend-shape external"></span>Extern / portaal</div>
+            <p class="section-copy" style="margin-top:12px">Voorbeeldlandschap voor een zorgorganisatie. Namen en relaties zijn fictief maar realistisch opgezet.</p>
+          </div>
+        </aside>
+        <section class="map-zone" aria-label="Interactief applicatielandschap">
+          <div class="map-toolbar">
+            <div class="context-chip" id="contextChip"><strong>Geen selectie</strong><span>Klik een systeem om relaties te volgen</span></div>
+            <div class="impact-toggle" aria-label="Impactdiepte">
+              <button class="impact-btn"
+                      type="button"
+                      data-impact="direct"
+                      aria-pressed="true">Direct</button>
+              <button class="impact-btn"
+                      type="button"
+                      data-impact="chain"
+                      aria-pressed="false">Hele keten</button>
+            </div>
+          </div>
+          <div class="map-scroll">
+            <svg id="landscape"
+                 viewBox="0 0 1000 650"
+                 role="img"
+                 aria-label="Netwerkkaart van applicaties en gegevensstromen">
+              <g id="staticFallback" aria-hidden="true">
+              <path d="M283 144 C330 140 330 138 365 137" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <path d="M470 179 C470 225 470 245 470 285" fill="none" stroke="#7656a8" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <path d="M580 333 C630 305 650 250 690 200" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <path d="M580 335 C630 335 650 350 690 357" fill="none" stroke="#087d78" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <path d="M470 381 C470 425 455 455 440 485" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <path d="M340 527 C300 520 260 515 275 512" fill="none" stroke="#b47112" stroke-width="7" stroke-linecap="round" opacity=".68" />
+              <g transform="translate(105 105)">
+              <rect width="178" height="78" rx="7" fill="white" stroke="#203039" stroke-width="2.3" /><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228" /><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">HRM</text><text x="14" y="49" font-size="18" font-weight="700" fill="#172228">HR &amp; salaris</text><text x="14" y="66" font-size="11" fill="#64747d">Medewerkerbron</text>
+              </g>
+              <g transform="translate(365 95)">
+              <rect width="195" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3" /><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228" /><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">IAM</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Identiteit &amp; toegang</text><text x="14" y="72" font-size="11" fill="#64747d">Provisioning &amp; SSO</text>
+              </g>
+              <g transform="translate(360 285)">
+              <rect width="220" height="96" rx="14" fill="white" stroke="#203039" stroke-width="4.5" /><rect x="13" y="12" width="45" height="20" rx="10" fill="#172228" /><text x="35.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">ECD</text><text x="14" y="67" font-size="18" font-weight="700" fill="#172228">Cliëntdossier</text><text x="14" y="84" font-size="11" fill="#64747d">Zorgregistratie</text>
+              </g>
+              <g transform="translate(690 140)">
+              <rect width="190" height="84" rx="14" fill="white" stroke="#203039" stroke-width="2.3" /><rect x="13" y="12" width="49" height="20" rx="10" fill="#172228" /><text x="37.5" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">PLAN</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Zorgplanning</text><text x="14" y="72" font-size="11" fill="#64747d">Roosters &amp; routes</text>
+              </g>
+              <g transform="translate(690 315)">
+              <rect width="190" height="84" rx="22" fill="white" stroke="#203039" stroke-width="2.3" stroke-dasharray="5 4" /><rect x="13" y="12" width="42" height="20" rx="10" fill="#172228" /><text x="34" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">MED</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Medicatie</text><text x="14" y="72" font-size="11" fill="#64747d">Toedienregistratie</text>
+              </g>
+              <g transform="translate(340 485)">
+              <rect width="200" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3" /><rect x="13" y="12" width="44" height="20" rx="10" fill="#172228" /><text x="35" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">DWH</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Datawarehouse</text><text x="14" y="72" font-size="11" fill="#64747d">Gegevensverzameling</text>
+              </g>
+              <g transform="translate(85 470)">
+              <rect width="190" height="84" rx="7" fill="white" stroke="#203039" stroke-width="2.3" /><rect x="13" y="12" width="38" height="20" rx="10" fill="#172228" /><text x="32" y="26" text-anchor="middle" font-size="10" font-weight="700" fill="white">BI</text><text x="14" y="55" font-size="18" font-weight="700" fill="#172228">Managementinformatie</text><text x="14" y="72" font-size="11" fill="#64747d">Dashboards &amp; KPI’s</text>
+              </g>
+              <text x="500" y="625" text-anchor="middle" font-size="11" fill="#64747d">Statische basisweergave. Interactie wordt automatisch geactiveerd wanneer JavaScript beschikbaar is.</text>
+              </g>
+            </svg>
+          </div>
+        </section>
+        <aside class="right-rail"
+               aria-live="polite"
+               aria-label="Details van geselecteerde applicatie">
+          <div class="right-rail-inner" id="detailPanel"></div>
+        </aside>
+      </main>
+    </div>
+    <div class="about-drawer" id="aboutDrawer" aria-hidden="true">
+      <div class="about-backdrop" id="aboutBackdrop"></div>
+      <section class="about-panel"
+               role="dialog"
+               aria-modal="true"
+               aria-labelledby="aboutTitle">
+        <button class="ghost-btn close"
+                id="aboutClose"
+                type="button"
+                aria-label="Sluit ontwerpkeuzes">Sluiten</button>
+        <h2 id="aboutTitle">Waarom dit ontwerp zo werkt</h2>
+        <p>Deze one-pager behandelt een applicatielandschap als een vervoerskaart: applicaties zijn haltes en gekleurde lijnen zijn betekenisvolle gegevensstromen. Daardoor zie je eerst het geheel en kun je daarna één systeem aanklikken om directe of ketenbrede afhankelijkheden te isoleren, zonder door een lange inventaris te hoeven scrollen.</p>
+        <p>De visuele nadruk ligt bewust op de relatiekaart, niet op KPI-kaarten. Filters laten één soort gegevensstroom tegelijk zien; de detailkolom vertaalt de gekozen applicatie vervolgens naar FAB-informatie zoals eigenaar, kritikaliteit, beheerpunten, gekoppelde systemen en mogelijke impact van een wijziging.</p>
+        <div class="about-meta">Demo-inhoud. Ontworpen als generiek patroon voor functioneel applicatiebeheer; alle CSS, JavaScript en voorbeelddata staan in dit ene HTML-bestand.</div>
+      </section>
+    </div>
+    <script>
 (() => {
   const apps = {
     hrm: {
@@ -1284,14 +1335,24 @@
     contextChip.innerHTML = '<strong>Basisweergave actief</strong><span>De interactieve laag kon niet worden geladen</span>';
   }
 })();
-</script>
-<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke processen en systemen raakt een wijziging of uitval?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren, ICT en leveranciers bij impactanalyse en overdracht. <strong>Uitkomst:</strong> geraakte processen, afhankelijkheden, controlepunten en verantwoordelijke rollen in het bestaande dossier. Behouden als basisconcept; geen live storingsmonitor.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetisch applicatie- en afhankelijkhedenmodel, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen. Een beheerde proces-/applicatieregistratie (bijvoorbeeld Saar) moet de bron zijn. FAB onderhoudt functionele afspraken; proceseigenaren bepalen zorgimpact, ICT/leverancier de technische uitvoering en de bevoegde beslisser accepteert risico. Geldigheid: demonstratie, niet lokaal gevalideerd.</p>
-  <nav aria-label="Landschapsviews"><a href="fab-proces-applicatie-map.html">Proces en registraties</a> · <a href="fab-ketenkaart.html">Ketencontroles</a> · <a href="fab-autorisatielandschap.html">Toegang</a> · <a href="incident-onepager.html#continuity">Incident en continuïteit</a></nav>
-  <p>De statussen zijn fictieve aandachtssignalen, geen uitgevoerde controles. Leg bij echte controles bron, versie, peildatum, beoordelaar en uitkomst vast. Onderscheid hinder, zorguitval, privacy en financiële gevolgen; gebruik bij zorguitval het goedgekeurde lokale noodplan. Externe platformen vallen niet vanzelf onder FAB-beheer.</p>
-  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie eerst aanwijzen; herzie bij wijziging van proces, applicatie of koppeling. Bewaar acties in de afgesproken registratie, geen tweede administratie. Deel alleen synthetische informatie; ook systeem- en contactoverzichten kunnen vertrouwelijk zijn. Vergelijk met de bestaande inventaris op juiste afhankelijkheden en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke processen en systemen raakt een wijziging of uitval?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren, ICT en leveranciers bij impactanalyse en overdracht. <strong>Uitkomst:</strong> geraakte processen, afhankelijkheden, controlepunten en verantwoordelijke rollen in het bestaande dossier. Behouden als basisconcept; geen live storingsmonitor.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetisch applicatie- en afhankelijkhedenmodel, demo v3, revisie 2026-10-01. Echte bronhouder nog niet aangewezen. Een beheerde proces-/applicatieregistratie (bijvoorbeeld Saar) moet de bron zijn. FAB onderhoudt functionele afspraken; proceseigenaren bepalen zorgimpact, ICT/leverancier de technische uitvoering en de bevoegde beslisser accepteert risico. Geldigheid: demonstratie, niet lokaal gevalideerd.</p>
+      <nav aria-label="Landschapsviews">
+        <a href="fab-proces-applicatie-map.html">Proces en registraties</a> · <a href="fab-ketenkaart.html">Ketencontroles</a> · <a href="fab-autorisatielandschap.html">Toegang</a> · <a href="incident-onepager.html#continuity">Incident en continuïteit</a>
+      </nav>
+      <p>De statussen zijn fictieve aandachtssignalen, geen uitgevoerde controles. Leg bij echte controles bron, versie, peildatum, beoordelaar en uitkomst vast. Onderscheid hinder, zorguitval, privacy en financiële gevolgen; gebruik bij zorguitval het goedgekeurde lokale noodplan. Externe platformen vallen niet vanzelf onder FAB-beheer.</p>
+      <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete vervolgactie eerst aanwijzen; herzie bij wijziging van proces, applicatie of koppeling. Bewaar acties in de afgesproken registratie, geen tweede administratie. Deel alleen synthetische informatie; ook systeem- en contactoverzichten kunnen vertrouwelijk zijn. Vergelijk met de bestaande inventaris op juiste afhankelijkheden en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>

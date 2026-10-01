@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light" />
-  <title>Bronkaart — interactieve one-pager</title>
-  <style>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Bronkaart — interactieve one-pager</title>
+    <style>
     :root {
       --paper: #f6f8fc;
       --surface: #ffffff;
@@ -525,82 +525,93 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
-  </style>
-</head>
-<body>
-<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke bronpassages hebben gevolgen voor mijn beheer?</h2>
-  <p><strong>Fictieve bron:</strong> de evaluatie, citaten, effecten, cijfers en eventuele pilotclaims hieronder zijn verzonnen. Ze tonen het presentatiepatroon, geen onderzoek of bewezen gebruikerswaarde.</p>
-  <p><strong>Gebruiker en moment:</strong> FAB bij beoordeling van leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare bronpassage → lokale gevolgen → actie → eigenaar in het bestaande dossier. Gericht bronpatroon, geen zelfstandige dagelijkse beheertool. Vergelijk met <a href="bron-scanner.html">BronScanner</a> of een gewone inhoudsopgave op dezelfde bron.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische bronthema’s, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Broneigenaar bewaakt versie en geldigheid, FAB lokale beheerimpact, bevoegde deskundigen zorg- en beleidsinhoud. Geldigheid: presentatieprototype, geen lokaal gevalideerde instructie.</p>
-  <p><strong>Vervolg en onderhoud:</strong> eerst actuele bron, controleerbare verwijzingen, eigenaar en vervolgactie vaststellen. Herzie bij bronwijziging; leg versie, datum, beoordelaar en uitkomst in de bestaande registratie vast, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk op juistheid, zoektijd en onderhoudslast; technische werking is geen gebruikersvalidatie.</p>
-</section>
-  <main class="page">
-    <header class="intro">
-      <div>
-        <p class="eyebrow">Interactieve bronverkenner</p>
-        <h1>Zie eerst het geheel. Zoom daarna pas in.</h1>
-        <p class="intro-copy">Een one-pager voor grote informatiebronnen: scan de kern, ontdek verbanden en open alleen de onderbouwing die je nodig hebt.</p>
-      </div>
-      <div class="source-meta" aria-label="Voorbeeldbron">
-        <strong>Demo: Evaluatie digitale dienstverlening 2026</strong>
-        <span>Voorbeeldinhoud · 82 pagina’s · 5 hoofdthema’s · 14 bronverwijzingen</span>
-      </div>
-    </header>
-
-    <div class="toolbar" role="search">
-      <label class="search-wrap">
-        <span style="position:absolute;left:-9999px">Zoek in thema’s</span>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <input id="sourceSearch" type="search" placeholder="Zoek bijvoorbeeld op risico, bewijs of impact" autocomplete="off" />
-      </label>
-      <button class="tool-button" id="resetButton" type="button">Herstel overzicht</button>
-    </div>
-
-    <section class="workspace" aria-label="Bronverkenner">
-      <aside class="pane scan-pane">
-        <h2>Kern in vijf klikken</h2>
-        <p class="pane-intro">Begin hier. Elk punt opent dezelfde verdieping rechts.</p>
-        <div class="scan-list" id="scanList"></div>
-        <div class="empty" id="emptyState">Geen thema’s gevonden. Probeer een ander woord.</div>
-      </aside>
-
-      <section class="pane map-pane">
-        <h2>Hoe de informatie samenhangt</h2>
-        <p class="pane-intro">De kaart maakt zichtbaar wat context, bewijs, effect of onzekerheid is.</p>
-        <div class="topic-map" id="topicMap" aria-label="Interactieve themakaart">
-          <div class="map-center" aria-hidden="true">
-            <strong>De bron</strong>
-            <span>één verhaal, meerdere lagen</span>
-          </div>
-        </div>
-        <div class="legend" aria-label="Legenda">
-          <span class="selected"><i></i>geselecteerd</span>
-          <span class="supported"><i></i>onderbouwd</span>
-          <span class="uncertain"><i></i>onzekerheid</span>
-        </div>
-      </section>
-
-      <article class="pane detail-pane" aria-live="polite">
-        <span class="detail-badge" id="detailKind">Kernbevinding</span>
-        <h2 id="detailTitle">Gebruik stijgt, maar de winst is ongelijk verdeeld</h2>
-        <p id="detailSummary"></p>
-        <ul class="detail-list" id="detailList"></ul>
-        <div class="detail-actions">
-          <button class="primary-action" id="sourceButton" type="button" aria-expanded="false">Toon bronfragment</button>
-          <button class="secondary-action" id="nextButton" type="button">Volgend thema</button>
-        </div>
-        <div class="source-fragment" id="sourceFragment"></div>
-      </article>
+    </style>
+  </head>
+  <body>
+    <section class="review-context"
+             aria-label="Beheerkaart en bronstatus"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke bronpassages hebben gevolgen voor mijn beheer?</h2>
+      <p><strong>Fictieve bron:</strong> de evaluatie, citaten, effecten, cijfers en eventuele pilotclaims hieronder zijn verzonnen. Ze tonen het presentatiepatroon, geen onderzoek of bewezen gebruikerswaarde.</p>
+      <p><strong>Gebruiker en moment:</strong> FAB bij beoordeling van leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare bronpassage → lokale gevolgen → actie → eigenaar in het bestaande dossier. Gericht bronpatroon, geen zelfstandige dagelijkse beheertool. Vergelijk met <a href="bron-scanner.html">BronScanner</a> of een gewone inhoudsopgave op dezelfde bron.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische bronthema’s, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. Broneigenaar bewaakt versie en geldigheid, FAB lokale beheerimpact, bevoegde deskundigen zorg- en beleidsinhoud. Geldigheid: presentatieprototype, geen lokaal gevalideerde instructie.</p>
+      <p><strong>Vervolg en onderhoud:</strong> eerst actuele bron, controleerbare verwijzingen, eigenaar en vervolgactie vaststellen. Herzie bij bronwijziging; leg versie, datum, beoordelaar en uitkomst in de bestaande registratie vast, geen tweede administratie. Ontbrekend bewijs is onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk op juistheid, zoektijd en onderhoudslast; technische werking is geen gebruikersvalidatie.</p>
     </section>
-
-    <div class="footnote">
-      <span>Ontworpen voor snelle oriëntatie zonder lange leesroute.</span>
-      <span>Demo-inhoud is fictief; de interactie is het concept.</span>
-    </div>
-  </main>
-
-  <script>
+    <main class="page">
+      <header class="intro">
+        <div>
+          <p class="eyebrow">Interactieve bronverkenner</p>
+          <h1>Zie eerst het geheel. Zoom daarna pas in.</h1>
+          <p class="intro-copy">Een one-pager voor grote informatiebronnen: scan de kern, ontdek verbanden en open alleen de onderbouwing die je nodig hebt.</p>
+        </div>
+        <div class="source-meta" aria-label="Voorbeeldbron">
+          <strong>Demo: Evaluatie digitale dienstverlening 2026</strong>
+          <span>Voorbeeldinhoud · 82 pagina’s · 5 hoofdthema’s · 14 bronverwijzingen</span>
+        </div>
+      </header>
+      <div class="toolbar" role="search">
+        <label class="search-wrap">
+          <span style="position:absolute;left:-9999px">Zoek in thema’s</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          <input id="sourceSearch"
+                 type="search"
+                 placeholder="Zoek bijvoorbeeld op risico, bewijs of impact"
+                 autocomplete="off" />
+        </label>
+        <button class="tool-button" id="resetButton" type="button">Herstel overzicht</button>
+      </div>
+      <section class="workspace" aria-label="Bronverkenner">
+        <aside class="pane scan-pane">
+          <h2>Kern in vijf klikken</h2>
+          <p class="pane-intro">Begin hier. Elk punt opent dezelfde verdieping rechts.</p>
+          <div class="scan-list" id="scanList"></div>
+          <div class="empty" id="emptyState">Geen thema’s gevonden. Probeer een ander woord.</div>
+        </aside>
+        <section class="pane map-pane">
+          <h2>Hoe de informatie samenhangt</h2>
+          <p class="pane-intro">De kaart maakt zichtbaar wat context, bewijs, effect of onzekerheid is.</p>
+          <div class="topic-map" id="topicMap" aria-label="Interactieve themakaart">
+            <div class="map-center" aria-hidden="true">
+              <strong>De bron</strong>
+              <span>één verhaal, meerdere lagen</span>
+            </div>
+          </div>
+          <div class="legend" aria-label="Legenda">
+            <span class="selected"><i></i>geselecteerd</span>
+            <span class="supported"><i></i>onderbouwd</span>
+            <span class="uncertain"><i></i>onzekerheid</span>
+          </div>
+        </section>
+        <article class="pane detail-pane" aria-live="polite">
+          <span class="detail-badge" id="detailKind">Kernbevinding</span>
+          <h2 id="detailTitle">Gebruik stijgt, maar de winst is ongelijk verdeeld</h2>
+          <p id="detailSummary"></p>
+          <ul class="detail-list" id="detailList">
+          </ul>
+          <div class="detail-actions">
+            <button class="primary-action"
+                    id="sourceButton"
+                    type="button"
+                    aria-expanded="false">Toon bronfragment</button>
+            <button class="secondary-action" id="nextButton" type="button">Volgend thema</button>
+          </div>
+          <div class="source-fragment" id="sourceFragment"></div>
+        </article>
+      </section>
+      <div class="footnote">
+        <span>Ontworpen voor snelle oriëntatie zonder lange leesroute.</span>
+        <span>Demo-inhoud is fictief; de interactie is het concept.</span>
+      </div>
+    </main>
+    <script>
     const topics = [
       {
         id: 'context',
@@ -788,6 +799,6 @@
 
     renderNavigation();
     selectTopic(selectedId, false);
-  </script>
-</body>
+    </script>
+  </body>
 </html>

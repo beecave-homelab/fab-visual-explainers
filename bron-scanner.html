@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BronScanner</title>
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>BronScanner</title>
+    <style>
 :root{
   --paper:#f6f7f3;
   --ink:#141714;
@@ -344,116 +344,127 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
 @media(prefers-reduced-motion:no-preference){
   .strip,.step{transition:background-color .15s ease,color .15s ease}
 }
-</style>
-</head>
-<body>
-<section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Waar staat de relevante onderbouwing in een omvangrijke bron?</h2>
-  <p><strong>Fictieve bron:</strong> alle secties, citaten, percentages en bewijsscores hieronder zijn verzonnen. Informatiedichtheid en betrouwbaarheid zijn handgekozen demonstratiewaarden zonder meetmethode, steekproef of gekalibreerde schaal; geen gemeten betrouwbaarheid of aangetoonde tijdwinst. Gebruik zulke scores niet voor een echt besluit zonder uitgelegde, controleerbare grondslag.</p>
-  <p><strong>Gebruiker en moment:</strong> FAB bij gerichte oriëntatie in omvangrijke leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare passage → lokaal gevolg → actie → eigenaar in het bestaande dossier. Gericht bronpatroon; een inhoudsopgave kan genoeg zijn. Vergelijk met <a href="bronkaart-onepager.html">Bronkaart</a> op dezelfde bron.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetisch bronmodel, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De broneigenaar bewaakt publicatie, versie en geldigheid; FAB beoordeelt lokale beheerimpact; bevoegde deskundigen beoordelen zorg-, privacy- of beleidsgevolgen. Geldigheid: presentatieprototype, geen FAB-werkinstructie of lokaal gevalideerde bron.</p>
-  <p><strong>Vervolg en onderhoud:</strong> selecteer alleen met actuele bron, controleerbare verwijzingen, eigenaar en concrete vervolgactie. Herzie bij bronwijziging; leg echte bronversie, datum, beoordelaar en uitkomst vast in de bestaande registratie, geen tweede administratie. Ontbrekend bewijs blijft onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk met de inhoudsopgave op juistheid, zoektijd en onderhoudslast; gebruikerswaarde is nog niet bewezen.</p>
-</section>
-<main class="shell" id="app">
-  <header class="topbar">
-    <div>
-      <div class="brandline">
-        <div class="mark" aria-hidden="true"></div>
+    </style>
+  </head>
+  <body>
+    <section class="review-context"
+             aria-label="Beheerkaart en bronstatus"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Waar staat de relevante onderbouwing in een omvangrijke bron?</h2>
+      <p><strong>Fictieve bron:</strong> alle secties, citaten, percentages en bewijsscores hieronder zijn verzonnen. Informatiedichtheid en betrouwbaarheid zijn handgekozen demonstratiewaarden zonder meetmethode, steekproef of gekalibreerde schaal; geen gemeten betrouwbaarheid of aangetoonde tijdwinst. Gebruik zulke scores niet voor een echt besluit zonder uitgelegde, controleerbare grondslag.</p>
+      <p><strong>Gebruiker en moment:</strong> FAB bij gerichte oriëntatie in omvangrijke leveranciers- of beleidsdocumentatie. <strong>Uitkomst:</strong> controleerbare passage → lokaal gevolg → actie → eigenaar in het bestaande dossier. Gericht bronpatroon; een inhoudsopgave kan genoeg zijn. Vergelijk met <a href="bronkaart-onepager.html">Bronkaart</a> op dezelfde bron.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetisch bronmodel, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. De broneigenaar bewaakt publicatie, versie en geldigheid; FAB beoordeelt lokale beheerimpact; bevoegde deskundigen beoordelen zorg-, privacy- of beleidsgevolgen. Geldigheid: presentatieprototype, geen FAB-werkinstructie of lokaal gevalideerde bron.</p>
+      <p><strong>Vervolg en onderhoud:</strong> selecteer alleen met actuele bron, controleerbare verwijzingen, eigenaar en concrete vervolgactie. Herzie bij bronwijziging; leg echte bronversie, datum, beoordelaar en uitkomst vast in de bestaande registratie, geen tweede administratie. Ontbrekend bewijs blijft onbekend. Deel geen vertrouwelijke documenten, cliëntgegevens of volledige logs in HTML. Vergelijk met de inhoudsopgave op juistheid, zoektijd en onderhoudslast; gebruikerswaarde is nog niet bewezen.</p>
+    </section>
+    <main class="shell" id="app">
+      <header class="topbar">
         <div>
-          <h1>BronScanner</h1>
-          <p class="subtitle">Een grote bron teruggebracht tot een scanbare strook. Kies een sectie, zie direct de kern, de onderbouwing en waar de tekst onzeker of onvolledig is.</p>
+          <div class="brandline">
+            <div class="mark" aria-hidden="true"></div>
+            <div>
+              <h1>BronScanner</h1>
+              <p class="subtitle">Een grote bron teruggebracht tot een scanbare strook. Kies een sectie, zie direct de kern, de onderbouwing en waar de tekst onzeker of onvolledig is.</p>
+            </div>
+          </div>
+          <div class="stats" aria-label="Bronoverzicht">
+            <span class="stat"><strong>42</strong> pagina's</span>
+            <span class="stat"><strong>8</strong> hoofdsecties</span>
+            <span class="stat"><strong>31</strong> bronverwijzingen</span>
+            <span class="stat"><strong>6</strong> aandachtspunten</span>
+          </div>
         </div>
-      </div>
-      <div class="stats" aria-label="Bronoverzicht">
-        <span class="stat"><strong>42</strong> pagina's</span>
-        <span class="stat"><strong>8</strong> hoofdsecties</span>
-        <span class="stat"><strong>31</strong> bronverwijzingen</span>
-        <span class="stat"><strong>6</strong> aandachtspunten</span>
-      </div>
-    </div>
-    <label class="search-wrap">
-      <span class="toast">Zoek in onderwerpen</span>
-      <input id="search" type="search" placeholder="Zoek onderwerp of begrip…" autocomplete="off">
-    </label>
-  </header>
-
-  <section class="workspace">
-    <aside class="panel side-left">
-      <div class="panel-head">
-        <h2>Bron als strook</h2>
-        <p>Hoogte van de blauwe balk toont een handgekozen demo-index, geen gemeten informatiedichtheid.</p>
-      </div>
-      <nav class="map" id="map" aria-label="Secties"></nav>
-    </aside>
-
-    <article class="focus" aria-live="polite">
-      <div class="focus-top">
-        <div>
-          <div class="kicker" id="meta">Sectie 1 van 8</div>
-          <h2 id="title">Aanleiding en context</h2>
-        </div>
-        <div class="confidence">
-          <strong id="confidence">92/100</strong>
-          <span>fictieve demo-index; niet gemeten</span>
-        </div>
-      </div>
-      <div class="progress" id="progress" aria-hidden="true"></div>
-
-      <div class="focus-body">
-        <div class="story">
-          <p class="lead" id="summary"></p>
-          <h3>Wat moet je hiervan onthouden?</h3>
-          <ul id="takeaways"></ul>
-          <blockquote class="quote" id="quote"></blockquote>
-        </div>
-        <aside class="inspect">
-          <h3>Snelle inspectie</h3>
-          <div class="meter">
-            <div class="meter-row"><span>Onderbouwing</span><strong id="evidenceLabel">sterk</strong></div>
-            <div class="meter-track"><i id="evidenceMeter"></i></div>
+        <label class="search-wrap">
+          <span class="toast">Zoek in onderwerpen</span>
+          <input id="search"
+                 type="search"
+                 placeholder="Zoek onderwerp of begrip…"
+                 autocomplete="off">
+        </label>
+      </header>
+      <section class="workspace">
+        <aside class="panel side-left">
+          <div class="panel-head">
+            <h2>Bron als strook</h2>
+            <p>Hoogte van de blauwe balk toont een handgekozen demo-index, geen gemeten informatiedichtheid.</p>
           </div>
-          <div class="meter">
-            <div class="meter-row"><span>Impact</span><strong id="impactLabel">hoog</strong></div>
-            <div class="meter-track"><i id="impactMeter"></i></div>
-          </div>
-          <div class="signal">
-            <b>Waarom relevant</b>
-            <p id="why"></p>
-          </div>
-          <div class="signal">
-            <b>Let op</b>
-            <p id="caution"></p>
-          </div>
-          <div class="signal">
-            <b>Verwant</b>
-            <p id="related"></p>
-          </div>
+          <nav class="map" id="map" aria-label="Secties">
+          </nav>
         </aside>
-      </div>
-
-      <div class="focus-nav">
-        <button class="step" id="prev" type="button">Vorige sectie</button>
-        <button class="step primary" id="next" type="button">Volgende sectie</button>
-      </div>
-    </article>
-
-    <aside class="panel side-right">
-      <div class="panel-head">
-        <h2>Bewijsspoor</h2>
-        <p>De belangrijkste ondersteuning bij de geselecteerde sectie.</p>
-      </div>
-      <div class="evidence" id="evidence"></div>
-    </aside>
-  </section>
-
-  <section class="design-note">
-    <h2>Ontwerprichting</h2>
-    <p>Dit concept behandelt een bron als iets dat je scant, niet als iets dat je van boven naar beneden moet uitlezen. De verticale strook blijft het vaste oriëntatiepunt; één selectie vult het middenscherm met precies genoeg context om te besluiten of je verder wilt verdiepen.</p>
-    <p>De vormgeving is bewust technisch en functioneel: scherpe lijnen, minimale decoratie en één dominante interactiekleur. Informatiedichtheid, onderbouwing en impact worden visueel gecodeerd, zodat de structuur van de bron zelf onderdeel wordt van de interface. Alle inhoud hieronder is fictieve demo-inhoud.</p>
-  </section>
-</main>
-
-<script>
+        <article class="focus" aria-live="polite">
+          <div class="focus-top">
+            <div>
+              <div class="kicker" id="meta">Sectie 1 van 8</div>
+              <h2 id="title">Aanleiding en context</h2>
+            </div>
+            <div class="confidence">
+              <strong id="confidence">92/100</strong>
+              <span>fictieve demo-index; niet gemeten</span>
+            </div>
+          </div>
+          <div class="progress" id="progress" aria-hidden="true"></div>
+          <div class="focus-body">
+            <div class="story">
+              <p class="lead" id="summary"></p>
+              <h3>Wat moet je hiervan onthouden?</h3>
+              <ul id="takeaways">
+              </ul>
+              <blockquote class="quote" id="quote">
+              </blockquote>
+            </div>
+            <aside class="inspect">
+              <h3>Snelle inspectie</h3>
+              <div class="meter">
+                <div class="meter-row"><span>Onderbouwing</span><strong id="evidenceLabel">sterk</strong></div>
+                <div class="meter-track">
+                  <i id="evidenceMeter"></i>
+                </div>
+              </div>
+              <div class="meter">
+                <div class="meter-row"><span>Impact</span><strong id="impactLabel">hoog</strong></div>
+                <div class="meter-track">
+                  <i id="impactMeter"></i>
+                </div>
+              </div>
+              <div class="signal">
+                <b>Waarom relevant</b>
+                <p id="why"></p>
+              </div>
+              <div class="signal">
+                <b>Let op</b>
+                <p id="caution"></p>
+              </div>
+              <div class="signal">
+                <b>Verwant</b>
+                <p id="related"></p>
+              </div>
+            </aside>
+          </div>
+          <div class="focus-nav">
+            <button class="step" id="prev" type="button">Vorige sectie</button>
+            <button class="step primary" id="next" type="button">Volgende sectie</button>
+          </div>
+        </article>
+        <aside class="panel side-right">
+          <div class="panel-head">
+            <h2>Bewijsspoor</h2>
+            <p>De belangrijkste ondersteuning bij de geselecteerde sectie.</p>
+          </div>
+          <div class="evidence" id="evidence"></div>
+        </aside>
+      </section>
+      <section class="design-note">
+        <h2>Ontwerprichting</h2>
+        <p>Dit concept behandelt een bron als iets dat je scant, niet als iets dat je van boven naar beneden moet uitlezen. De verticale strook blijft het vaste oriëntatiepunt; één selectie vult het middenscherm met precies genoeg context om te besluiten of je verder wilt verdiepen.</p>
+        <p>De vormgeving is bewust technisch en functioneel: scherpe lijnen, minimale decoratie en één dominante interactiekleur. Informatiedichtheid, onderbouwing en impact worden visueel gecodeerd, zodat de structuur van de bron zelf onderdeel wordt van de interface. Alle inhoud hieronder is fictieve demo-inhoud.</p>
+      </section>
+    </main>
+    <script>
 (() => {
   const data = [
     {
@@ -667,6 +678,6 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
   renderMap();
   select(0);
 })();
-</script>
-</body>
+    </script>
+  </body>
 </html>

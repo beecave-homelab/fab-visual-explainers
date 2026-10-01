@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FAB Decision Canvas — hoe voeren we de teamindeling per wijk in?</title>
-<link rel="icon" href="data:,">
-<style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAB Decision Canvas — hoe voeren we de teamindeling per wijk in?</title>
+    <link rel="icon" href="data:,">
+    <style>
 :root {
   --paper: #f6f7f1;
   --surface: #ffffff;
@@ -228,91 +228,185 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 #gateEditor input, #gateEditor select { width: 100%; min-width: 0; max-width: 100%; padding: 8px; border: 1px solid var(--rule); color: var(--ink); background: var(--surface); }
 #gateEditor button { min-height: 40px; padding: 8px 12px; background: var(--accent-tint); border: 1px solid var(--accent); }
 @media print { #gateEditor form { display: none; } #gateEditor { padding: 8px; font-size: 10px; } }
-</style>
-</head>
-<body>
-<a class="skip" href="#inspector">Naar de besluitdetails</a>
-<main class="page">
-  <header class="mast">
-    <div class="hero">
-      <div class="hero-text">
-        <span class="hero-label">Besluitvraag voor de stuurgroep van 30 oktober</span>
-        <h1>Hoe voeren we de teamindeling per wijk in?</h1>
-        <p>Drie opties, vijf invalshoeken, vier wegingscriteria. Schuif de weging en zie wat de volgorde doet — het canvas is een hulpmiddel, geen besluit.</p>
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#inspector">Naar de besluitdetails</a>
+    <main class="page">
+      <header class="mast">
+        <div class="hero">
+          <div class="hero-text">
+            <span class="hero-label">Besluitvraag voor de stuurgroep van 30 oktober</span>
+            <h1>Hoe voeren we de teamindeling per wijk in?</h1>
+            <p>Drie opties, vijf invalshoeken, vier wegingscriteria. Schuif de weging en zie wat de volgorde doet — het canvas is een hulpmiddel, geen besluit.</p>
+          </div>
+          <div class="case">
+            <strong>Teamindeling per wijk in het ECD</strong>
+            <span>Release ECD 2026.4 · wijziging RFC-2026-118</span>
+            <span>Fictieve casus voor functioneel beheer</span>
+          </div>
+        </div>
+      </header>
+      <noscript>
+        <p class="nojs">JavaScript staat uit. Je ziet het hele canvas, maar de weging rekent niet mee en selectie werkt niet. Zet JavaScript aan voor de interactieve versie.</p>
+      </noscript>
+      <div class="toolbar" aria-label="Canvas verkennen">
+        <button type="button"
+                class="toggle"
+                id="uncToggle"
+                aria-pressed="true"
+                disabled>Toon onzekerheden</button>
+        <button type="button" class="quiet-button" id="resetButton" disabled>Herstel weging</button>
       </div>
-      <div class="case">
-        <strong>Teamindeling per wijk in het ECD</strong>
-        <span>Release ECD 2026.4 · wijziging RFC-2026-118</span>
-        <span>Fictieve casus voor functioneel beheer</span>
+      <section class="canvas-board" aria-labelledby="boardTitle">
+        <div class="board-head">
+          <h2 id="boardTitle">Drie opties naast elkaar</h2>
+          <p>Klik op een punt voor de onderbouwing, of op een optiekop voor het totaalplaatje.</p>
+        </div>
+        <div class="canvas-grid" id="canvasGrid"></div>
+        <div class="weging">
+          <div>
+            <h3>Weging</h3>
+            <p class="weging-note">Gewicht 0 telt niet mee; gewicht 5 telt vijfmaal zo zwaar als 1. Deelscores lopen van 1 (ongunstig) tot 5 (gunstig). Alleen opties met geaccepteerde harde voorwaarden krijgen een gewogen score; alle gewichten 0 geeft een gelijke stand.</p>
+            <div class="slider-row">
+              <label for="w-zorg">Zorgcontinuïteit</label><input type="range"
+       id="w-zorg"
+       data-weight="zorg"
+       min="0"
+       max="5"
+       step="1"
+       value="4"
+       disabled><output for="w-zorg">4</output>
+            </div>
+            <div class="slider-row">
+              <label for="w-beheer">Beheerlast</label><input type="range"
+       id="w-beheer"
+       data-weight="beheer"
+       min="0"
+       max="5"
+       step="1"
+       value="3"
+       disabled><output for="w-beheer">3</output>
+            </div>
+            <div class="slider-row">
+              <label for="w-data">Datakwaliteit rapportage</label><input type="range"
+       id="w-data"
+       data-weight="data"
+       min="0"
+       max="5"
+       step="1"
+       value="2"
+       disabled><output for="w-data">2</output>
+            </div>
+            <div class="slider-row">
+              <label for="w-tijd">Doorlooptijd</label><input type="range"
+       id="w-tijd"
+       data-weight="tijd"
+       min="0"
+       max="5"
+       step="1"
+       value="3"
+       disabled><output for="w-tijd">3</output>
+            </div>
+          </div>
+          <div class="score-table" aria-live="polite">
+            <h3>Gewogen score</h3>
+            <div id="scoreRows"></div>
+            <p class="weging-note" style="margin-top:10px">Harde veiligheids-, privacy- en uitvoeringsvoorwaarden zijn geen wegingsvoorkeur: ze bepalen eerst welke opties toelaatbaar zijn. Daarna helpt de score alleen bij het gesprek. Onbevestigde aannames blijven zichtbaar; de bevoegde rol neemt het formele besluit.</p>
+          </div>
+        </div>
+        <div class="board-foot">
+          <div class="legend" aria-label="Legenda"><span><span class="aanname-key">aanname</span>punt is niet bevestigd</span><span>Gestippelde rand: bevat onzekerheid</span></div>
+          <p id="pathText">Hele canvas zichtbaar</p>
+        </div>
+      </section>
+      <div class="canvas-summary" id="canvasSummary" role="status">
+        <strong id="summaryTitle">Geen optie toelaatbaar</strong>
+        <p id="summaryText">Harde voorwaarden voor veiligheid, privacy, uitvoerbaarheid en bewijs zijn niet geaccepteerd. Geen rangorde of voorkeuradvies zonder beoordeling.</p>
       </div>
-    </div>
-  </header>
-  <noscript><p class="nojs">JavaScript staat uit. Je ziet het hele canvas, maar de weging rekent niet mee en selectie werkt niet. Zet JavaScript aan voor de interactieve versie.</p></noscript>
-  <div class="toolbar" aria-label="Canvas verkennen">
-    <button type="button" class="toggle" id="uncToggle" aria-pressed="true" disabled>Toon onzekerheden</button>
-    <button type="button" class="quiet-button" id="resetButton" disabled>Herstel weging</button>
-  </div>
-  <section class="canvas-board" aria-labelledby="boardTitle">
-    <div class="board-head">
-      <h2 id="boardTitle">Drie opties naast elkaar</h2>
-      <p>Klik op een punt voor de onderbouwing, of op een optiekop voor het totaalplaatje.</p>
-    </div>
-    <div class="canvas-grid" id="canvasGrid"></div>
-    <div class="weging">
-      <div>
-        <h3>Weging</h3>
-        <p class="weging-note">Gewicht 0 telt niet mee; gewicht 5 telt vijfmaal zo zwaar als 1. Deelscores lopen van 1 (ongunstig) tot 5 (gunstig). Alleen opties met geaccepteerde harde voorwaarden krijgen een gewogen score; alle gewichten 0 geeft een gelijke stand.</p>
-        <div class="slider-row"><label for="w-zorg">Zorgcontinuïteit</label><input type="range" id="w-zorg" data-weight="zorg" min="0" max="5" step="1" value="4" disabled><output for="w-zorg">4</output></div>
-        <div class="slider-row"><label for="w-beheer">Beheerlast</label><input type="range" id="w-beheer" data-weight="beheer" min="0" max="5" step="1" value="3" disabled><output for="w-beheer">3</output></div>
-        <div class="slider-row"><label for="w-data">Datakwaliteit rapportage</label><input type="range" id="w-data" data-weight="data" min="0" max="5" step="1" value="2" disabled><output for="w-data">2</output></div>
-        <div class="slider-row"><label for="w-tijd">Doorlooptijd</label><input type="range" id="w-tijd" data-weight="tijd" min="0" max="5" step="1" value="3" disabled><output for="w-tijd">3</output></div>
-      </div>
-      <div class="score-table" aria-live="polite">
-        <h3>Gewogen score</h3>
-        <div id="scoreRows"></div>
-        <p class="weging-note" style="margin-top:10px">Harde veiligheids-, privacy- en uitvoeringsvoorwaarden zijn geen wegingsvoorkeur: ze bepalen eerst welke opties toelaatbaar zijn. Daarna helpt de score alleen bij het gesprek. Onbevestigde aannames blijven zichtbaar; de bevoegde rol neemt het formele besluit.</p>
-      </div>
-    </div>
-    <div class="board-foot">
-      <div class="legend" aria-label="Legenda"><span><span class="aanname-key">aanname</span>punt is niet bevestigd</span><span>Gestippelde rand: bevat onzekerheid</span></div>
-      <p id="pathText">Hele canvas zichtbaar</p>
-    </div>
-  </section>
-  <div class="canvas-summary" id="canvasSummary" role="status">
-    <strong id="summaryTitle">Geen optie toelaatbaar</strong>
-    <p id="summaryText">Harde voorwaarden voor veiligheid, privacy, uitvoerbaarheid en bewijs zijn niet geaccepteerd. Geen rangorde of voorkeuradvies zonder beoordeling.</p>
-  </div>
-  <p class="sr-only" id="selectionStatus" role="status"></p>
-  <a class="selection-jump" id="selectionJump" href="#inspector" hidden><span id="jumpText">Bekijk besluitdetails</span></a>
-  <section class="inspector" id="inspector" aria-labelledby="selectionTitle" tabindex="-1">
-    <div class="selection-head">
-      <span class="selection-kind" id="selectionKind">De besluitvraag</span>
-      <h2 id="selectionTitle">Drie tempo's, één systeem</h2>
-      <p id="selectionIntro">De wijziging zelf is al goedgekeurd (RFC-2026-118); dit besluit gaat over het tempo. Selecteer een punt voor de onderbouwing of een optiekop voor de samenvatting van die optie.</p>
-      <div class="owner"><span>Regie</span><strong id="selectionOwner">Wijzigingencoördinator &amp; FAB Zorg</strong></div>
-    </div>
-    <div>
-      <div class="detail-tabs" role="tablist" aria-label="Besluitdetails">
-        <button type="button" id="tab-ond" role="tab" data-tab="ond" aria-selected="true" aria-controls="panel-ond" tabindex="0" disabled>Onderbouwing</button>
-        <button type="button" id="tab-onz" role="tab" data-tab="onz" aria-selected="false" aria-controls="panel-onz" tabindex="-1" disabled>Onzekerheid</button>
-        <button type="button" id="tab-bron" role="tab" data-tab="bron" aria-selected="false" aria-controls="panel-bron" tabindex="-1" disabled>Bron</button>
-      </div>
-      <div class="detail-panel" id="panel-ond" role="tabpanel" aria-labelledby="tab-ond" tabindex="0"></div>
-      <div class="detail-panel" id="panel-onz" role="tabpanel" aria-labelledby="tab-onz" tabindex="0" hidden></div>
-      <div class="detail-panel" id="panel-bron" role="tabpanel" aria-labelledby="tab-bron" tabindex="0" hidden></div>
-      <div class="copy-row"><button type="button" class="copy-button" id="copyButton" disabled>Kopieer besluitnotitie</button><span id="copyStatus" role="status"></span></div>
-      <textarea id="copyFallback" aria-label="Besluitnotitie om handmatig te kopiëren" readonly hidden></textarea>
-    </div>
-  </section>
-  <details class="about">
-    <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
-    <p>Het canvas legt drie opties naast elkaar over vijf invalshoeken. Punten met een gestippelde rand en het label "aanname" zijn niet bevestigd; de toggle Toon onzekerheden laat zien hoeveel van het beeld op aannames rust.</p>
-    <p>De weging hieronder is een gespreksinstrument: de deelscores per optie zijn vast (fictief) ingeschat, alleen de weging is instelbaar. Een veranderende volgorde is geen antwoord maar een signaal om te bespreken waarom.</p>
-    <p>Deze casus gebruikt dezelfde voorbeeldreferentie als de Change Impact Map en de Go/No-Go Cockpit: RFC-2026-118, dezelfde datums en systemen. De gegevens staan afzonderlijk in ieder bestand; er is geen synchronisatie. Alle feiten, risico's en scores zijn fictief.</p>
-  </details>
-  <footer><span>FAB Decision Canvas — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span></footer>
-</main>
-<script>
+      <p class="sr-only" id="selectionStatus" role="status"></p>
+      <a class="selection-jump"
+         id="selectionJump"
+         href="#inspector"
+         hidden><span id="jumpText">Bekijk besluitdetails</span></a>
+      <section class="inspector"
+               id="inspector"
+               aria-labelledby="selectionTitle"
+               tabindex="-1">
+        <div class="selection-head">
+          <span class="selection-kind" id="selectionKind">De besluitvraag</span>
+          <h2 id="selectionTitle">Drie tempo's, één systeem</h2>
+          <p id="selectionIntro">De wijziging zelf is al goedgekeurd (RFC-2026-118); dit besluit gaat over het tempo. Selecteer een punt voor de onderbouwing of een optiekop voor de samenvatting van die optie.</p>
+          <div class="owner"><span>Regie</span><strong id="selectionOwner">Wijzigingencoördinator &amp; FAB Zorg</strong></div>
+        </div>
+        <div>
+          <div class="detail-tabs" role="tablist" aria-label="Besluitdetails">
+            <button type="button"
+                    id="tab-ond"
+                    role="tab"
+                    data-tab="ond"
+                    aria-selected="true"
+                    aria-controls="panel-ond"
+                    tabindex="0"
+                    disabled>Onderbouwing</button>
+            <button type="button"
+                    id="tab-onz"
+                    role="tab"
+                    data-tab="onz"
+                    aria-selected="false"
+                    aria-controls="panel-onz"
+                    tabindex="-1"
+                    disabled>Onzekerheid</button>
+            <button type="button"
+                    id="tab-bron"
+                    role="tab"
+                    data-tab="bron"
+                    aria-selected="false"
+                    aria-controls="panel-bron"
+                    tabindex="-1"
+                    disabled>Bron</button>
+          </div>
+          <div class="detail-panel"
+               id="panel-ond"
+               role="tabpanel"
+               aria-labelledby="tab-ond"
+               tabindex="0"></div>
+          <div class="detail-panel"
+               id="panel-onz"
+               role="tabpanel"
+               aria-labelledby="tab-onz"
+               tabindex="0"
+               hidden></div>
+          <div class="detail-panel"
+               id="panel-bron"
+               role="tabpanel"
+               aria-labelledby="tab-bron"
+               tabindex="0"
+               hidden></div>
+          <div class="copy-row">
+            <button type="button"
+                    class="copy-button"
+                    id="copyButton"
+                    disabled>Kopieer besluitnotitie</button>
+            <span id="copyStatus" role="status"></span>
+          </div>
+          <textarea id="copyFallback"
+                    aria-label="Besluitnotitie om handmatig te kopiëren"
+                    readonly
+                    hidden></textarea>
+        </div>
+      </section>
+      <details class="about">
+        <summary>Over dit ontwerp en de voorbeeldgegevens</summary>
+        <p>Het canvas legt drie opties naast elkaar over vijf invalshoeken. Punten met een gestippelde rand en het label "aanname" zijn niet bevestigd; de toggle Toon onzekerheden laat zien hoeveel van het beeld op aannames rust.</p>
+        <p>De weging hieronder is een gespreksinstrument: de deelscores per optie zijn vast (fictief) ingeschat, alleen de weging is instelbaar. Een veranderende volgorde is geen antwoord maar een signaal om te bespreken waarom.</p>
+        <p>Deze casus gebruikt dezelfde voorbeeldreferentie als de Change Impact Map en de Go/No-Go Cockpit: RFC-2026-118, dezelfde datums en systemen. De gegevens staan afzonderlijk in ieder bestand; er is geen synchronisatie. Alle feiten, risico's en scores zijn fictief.</p>
+      </details>
+      <footer>
+        <span>FAB Decision Canvas — zelfstandige HTML-demo</span><span>Fictieve gegevens. Geen live monitoring.</span>
+      </footer>
+    </main>
+    <script>
 (() => {
   const ASPECTS = ['Feiten', "Risico's", 'Afhankelijkheden', 'Inspanning & kosten', 'Gevolgen voor gebruikers'];
   const ASPECT_SUB = ['wat vaststaat', 'wat kan misgaan', 'waar het aan hangt', 'wat het kost', 'wie het merkt'];
@@ -623,14 +717,24 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   document.querySelectorAll('button:disabled, input:disabled, select:disabled').forEach(el => el.disabled = false);
   buildCanvas(); renderGates(); updateMap(); renderDetails();
 })();
-</script>
-<section class="review-context" aria-label="Beheerkaart" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
-  <h2>Welke invoeringsroute is toelaatbaar en verdient de voorkeur?</h2>
-  <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren en bevoegde beslisser bij complexe keuzen rond RFC-2026-118. <strong>Uitkomst:</strong> besluitnotitie met harde voorwaarden, aannames, onderbouwing en voorgestelde route. Aanvullend overleginstrument; bij eenvoudige vragen kan een korte besluitnotitie beter werken.</p>
-  <p><strong>Bron en eigenaar:</strong> synthetische opties, deelscores en voorwaarden RFC-2026-118, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. FAB adviseert, bevoegde deskundigen toetsen veiligheid/privacy en de afgesproken beslisser besluit en accepteert restrisico. Geldigheid: demonstratie, geen lokaal gevalideerde beoordeling of formeel besluit.</p>
-  <nav aria-label="Besluitviews"><a href="fab-releaseatelier.html">Wijzigingsingang</a> · <a href="fab-change-impact-map.html">Impact RFC-2026-118</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies RFC-2026-118</a></nav>
-  <p>Toets harde voorwaarden vóór voorkeuren. Niet getoetst is niet toelaatbaar; een fictieve deelscore is geen meting of geaccepteerd bewijs. Leg bron, versie, datum, beoordelaar en uitkomst vast; een rangorde vervangt geen goedkeuring. Dezelfde RFC is geen gedeelde, actuele administratie: invoer en status worden niet tussen pagina’s gesynchroniseerd en verdwijnen bij herladen.</p>
-  <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete besluitroute vooraf aanwijzen; herzie bij bron-, optie- of eiswijziging. Echte besluiten en acties horen één keer in het bestaande wijzigingsdossier, geen tweede administratie. Alleen synthetische referenties gebruiken, geen cliëntgegevens of volledige logs. Vergelijk met een korte besluitnotitie op juistheid en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
-</section>
-</body>
+    </script>
+    <section class="review-context"
+             aria-label="Beheerkaart"
+             style="max-width:1440px;
+                    margin:24px auto;
+                    padding:24px;
+                    border:1px solid currentColor;
+                    border-radius:16px;
+                    line-height:1.6;
+                    overflow-wrap:anywhere">
+      <h2>Welke invoeringsroute is toelaatbaar en verdient de voorkeur?</h2>
+      <p><strong>Gebruiker en moment:</strong> FAB met proceseigenaren en bevoegde beslisser bij complexe keuzen rond RFC-2026-118. <strong>Uitkomst:</strong> besluitnotitie met harde voorwaarden, aannames, onderbouwing en voorgestelde route. Aanvullend overleginstrument; bij eenvoudige vragen kan een korte besluitnotitie beter werken.</p>
+      <p><strong>Bron en eigenaar:</strong> synthetische opties, deelscores en voorwaarden RFC-2026-118, demo v3, revisie 2026-10-01; echte bronhouder nog niet aangewezen. FAB adviseert, bevoegde deskundigen toetsen veiligheid/privacy en de afgesproken beslisser besluit en accepteert restrisico. Geldigheid: demonstratie, geen lokaal gevalideerde beoordeling of formeel besluit.</p>
+      <nav aria-label="Besluitviews">
+        <a href="fab-releaseatelier.html">Wijzigingsingang</a> · <a href="fab-change-impact-map.html">Impact RFC-2026-118</a> · <a href="fab-go-no-go-cockpit.html">Livegangadvies RFC-2026-118</a>
+      </nav>
+      <p>Toets harde voorwaarden vóór voorkeuren. Niet getoetst is niet toelaatbaar; een fictieve deelscore is geen meting of geaccepteerd bewijs. Leg bron, versie, datum, beoordelaar en uitkomst vast; een rangorde vervangt geen goedkeuring. Dezelfde RFC is geen gedeelde, actuele administratie: invoer en status worden niet tussen pagina’s gesynchroniseerd en verdwijnen bij herladen.</p>
+      <p><strong>Onderhoud en toelating:</strong> bronhouder en concrete besluitroute vooraf aanwijzen; herzie bij bron-, optie- of eiswijziging. Echte besluiten en acties horen één keer in het bestaande wijzigingsdossier, geen tweede administratie. Alleen synthetische referenties gebruiken, geen cliëntgegevens of volledige logs. Vergelijk met een korte besluitnotitie op juistheid en onderhoudslast. Technische werking bewijst geen gebruikerswaarde.</p>
+    </section>
+  </body>
 </html>
