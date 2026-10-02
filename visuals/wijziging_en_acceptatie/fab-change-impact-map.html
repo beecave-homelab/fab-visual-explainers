@@ -214,6 +214,18 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .evidence code { font-size: 10px; }
   footer { margin-top: 12px; font-size: 10px; }
 }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen and (min-width: 1181px) {
+  .stage { aspect-ratio: 1480 / 900; }
+  .src-block { padding: 12px; overflow-wrap: anywhere; }
+  .pt { overflow-wrap: anywhere; min-height: 72px; }
+}
     </style>
   </head>
   <body>
@@ -269,6 +281,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
         <div class="stage">
           <svg class="grid-svg"
                viewBox="0 0 1480 740"
+               preserveAspectRatio="none"
                role="img"
                aria-labelledby="imp-title imp-desc">
             <title id="imp-title">Impactrooster van de wijziging Teamindeling per wijk</title>

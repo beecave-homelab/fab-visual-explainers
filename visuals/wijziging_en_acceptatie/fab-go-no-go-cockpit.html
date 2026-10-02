@@ -259,6 +259,19 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 .crit[data-status="onbekend"] { border-style: dashed; }
 .crit[data-status="onbekend"] .shape { background: var(--warn); }
 @media print { #criterionEvidence, #findingEditor { display: none; } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen and (max-width: 480px) {
+  .crit { display: grid; grid-template-columns: minmax(0, 1fr) 15px; }
+  .crit .crit-txt { overflow-wrap: anywhere; }
+  .crit .leader { display: none; }
+  .crit .crit-status { grid-column: 1 / -1; }
+}
     </style>
   </head>
   <body>

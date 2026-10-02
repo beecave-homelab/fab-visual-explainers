@@ -228,6 +228,11 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 #gateEditor input, #gateEditor select { width: 100%; min-width: 0; max-width: 100%; padding: 8px; border: 1px solid var(--rule); color: var(--ink); background: var(--surface); }
 #gateEditor button { min-height: 40px; padding: 8px 12px; background: var(--accent-tint); border: 1px solid var(--accent); }
 @media print { #gateEditor form { display: none; } #gateEditor { padding: 8px; font-size: 10px; } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
     </style>
   </head>
   <body>
