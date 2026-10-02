@@ -118,6 +118,20 @@ footer { padding: 28px 0 8px; font-size: 13.5px; color: var(--muted); max-width:
   .detail h2 { font-size: 18px; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .node { overflow-wrap: anywhere; min-width: min(190px, 100%); flex-basis: 190px; }
+  .band { grid-template-columns: 140px minmax(0, 1fr); gap: 16px; }
+}
+@media screen and (max-width: 860px) {
+  .band { grid-template-columns: 1fr; }
+}
     </style>
   </head>
   <body>
