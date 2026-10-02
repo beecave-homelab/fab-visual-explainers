@@ -223,6 +223,33 @@ body{background:#061923;color:#e8f2f4}
 #atlas.design{display:block;min-height:100vh}
 #atlas .atlas-wrap{min-height:100vh}
 
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .atlas-wrap { max-width: 1600px; margin: auto; min-height: 0; }
+  .atlas-map { container-type: inline-size; }
+  .atlas-relations { display: none; font-size: 12px; line-height: 1.6; }
+  .atlas-node[data-node="confidence"] { left: 82% !important; top: 50% !important; }
+  .atlas-node { padding-right: 22px; }
+}
+@container (max-width: 550px) {
+  .map-top { position: static; flex-wrap: wrap; margin-bottom: 14px; }
+  .atlas-map .connections { display: none; }
+  .atlas-map .atlas-relations { display: block; }
+  .atlas-map .atlas-node { position: relative; inset: auto !important; transform: none; width: 100%; min-height: 72px; margin-bottom: 10px; }
+}
+@media screen and (max-width: 1200px) and (min-width: 901px) {
+  .atlas-board { grid-template-columns: 190px minmax(0, 1fr); }
+  .atlas-detail { grid-column: 1 / -1; }
+}
+@media screen and (max-width: 650px) {
+  .atlas-map { min-height: 0; padding: 16px; }
+}
 </style>
 </head>
 <body>
@@ -304,6 +331,23 @@ body{background:#061923;color:#e8f2f4}
 <button class="atlas-node" data-node="confidence" data-route-kind="effect" style="left:67%;top:49%">
 <strong>Meer vertrouwen in besluitvorming</strong><small>Effect</small>
 </button>
+<details class="atlas-relations">
+<summary>Alle 11 verbanden als lijst</summary>
+<p>Verbanden uit de fictieve kaart; geen bewezen oorzaken.</p>
+<ul>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Versnipperde informatie</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Duidelijk eigenaarschap</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Kwaliteit brondata wisselt</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Te veel detail remt gebruik</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Versnipperde informatie ↔ Meetbare tijdswinst</li>
+<li>Duidelijk eigenaarschap ↔ Meetbare tijdswinst</li>
+<li>Kwaliteit brondata wisselt ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Te veel detail remt gebruik ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Versnipperde informatie ↔ Kwaliteit brondata wisselt</li>
+<li>Duidelijk eigenaarschap ↔ Te veel detail remt gebruik</li>
+</ul>
+</details>
 </section>
 <aside aria-live="polite" class="atlas-detail">
 <div class="focus-type" id="atlasType">Centraal inzicht</div>

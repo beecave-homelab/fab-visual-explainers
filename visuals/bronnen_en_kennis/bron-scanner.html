@@ -344,6 +344,25 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
 @media(prefers-reduced-motion:no-preference){
   .strip,.step{transition:background-color .15s ease,color .15s ease}
 }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .strip { grid-template-columns: 18px minmax(0, 1fr); }
+  .strip .copy b { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+  .strip .count { grid-column: 2; overflow-wrap: anywhere; }
+}
+@media screen and (max-width: 760px) {
+  .map { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .strip { min-width: 0; }
+}
+@media screen and (max-width: 460px) {
+  .map { grid-template-columns: 1fr; }
+}
     </style>
   </head>
   <body>
