@@ -36,6 +36,9 @@ TASK_FILES = (
     "fab-test-coverage-map.html",
     "fab-continuiteitskaart.html",
     "fab-data-quality-map.html",
+    "fab-omgevingsvergelijker.html",
+    "fab-known-error-map.html",
+    "fab-life-cycle-map.html",
 )
 
 

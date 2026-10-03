@@ -525,6 +525,30 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .map-pane { container-type: inline-size; }
+  .topic-map { min-height: 580px; }
+  .map-node[data-id="evidence"], .map-node[data-id="impact"] { top: 60%; }
+  .map-center { top: 43%; }
+  .topic-map::after { top: 68%; }
+}
+@container (max-width: 480px) {
+  .topic-map { min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .topic-map::before, .topic-map::after { display: none; }
+  .topic-map .map-center, .topic-map .map-node { position: static; translate: none; transform: none; width: 100%; min-height: 0; padding: 12px; border-radius: 12px; }
+  .topic-map .map-center { grid-column: 1 / -1; order: -1; }
+  .topic-map .map-node small { display: block; }
+}
+@media screen and (max-width: 430px) {
+  .topic-map { grid-template-columns: 1fr; }
+}
     </style>
   </head>
   <body>

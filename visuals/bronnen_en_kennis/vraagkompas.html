@@ -298,6 +298,31 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:no-preference){
   .q,.mode{transition:background-color .16s ease,color .16s ease,border-color .16s ease}
 }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .compass { container-type: inline-size; min-height: 0; }
+  .question-ring { min-height: 580px; }
+  .q:nth-child(3) { right: 8px; bottom: 122px; }
+  .q:nth-child(5) { left: 5px; bottom: 122px; }
+  .note p { grid-column: 2; }
+}
+@container (max-width: 440px) {
+  .question-ring { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-height: 0; margin-top: 18px; }
+  .question-ring .q:nth-child(n) { position: static; transform: none; width: 100%; min-height: 96px; }
+  .question-ring .center { display: none; }
+}
+@media screen and (max-width: 720px) {
+  .note p { grid-column: 1; }
+}
+@media screen and (max-width: 430px) {
+  .question-ring { grid-template-columns: 1fr; }
+}
     </style>
   </head>
   <body>

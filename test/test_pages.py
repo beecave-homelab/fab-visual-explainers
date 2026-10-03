@@ -106,16 +106,23 @@ def test_task_views__print_and_nojs(
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), filename
         if not javascript:
             expect(page.locator("#copy")).to_be_hidden()
-        if filename == TASK_FILES[0]:
+        if filename == "fab-test-coverage-map.html":
             expect(page.locator(".register article")).to_have_count(5)
             expect(page.locator(".register article").last).to_contain_text("noodplan")
-        elif filename == TASK_FILES[1]:
+        elif filename == "fab-continuiteitskaart.html":
             expect(page.locator(".readable ol li")).to_have_count(3)
             expect(page.locator(".checks")).to_be_visible()
-        else:
+        elif filename == "fab-data-quality-map.html":
             expect(page.locator(".register article")).to_have_count(3)
             if not javascript:
                 expect(page.locator("#lens-caption")).to_contain_text("overlappen")
+        elif filename == "fab-omgevingsvergelijker.html":
+            expect(page.locator(".register tr[data-static-aspect]")).to_have_count(8)
+        elif filename == "fab-known-error-map.html":
+            expect(page.locator(".register article")).to_have_count(4)
+        elif filename == "fab-life-cycle-map.html":
+            expect(page.locator(".register article")).to_have_count(5)
+            expect(page.locator(".register")).to_contain_text("Einddatum onbekend")
         page.emulate_media(media="print")
         expect(page.locator("#copy")).to_be_hidden()
         expect(page.locator("[data-action]:visible")).to_have_count(0)

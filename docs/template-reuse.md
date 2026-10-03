@@ -4,18 +4,18 @@ Deze gids is de centrale selectie- en bewerkkaart voor de prototypes. Gebruik he
 
 ## Selectie op hoofdvraag
 
-| Vraag of bronstructuur                               | Eerste keuze                                                                                           | Wanneer een andere vorm beter past                                                                        |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| Hoofdthema's met passages, betekenis en open vragen  | Bronkaart                                                                                              | BronScanner als hoofdstukvolgorde leidend is.                                                             |
-| Lang document dat per sectie onderzocht wordt        | BronScanner                                                                                            | Bronkaart als thematische ordening belangrijker is.                                                       |
-| Inzichten met expliciete verbanden                   | Kennisatlas                                                                                            | Geen netwerk tekenen als de bron relaties niet onderbouwt; kies dan Bronkaart.                            |
-| Eén adviesvraag met conclusie, context en bewijs     | Vraagdossier                                                                                           | VraagKompas bij meerdere zelfstandige gebruikersvragen.                                                   |
-| Meerdere gebruikersvragen over dezelfde bron         | VraagKompas                                                                                            | Een lijst of kennisitem bij een korte lineaire instructie.                                                |
-| Incident, analyse of continuïteit                    | Incidentvisual, Serviceradar, Oorzaakopsporing of Continuïteitskaart                                   | Kies proces, perspectief, hypothesen of nood-/herstelvoorwaarden als hoofdtaak.                           |
-| Wijzigingsdossier of besluitvoorbereiding            | Releaseatelier, Change Impact Map, Test Coverage Map, Beheerbaarheid Scan, Go/No-Go of Decision Canvas | Kies respectievelijk fasen, gevolgen, tests, beheeracceptatie, livegangvoorwaarden of toelaatbare opties. |
-| Systemen, processen en verantwoordelijkheden         | Applicatielandschap of Proces × Applicatie-map                                                         | Ketenkaart bij berichtverwerking; Rapportage Lineage bij een KPI-definitie.                               |
-| Toegang en overgangsmomenten                         | Autorisatielandschap of Joiner-Mover-Leaver                                                            | Rechtenmatrix voor model/feitelijk/uitzondering; tijdlijn voor afzonderlijke eindmomenten.                |
-| Gegevensstromen, afwijkingen of rapportagedefinities | Ketenkaart, Data Quality Map of Rapportage Lineage                                                     | Geen totaalscore toevoegen zonder expliciete brondefinitie.                                               |
+| Vraag of bronstructuur                               | Eerste keuze                                                                                                                 | Wanneer een andere vorm beter past                                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Hoofdthema's met passages, betekenis en open vragen  | Bronkaart                                                                                                                    | BronScanner als hoofdstukvolgorde leidend is.                                                                                   |
+| Lang document dat per sectie onderzocht wordt        | BronScanner                                                                                                                  | Bronkaart als thematische ordening belangrijker is.                                                                             |
+| Inzichten met expliciete verbanden                   | Kennisatlas                                                                                                                  | Geen netwerk tekenen als de bron relaties niet onderbouwt; kies dan Bronkaart.                                                  |
+| Eén adviesvraag met conclusie, context en bewijs     | Vraagdossier                                                                                                                 | VraagKompas bij meerdere zelfstandige gebruikersvragen.                                                                         |
+| Meerdere gebruikersvragen over dezelfde bron         | VraagKompas                                                                                                                  | Een lijst of kennisitem bij een korte lineaire instructie.                                                                      |
+| Incident, analyse of continuïteit                    | Incidentvisual, Serviceradar, Oorzaakopsporing, Continuïteitskaart of Known Error Map                                        | Kies proces, perspectief, hypothesen, nood-/herstelvoorwaarden of bekende fouten als hoofdtaak.                                 |
+| Wijzigingsdossier of besluitvoorbereiding            | Releaseatelier, Change Impact Map, Test Coverage Map, Omgevingsvergelijker, Beheerbaarheid Scan, Go/No-Go of Decision Canvas | Kies respectievelijk fasen, gevolgen, tests, omgevingsverschillen, beheeracceptatie, livegangvoorwaarden of toelaatbare opties. |
+| Systemen, processen en verantwoordelijkheden         | Applicatielandschap, Proces × Applicatie-map of Life Cycle Map                                                               | Ketenkaart bij berichtverwerking; Rapportage Lineage bij een KPI-definitie; Life Cycle Map bij ondersteuningstermijnen.         |
+| Toegang en overgangsmomenten                         | Autorisatielandschap of Joiner-Mover-Leaver                                                                                  | Rechtenmatrix voor model/feitelijk/uitzondering; tijdlijn voor afzonderlijke eindmomenten.                                      |
+| Gegevensstromen, afwijkingen of rapportagedefinities | Ketenkaart, Data Quality Map of Rapportage Lineage                                                                           | Geen totaalscore toevoegen zonder expliciete brondefinitie.                                                                     |
 
 De twee incidentvarianten hebben hetzelfde inhoudelijke patroon. De vijf bron-/kennispatronen passen ook bij openbare documenten buiten FAB; pas de doelgroep en beheerkaart daarop aan. Operationele patronen zijn geen generieke rapportdecoratie: ontbrekende beslis-, bewijs- of herstelvoorwaarden mogen niet worden ingevuld met verzonnen zekerheden.
 
@@ -178,6 +178,26 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **Regels en export:** `valid()` vraagt actuele bewijsversie, geslaagde uitvoering en akkoord; `initialize()` zet alles op gepland. Voor echte snapshot expliciete bronstatus laden en simulatie scheiden. `summary()` bevat hardcoded omgeving/casus.
 - **Leeslaag en afdruk:** Print en statisch register aanwezig; werk alle testartikelen tegelijk bij, ook negatieve/fout-/terugvalscenario’s waar relevant.
 
+### fab-omgevingsvergelijker.html
+
+[Open origineel](../visuals/wijziging_en_acceptatie/fab-omgevingsvergelijker.html). **Taak:** testresultaat naast de productiedoelstand leggen per configuratie-onderdeel.
+
+- **Statische inhoud:** `.register`-tabel met `tr[data-static-aspect]` per onderdeel, beginoordelen per testspoor in `.tracknotes` en de koppelpunt-/testrolnotities.
+- **JavaScript-data:** `INITIAL` (per onderdeel `prodNow`, `prodTarget`, `env.acc`/`env.tst` met `v`, `snap`, `verified`, `note`), `TRACKS` (aspecten per spoor), `PEIL` en `PROD_SNAP`.
+- **Samen aanpassen:** omgevingskeys (`acc`/`tst` met `ENVNAME`), aspect- en spoor-ID's, `initialize()`, `draw()`, beginselectie `track`/`env` en reset samen bijwerken; rij-ID's (`data-aspect`) en statische `data-static-aspect` moeten overeenkomen.
+- **Regels en export:** `statusOf()` geeft per onderdeel en omgeving Gelijk, Gelijk aan doelstand, Verschil, Onbekend, Verouderd of Herbeoordeling nodig; verouderd (> 14 dagen) en ongecontroleerd tellen als onbekend, nooit als gelijk. `verdictParts()`, scherm en `summary()` gebruiken diezelfde status; een verschil vraagt een aanvullende test en "geen bekend verschil" is geen productiebewijs.
+- **Leeslaag en afdruk:** Print en statische tabel aanwezig; werk tabel, spoorteksten en notities samen bij met de data.
+
+### fab-known-error-map.html
+
+[Open origineel](../visuals/incident_en_continuiteit/fab-known-error-map.html). **Taak:** meldingskenmerken koppelen aan bekende fouten en goedgekeurde tijdelijke werkwijzen.
+
+- **Statische inhoud:** kenmerk-checkboxes `data-sign`, versie-select `#version`, `.register article` per kennisitem (`ke-static-<nr>`) en het meldingsblok.
+- **JavaScript-data:** `INITIAL` (per item `signs`, `excludes`, `workaround`/`noWorkaround`, `conditions`, `impact`, `kind`, `versions`, `approval`, `review`, `structural`, `owner`, `escalation`, `links`), `SIGNS` en `PEIL`.
+- **Samen aanpassen:** kenmerk- en item-ID's, `initialize()`, `draw()`, beginselectie, `data-condition`-voorwaarden en de acties `reconfirm`/`revise` samen bijwerken; label (`data-select`), detail (`#detail-<id>`) en register-ID moeten overeenkomen.
+- **Regels en export:** `assess()` volgt vaste volgorde: uitgesloten kenmerk, geen aanwijzing, concept, verlopen herbeoordeling, onbeoordeelde versie, openstaande voorwaarden, pas dan toepasbaar. Scherm, `#verdict` en `summary()` gebruiken diezelfde uitkomst; gewijzigde kenmerken of status resetten bevestigde voorwaarden.
+- **Leeslaag en afdruk:** Print en statisch register aanwezig; werk kenmerken, uitsluitingen, werkwijze, voorwaarden en escalatie per item samen bij.
+
 ### fab-beheerbaarheid-scan.html
 
 [Open origineel](../visuals/wijziging_en_acceptatie/fab-beheerbaarheid-scan.html). **Taak:** Beheeracceptatie met afzonderlijke bewijscontrole.
@@ -267,6 +287,16 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **Samen aanpassen:** Regel-ID en register-ID, gecontroleerde populatie, overlap-/unietelling en state/reset samen wijzigen.
 - **Regels en export:** `totals()`/`remaining()` gebruiken verzonnen overlappende positions; alleen brononderbouwde overlap tellen, anders onbekend. Regeldefinitie/tijdsdrempel en bevoegd herstel apart toetsen; `summary()` heeft bronmetadata.
 - **Leeslaag en afdruk:** Print en statisch register aanwezig; populatie, afwijkingen, afnemers en herstelvoorwaarden consistent met interactie bijwerken.
+
+### fab-life-cycle-map.html
+
+[Open origineel](../visuals/landschap_en_processen/fab-life-cycle-map.html). **Taak:** ondersteuningstermijnen en uiterlijke startdata per applicatie-onderdeel.
+
+- **Statische inhoud:** `.register article` per onderdeel (`lc-static-<id>`) met beide termijnen, bron en bronstatus, doorlooptijd met opbouw, afhankelijkheid, berekende start, status op peildatum, eigenaar en volgende actie; de rekenregel staat in de introtekst.
+- **JavaScript-data:** `INITIAL` (per onderdeel `version`, `full`, `end`, `source`, `srcStatus`, `confirmed`, `weeks`, `leadText`, `dep`, `depNote`, `owner`), `PEIL`, schuifbereik `D0`–`D1` en `MN`.
+- **Samen aanpassen:** onderdeel-ID's (`data-select`, `#detail-<id>`, `lc-static-<id>`), kolomgeometrie (`x()`, `y()`), afhankelijkheidslijn, `initialize()`, `draw()`, beginselectie en de acties `confirm`/`roadmap`/`enddate` samen bijwerken.
+- **Regels en export:** `plan()` berekent uiterlijke start als einde − doorlooptijd en laat de ECD-afhankelijkheid eerder schuiven; statussen volgen vaste volgorde (onbekend, buiten ondersteuning, verstreken, binnen 8 weken, bewaken) en een onbevestigde bron blijft gemarkeerd. Scherm, `#summary`-telling en `summary()` gebruiken dezelfde uitkomst; gepland is niet uitgevoerd.
+- **Leeslaag en afdruk:** Print, smalle-schermlijst (`.almanac-list`) en statisch register aanwezig; werk alle termijnen, opbouw en uitkomsten samen bij.
 
 ### fab-rapportage-lineage.html
 

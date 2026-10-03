@@ -364,6 +364,11 @@
   .review-context a { color:inherit; text-underline-offset:3px; }
   .summary-strip { grid-template-columns:repeat(5,minmax(0,1fr)); }
   @media(max-width:760px) { .summary-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
     </style>
   </head>
   <body>

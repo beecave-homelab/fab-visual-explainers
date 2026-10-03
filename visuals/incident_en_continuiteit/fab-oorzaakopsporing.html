@@ -108,6 +108,11 @@ input, select { font: inherit; color: inherit; max-width: 100%; border: 1px soli
 .card form label { display: grid; gap: 4px; margin-top: 8px; }
 .card form input, .card form select { width: 100%; }
 @media print { .ans button, #assessment button { display: none; } .card, .sheet tr { break-inside: avoid; } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
     </style>
   </head>
   <body>

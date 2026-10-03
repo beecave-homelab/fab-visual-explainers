@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische levenscycluskaart: per applicatie-onderdeel de ondersteuningstermijn en de uiterlijke startdatum van de upgrade.">
+    <title>FAB Life Cycle Map — welke upgrade vraagt nu actie?</title>
+    <style>
+:root{--concrete:#D9D7D2;--page:#F3F2EF;--ink:#22262B;--signal:#F2B705;--late:#A23B2A;--rule:#B9B6AF;--display:"DIN Condensed","DIN Alternate","Bahnschrift Condensed","Arial Narrow",sans-serif;--body:"Seravek","Corbel","Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--concrete);color:var(--ink);font:17px/1.5 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--ink);text-underline-offset:4px}a:hover{color:var(--late)}p{max-width:72ch}h1,h2,h3,p,dl,dd{margin:0}h1{font-family:var(--display);font-size:clamp(40px,5.5vw,72px);font-weight:700;line-height:1;letter-spacing:0;max-width:16ch}h2{font-family:var(--display);font-size:27px;font-weight:700}h3{font-family:var(--display);font-size:20px;font-weight:700}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--ink);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:14px;font-size:15px}.demo strong{color:var(--late)}
+.mast{display:grid;grid-template-columns:1fr minmax(260px,.65fr);gap:50px;align-items:end;padding:25px 0 34px}.intro{margin-top:18px;max-width:54ch}.context{border-left:5px solid var(--signal);padding-left:24px;font-size:16px}.context p+p{margin-top:10px}
+.tools{display:flex;gap:16px 22px;align-items:center;flex-wrap:wrap;margin:24px 0}.tools>label{display:flex;align-items:center;gap:10px}input[type=range]{min-width:220px;accent-color:var(--ink)}#date-label{font-variant-numeric:tabular-nums;font-family:var(--display);font-size:22px;font-weight:700}.plain{background:var(--page);border:1px solid var(--rule);border-radius:4px;padding:9px 16px}.tools .plain{margin-left:auto}
+.interactive{display:none}body.ready .interactive{display:flex}
+.almanac{background:var(--page);border:2px solid var(--ink);padding:0 0 26px}
+.colheads{display:grid;grid-template-columns:repeat(5,1fr);margin-left:110px;border-bottom:2px solid var(--ink)}
+.colhead{background:transparent;border:0;border-right:1px solid var(--rule);padding:12px 8px;text-align:center;font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2}.colhead small{display:block;font-family:var(--body);font-weight:400;font-size:13px;margin-top:4px}
+.plotwrap{display:grid;grid-template-columns:110px 1fr}
+.spine{position:relative;font-family:var(--display)}.spine .year{position:absolute;left:-14px;font-size:clamp(52px,6vw,88px);font-weight:700;color:rgba(34,38,43,.85);writing-mode:vertical-rl;transform:rotate(180deg);line-height:1}.spine .month{position:absolute;right:2px;font-size:12px;font-family:var(--body);color:var(--ink);transform:translateY(-50%);background:var(--page);padding:0 3px}
+.plot{position:relative;height:900px}.mline{position:absolute;left:0;right:0;border-top:1px solid var(--rule)}
+.band{position:absolute;left:50%;transform:translateX(-50%);width:16%;background:rgba(34,38,43,.85)}.band.sec{background:repeating-linear-gradient(45deg,rgba(34,38,43,.85) 0 5px,transparent 5px 10px)}.band.unknown{background:transparent;border:2px dashed rgba(34,38,43,.7);width:14%}
+.endline{position:absolute;left:12%;right:12%;border-top:5px solid var(--ink)}.endlabel{position:absolute;font-size:13px;font-weight:700;white-space:nowrap;background:var(--page);color:var(--ink);border:1px solid var(--rule);padding:2px 8px}
+.startmark{position:absolute;left:50%;transform:translateX(-140%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:13px solid var(--signal)}.startlabel{position:absolute;transform:translateX(-50%);background:var(--signal);color:var(--ink);font-size:13px;font-weight:700;padding:2px 8px;white-space:nowrap}
+.leadrule{position:absolute;width:0;border-left:2px solid var(--ink)}.leadrule::before,.leadrule::after{content:"";position:absolute;left:-6px;width:10px;border-top:2px solid var(--ink)}.leadrule::before{top:0}.leadrule::after{bottom:0}.leadlabel{position:absolute;writing-mode:vertical-rl;transform:translate(-50%,-50%);font-size:11px;background:var(--page);color:var(--ink);border:1px solid var(--rule);padding:3px 2px;white-space:nowrap}
+.dep{position:absolute;color:var(--ink)}.depline{position:absolute;border-top:2px dashed var(--ink)}.depvert{position:absolute;border-left:2px dashed var(--ink)}.deplabel{position:absolute;font-size:12.5px;font-weight:700;white-space:nowrap;background:var(--page);color:var(--ink);border:1px solid var(--rule);padding:2px 6px}
+.peil{position:absolute;left:0;right:0;border-top:4px solid var(--signal);z-index:3;transition:top .25s ease}.spine .peillabel{position:absolute;right:6px;transform:translateY(-50%);background:var(--signal);color:var(--ink);font-weight:700;font-size:11.5px;line-height:1.25;padding:2px 6px;text-align:right;z-index:4}
+.statelines{display:grid;grid-template-columns:repeat(5,1fr);margin-left:110px}.stateline{text-align:center;font-size:14px;padding:8px 4px 0;font-weight:600}.stateline.late{color:var(--late)}
+.detail{background:var(--page);border:1px solid var(--rule);padding:20px 22px;margin-top:18px}.detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:26px;margin-top:12px}.detail dl{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;font-size:15px}.detail dt{font-weight:700}
+.detail-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.detail-actions button{background:transparent;border:1px solid var(--ink);border-radius:4px;padding:8px 14px;font-size:15px;min-height:44px}
+.almanac-list{display:none}
+.notice{margin-top:16px;font-size:16px}.live{min-height:24px;color:var(--late);font-size:15px;margin-top:10px}
+.export{margin-top:14px;background:var(--page);padding:22px;border:1px solid var(--rule)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid var(--rule)}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(max-width:760px){.page{padding:16px 12px}h1{font-size:42px}.mast{grid-template-columns:1fr;gap:25px}.context{padding-left:16px}.almanac{border:0;background:transparent}.colheads,.plotwrap{display:none}.statelines{display:none}.almanac-list{display:grid;gap:14px}.mini{background:var(--page);border:1px solid var(--rule);padding:14px 16px}.mini h3{font-size:19px}.mini .mbar{position:relative;height:16px;margin:10px 0 6px}.mini .mbar .seg{position:absolute;top:0;bottom:0}.mini .mbar .full{background:rgba(34,38,43,.85)}.mini .mbar .secg{background:repeating-linear-gradient(45deg,rgba(34,38,43,.85) 0 5px,transparent 5px 10px)}.mini .mbar .unk{border:2px dashed rgba(34,38,43,.7);left:0;right:0}.mini .mbar .now{position:absolute;top:-4px;bottom:-4px;border-left:4px solid var(--signal)}.mini p{font-size:14px;margin-top:4px}.detail-grid{grid-template-columns:1fr}.detail dl{grid-template-columns:1fr}.detail dd{margin-bottom:8px}.tools .plain{margin-left:0}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context{font-size:10pt}.tools,.detail-actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.almanac{border:0}.plot{height:640px}.band{border:1px solid #000}.endlabel,.startlabel,.deplabel,.stateline,.peillabel,.leadlabel{font-size:8pt}.detail{border:1px solid #777;break-inside:avoid}.detail[hidden]{display:block!important}.notice{font-size:11pt}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de almanak</a>
+<main class="page">
+<div class="demo"><span>FAB / Life Cycle Map</span><strong>Synthetische demonstratie, geen contractregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Welke versie loopt af voordat we klaar kunnen zijn?</h1>
+<p class="intro">Het einde van de ondersteuning is niet het moment om te beginnen. Per onderdeel staat wanneer je uiterlijk moet starten, gerekend met de doorlooptijd van testen, opleiden en invoeren. Een geplande wijziging verandert die datum niet; alleen uitvoering op schema verlaagt het risico.</p>
+</div>
+<div class="context">
+<p><strong>Vijf onderdelen van een fictieve VVT-organisatie</strong></p>
+<p>Peildatum 2026-10-03 / demo v1</p>
+<p>Doorlooptijden zijn demo-inschattingen van FAB, niet afgestemd met leveranciers of ICT.</p>
+<p>Demo-drempel: start binnen 8 weken telt als actie nodig.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title" style="margin-bottom:14px">Almanak van ondersteuning</h2>
+<div class="tools interactive">
+<label for="date">
+Bekijk per datum
+<input type="range" id="date" min="0" max="20" step="1" value="0">
+</label>
+<span id="date-label">2026-10-03</span>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer planningsoverzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="almanac" id="almanac">
+<div class="colheads" id="colheads"></div>
+<div class="plotwrap">
+<div class="spine" id="spine"></div>
+<div class="plot" id="plot"></div>
+</div>
+<div class="statelines" id="statelines"></div>
+<div class="almanac-list" id="alist"></div>
+</div>
+<div id="details"></div>
+<p class="notice" id="summary" aria-live="polite"></p>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Planningsoverzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie en gekozen datum. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle termijnen en uitkomsten, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde status bovenaan kan ervan afwijken en geldt nooit als werkelijke contractinformatie. Rekenregel: uiterlijke start = einde ondersteuning − doorlooptijd in weken; afhankelijkheden schuiven de start eerder. Peildatum 2026-10-03.</p>
+<div class="register">
+<article id="lc-static-ecd">
+<h3>Zorgdossier (ECD), versie 2026.3</h3>
+<p><strong>Volledige ondersteuning tot</strong> 2027-03-31; <strong>beveiligingsupdates tot</strong> 2027-09-30 (einde). <strong>Bron:</strong> Leveranciersroadmap 2026-09 (demo); bevestigd door contractbeheer (demo) 2026-09-20.</p>
+<p><strong>Doorlooptijd:</strong> 16 weken (test 6, opleiding 4, invoering en nazorg 6). <strong>Afhankelijkheid:</strong> ECD 2026.4 moet live zijn vóór de uitrol van besturingssysteem 16 op de zorgtablets. <strong>Berekende uiterlijke start:</strong> 2026-08-02, door de tabletafhankelijkheid eerder dan de eigen 2027-06-10. <strong>Status op peildatum:</strong> Start uiterlijk verstreken. <strong>Eigenaar:</strong> applicatie-eigenaar zorgdossier (voorgestelde rol). <strong>Volgende actie:</strong> escaleer naar de eigenaar; laat de bevoegde rol een tijdelijke maatregel en het restrisico beoordelen.</p>
+</article>
+<article id="lc-static-rooster">
+<h3>Roosterportaal, versie 4.2</h3>
+<p><strong>Volledige ondersteuning tot</strong> 2026-12-31; <strong>beveiligingsupdates tot</strong> 2026-12-31 (einde). <strong>Bron:</strong> Leveranciersmail 2026-08 (demo); onbevestigde opgave, niet in contractregistratie.</p>
+<p><strong>Doorlooptijd:</strong> 12 weken (test 4, opleiding 2, invoering 6). <strong>Berekende uiterlijke start:</strong> 2026-10-08. <strong>Status op peildatum:</strong> Start binnen 8 weken (op basis van onbevestigde opgave). <strong>Eigenaar:</strong> applicatie-eigenaar planning (voorgestelde rol). <strong>Volgende actie:</strong> start de voorbereiding: plan test, opleiding en invoering met de eigenaar.</p>
+</article>
+<article id="lc-static-connector">
+<h3>Overdrachtsconnector, versie 0.2</h3>
+<p><strong>Volledige ondersteuning tot</strong> onbekend; <strong>einde onbekend.</strong> <strong>Bron:</strong> Wijzigingsplan CHG-DEMO-LOC-02 (demo): versie 0.2 vervalt na livegang van 0.3, datum niet vastgesteld.</p>
+<p><strong>Doorlooptijd:</strong> 8 weken. <strong>Status op peildatum:</strong> Einddatum onbekend — geen berekening mogelijk. <strong>Eigenaar:</strong> functioneel keteneigenaar met integratiebeheer. <strong>Volgende actie:</strong> vraag de einddatum op bij de functioneel keteneigenaar en leg die vast in het wijzigingsplan.</p>
+</article>
+<article id="lc-static-bi">
+<h3>Rapportageplatform, versie 9</h3>
+<p><strong>Volledige ondersteuning tot</strong> 2027-12-31; <strong>beveiligingsupdates tot</strong> 2028-06-30 (einde). <strong>Bron:</strong> productlevenscyclus fabrikant, peildatum 2026-09-01 (demo); bevestigd.</p>
+<p><strong>Doorlooptijd:</strong> 26 weken (migratie rapporten 14, test 8, overdracht 4). <strong>Berekende uiterlijke start:</strong> 2027-12-30. <strong>Status op peildatum:</strong> Bewaken. <strong>Eigenaar:</strong> rapportage-eigenaar met BI. <strong>Volgende actie:</strong> herbeoordeel bij nieuwe roadmap of uiterlijk 2027-11-05.</p>
+</article>
+<article id="lc-static-tabletos">
+<h3>Besturingssysteem zorgtablets, versie 15</h3>
+<p><strong>Volledige ondersteuning tot</strong> 2026-10-31; <strong>beveiligingsupdates tot</strong> 2027-01-31 (einde). <strong>Bron:</strong> fabrikantpagina, peildatum 2026-09-01 (demo); bevestigd door ICT (demo).</p>
+<p><strong>Doorlooptijd:</strong> 10 weken (uitrol ICT). <strong>Berekende uiterlijke start:</strong> 2026-11-22. <strong>Status op peildatum:</strong> Start binnen 8 weken. <strong>Eigenaar:</strong> ICT-werkplekbeheer met FAB. <strong>Volgende actie:</strong> start de voorbereiding: plan test, opleiding en invoering met de eigenaar.</p>
+</article>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij beheerplanning en kwartaaloverleg met applicatie-eigenaren, ICT en contractbeheer; de uitkomst is een tijdig gestarte upgrade of een geëscaleerd restrisico.</p>
+<p><strong>Bron:</strong> synthetische termijnen; de echte bron is de contract- en leveranciersregistratie — dit is geen tweede contractadministratie en bronhouders zijn niet vastgesteld. Herzie bij een nieuwe roadmap, contractwijziging of iedere kwartaalplanning.</p>
+<p><strong>Regels:</strong> uiterlijke start = einde − doorlooptijd; afhankelijkheden schuiven eerder; een onbevestigde opgave blijft zichtbaar; gepland is niet uitgevoerd; de drempel van 8 weken is een demo-afspraak.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige versie- en contractlijst op gemiste afhankelijkheden en te late signalering. Technische werking bewijst geen lokale inhoudelijke juistheid of gebruikerswaarde.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-applicatielandschap.html">Applicatielandschap</a><a href="../wijziging_en_acceptatie/fab-omgevingsvergelijker.html">Omgevingsvergelijker</a><a href="../wijziging_en_acceptatie/fab-releaseatelier.html">Releaseatelier</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een bronreferentie is op zichzelf geen beoordeeld bewijs.</p>
+</section>
+</main>
+<script>
+const DAY=864e5,D0=Date.UTC(2026,9,1),D1=Date.UTC(2028,6,1),PEIL=Date.UTC(2026,9,3),WEEKS56=56*DAY;
+const MN=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const INITIAL=[
+{id:'ecd',name:'Zorgdossier (ECD)',version:'2026.3',full:'2027-03-31',end:'2027-09-30',source:'Leveranciersroadmap 2026-09 (demo)',srcStatus:'Bevestigd door contractbeheer (demo) 2026-09-20',confirmed:true,weeks:16,leadText:'test 6, opleiding 4, invoering en nazorg 6',dep:true,depNote:'Door afhankelijkheid van het besturingssysteem van de zorgtablets',owner:'Applicatie-eigenaar zorgdossier'},
+{id:'rooster',name:'Roosterportaal',version:'4.2',full:'2026-12-31',end:'2026-12-31',source:'Leveranciersmail 2026-08 (demo)',srcStatus:'Onbevestigde opgave, niet in contractregistratie',confirmed:false,weeks:12,leadText:'test 4, opleiding 2, invoering 6',owner:'Applicatie-eigenaar planning'},
+{id:'connector',name:'Overdrachtsconnector',version:'0.2',full:null,end:null,source:'Wijzigingsplan CHG-DEMO-LOC-02 (demo)',srcStatus:'0.2 vervalt na livegang van 0.3, datum niet vastgesteld',confirmed:true,weeks:8,leadText:'8 weken',owner:'Functioneel keteneigenaar met integratiebeheer'},
+{id:'bi',name:'Rapportageplatform',version:'9',full:'2027-12-31',end:'2028-06-30',source:'Productlevenscyclus fabrikant, peildatum 2026-09-01 (demo)',srcStatus:'Bevestigd',confirmed:true,weeks:26,leadText:'migratie rapporten 14, test 8, overdracht 4',owner:'Rapportage-eigenaar met BI'},
+{id:'tabletos',name:'Besturingssysteem zorgtablets',version:'15',full:'2026-10-31',end:'2027-01-31',source:'Fabrikantpagina, peildatum 2026-09-01 (demo)',srcStatus:'Bevestigd door ICT (demo)',confirmed:true,weeks:10,leadText:'uitrol ICT',owner:'ICT-werkplekbeheer met FAB'}
+];
+let items,step=0,selected='rooster';
+function day(d){return Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));}
+function fmt(t){const d=new Date(t);return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
+function currentDate(){return step===0?PEIL:Date.UTC(2026+Math.floor((9+step)/12),(9+step)%12,1);}
+function initialize(){items=INITIAL.map(i=>({...i}));}
+function ownStart(i){return i.end?day(i.end)-i.weeks*7*DAY:null;}
+function startOf(i){
+ const own=ownStart(i);
+ if(i.id==='ecd'&&own!==null){const t=items.find(x=>x.id==='tabletos');const ts=ownStart(t);if(ts!==null)return Math.min(own,ts-i.weeks*7*DAY);}
+ return own;
+}
+function dependent(i){return i.id==='ecd'&&ownStart(i)!==null&&startOf(i)<ownStart(i);}
+function plan(i,D){
+ const end=i.end?day(i.end):null;
+ if(end===null)return{status:'Einddatum onbekend',action:'Vraag de einddatum op bij de functioneel keteneigenaar en leg die vast in het wijzigingsplan.',start:null,end:null};
+ const start=startOf(i);
+ let status,action;
+ if(D>end){status='Buiten ondersteuning';action=`Gebruik is niet meer ondersteund; escaleer naar ${i.owner} en leg het restrisico voor aan de bevoegde rol.`;}
+ else if(D>=start){status='Start uiterlijk verstreken';action=`Escaleer naar ${i.owner}; laat de bevoegde rol een tijdelijke maatregel en het restrisico beoordelen.`;}
+ else if(start-D<=WEEKS56){status='Start binnen 8 weken';action=`Start de voorbereiding: plan test, opleiding en invoering met ${i.owner}.`;}
+ else{status='Bewaken';action=`Herbeoordeel bij nieuwe roadmap of uiterlijk ${fmt(start-WEEKS56)}.`;}
+ if(!i.confirmed)status+=' (op basis van onbevestigde opgave)';
+ return{status,action,start,end};
+}
+function y(t){return (t-D0)/(D1-D0)*100;}
+function x(i){return i*20;}
+function draw(){
+ const D=currentDate();
+ document.querySelector('#date-label').textContent=fmt(D);
+ document.querySelector('#colheads').innerHTML=items.map(i=>`<button class="colhead" data-select="${i.id}" aria-expanded="${selected===i.id}" aria-controls="detail-${i.id}">${i.name}<small>versie ${i.version}</small></button>`).join('');
+ let spine='';
+ for(let m=0;m<=21;m++){const t=Date.UTC(2026,9+m,1);const yy=y(t);if(yy>100)break;spine+=`<span class="month" style="top:${yy}%">${MN[new Date(t).getUTCMonth()]}</span>`;}
+ [2026,2027,2028].forEach((yr,ix)=>{const a=y(Date.UTC(yr,0,1)),b=Math.min(y(Date.UTC(yr+1,0,1)),100);if(b>0)spine+=`<span class="year" style="top:${Math.max(a,0)+(b-Math.max(a,0))/2-8}%">${yr}</span>`;});
+ spine+=`<div class="peillabel" style="top:${y(D)}%">Peildatum<br>${fmt(D)}</div>`;
+ document.querySelector('#spine').innerHTML=spine;
+ let plot='';
+ for(let m=0;m<=21;m++){const t=Date.UTC(2026,9+m,1);const yy=y(t);if(yy>100)break;plot+=`<div class="mline" style="top:${yy}%"></div>`;}
+ items.forEach((it,ix)=>{
+  const p=plan(it,D),L=x(ix)+10;
+  if(it.end===null){
+   plot+=`<div class="band unknown" style="left:${L}%;top:0;height:100%"></div>`;
+   plot+=`<div class="endlabel" style="left:${x(ix)}%;width:20%;top:1%;text-align:center">Einddatum onbekend</div>`;
+  }else{
+   const fe=day(it.full),ee=day(it.end),st=p.start;
+   const ey=Math.min(y(ee),97),sy=y(st),syC=Math.max(sy,1.2);
+   plot+=`<div class="band" style="left:${L}%;top:0;height:${y(fe)}%"></div>`;
+   if(ee>fe)plot+=`<div class="band sec" style="left:${L}%;top:${y(fe)}%;height:${y(ee)-y(fe)}%"></div>`;
+   plot+=`<div class="endline" style="left:${x(ix)+2}%;width:16%;top:${Math.min(y(ee),99.4)}%"></div>`;
+   let endTop=y(ee)>94?ey:ey+1;
+   const endTf=y(ee)>94?'transform:translateY(-118%);':'';
+   if(sy>=0&&endTop<sy+4.6)endTop=Math.min(sy+4.6,97);
+   plot+=`<div class="endlabel" style="left:${x(ix)}%;width:20%;top:${endTop}%;text-align:center;${endTf}">einde ${it.end}</div>`;
+   const leadWk=Math.round((ee-st)/6048e5);
+   plot+=`<div class="leadrule" style="left:${x(ix)+19}%;top:${syC}%;height:${Math.max(ey-syC,.4)}%"></div><div class="leadlabel" style="left:${x(ix)+18.9}%;top:${(syC+ey)/2}%">doorlooptijd ${leadWk} wk</div>`;
+   if(sy>=0){
+    plot+=`<div class="startmark" style="left:${L}%;top:${sy}%"></div><div class="startlabel" style="left:${L}%;top:${sy+1.7}%">uiterlijk ${fmt(st)}</div>`;
+   }else{
+    plot+=`<div class="startlabel" style="left:${x(ix)+1}%;top:1%;transform:none">uiterlijk ${fmt(st)}, vóór dit venster</div>`;
+   }
+  }
+ });
+ const os=items.findIndex(i=>i.id==='tabletos'),ec=items.findIndex(i=>i.id==='ecd');
+ const osP=plan(items[os],D),ecP=plan(items[ec],D);
+ if(osP.start!==null&&ecP.start!==null&&ecP.start<ownStart(items[ec])){
+  const x1=x(os)+10,x2=x(ec)+10,yT=y(osP.start),ye=Math.max(y(ecP.start),4);
+  plot+=`<div class="depline" style="left:${x2}%;width:${x1-x2}%;top:${ye}%"></div><div class="depvert" style="left:${x1}%;top:${ye}%;height:${Math.max(yT-ye,.4)}%"></div><div class="deplabel" style="left:${x1-11}%;top:${ye+0.6}%">ECD ${items[ec].version} eerst live</div>`;
+ }
+ plot+=`<div class="peil" style="top:${y(D)}%"></div>`;
+ document.querySelector('#plot').innerHTML=plot;
+ document.querySelector('#statelines').innerHTML=items.map(i=>{const p=plan(i,D);const late=/verstreken|Buiten/.test(p.status);return`<div class="stateline ${late?'late':''}">${p.status}</div>`;}).join('');
+ document.querySelector('#alist').innerHTML=items.map(i=>{const p=plan(i,D);const fe=i.full?y(day(i.full)):0,ee=i.end?y(day(i.end)):100;const bar=i.end?`<div class="seg full" style="left:0;width:${fe}%"></div>${ee>fe?`<div class="seg secg" style="left:${fe}%;width:${ee-fe}%"></div>`:''}`:`<div class="seg unk"></div>`;
+  return`<article class="mini"><h3>${i.name} (${i.version})</h3><div class="mbar">${bar}<div class="now" style="left:${y(D)}%"></div></div><p><strong>${p.status}</strong>${p.start?` — uiterlijk starten ${fmt(p.start)}, einde ${i.end}`:' — einde onbekend'}.</p><p>${p.action}</p></article>`;}).join('');
+ document.querySelector('#details').innerHTML=items.map(i=>{const p=plan(i,D);
+  const acts=[];
+  if(!i.confirmed)acts.push(`<button data-action="confirm" data-id="${i.id}">Simuleer bevestiging door contractbeheer</button>`);
+  if(i.id==='rooster')acts.push(`<button data-action="roadmap" data-id="rooster">Simuleer gewijzigde roadmap</button>`);
+  if(i.id==='connector'&&!i.end)acts.push(`<button data-action="enddate" data-id="connector">Simuleer vastgestelde einddatum</button>`);
+  return`<div class="detail" id="detail-${i.id}" ${selected===i.id?'':'hidden'}><h3>${i.name}, versie ${i.version}</h3><div class="detail-grid"><div><p><strong>Status op ${fmt(D)}:</strong> ${p.status}.${dependent(i)?' '+i.depNote+'.':''}</p><p style="margin-top:10px"><strong>Volgende actie:</strong> ${p.action}</p><div class="detail-actions">${acts.join('')}</div></div><dl><dt>Ondersteuning volledig</dt><dd>${i.full||'onbekend'}</dd><dt>Beveiligingsupdates tot</dt><dd>${i.end||'onbekend'}</dd><dt>Uiterlijke start</dt><dd>${p.start?fmt(p.start):'niet te berekenen'}</dd><dt>Doorlooptijd</dt><dd>${i.weeks} weken (${i.leadText})</dd><dt>Bron</dt><dd>${i.source}</dd><dt>Bronstatus</dt><dd>${i.srcStatus}</dd><dt>Eigenaar</dt><dd>${i.owner} (voorgestelde rol)</dd></dl></div></div>`;}).join('');
+ const c={verstreken:0,binnen:0,bewaken:0,buiten:0,onbekend:0};
+ items.forEach(i=>{const s=plan(i,D).status;if(s.startsWith('Start uiterlijk'))c.verstreken++;else if(s.startsWith('Start binnen'))c.binnen++;else if(s.startsWith('Bewaken'))c.bewaken++;else if(s.startsWith('Buiten'))c.buiten++;else c.onbekend++;});
+ document.querySelector('#summary').textContent=`${c.verstreken} verstreken, ${c.binnen} binnen 8 weken, ${c.bewaken} bewaken, ${c.buiten} buiten ondersteuning, ${c.onbekend} einddatum onbekend. Geen planning of besluit.`;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const D=currentDate();
+ const lines=items.map(i=>{const p=plan(i,D);return`${i.name} (${i.version})\nVolledige ondersteuning tot ${i.full||'onbekend'}; beveiligingsupdates tot ${i.end||'onbekend'}\nDoorlooptijd: ${i.weeks} weken (${i.leadText})${dependent(i)?'; '+i.depNote:''}\nUiterlijke start: ${p.start?fmt(p.start):'niet te berekenen'}; status op ${fmt(D)}: ${p.status}\nBron: ${i.source}; bronstatus: ${i.srcStatus}\nEigenaar: ${i.owner} (voorgestelde rol). Volgende actie: ${p.action}`;});
+ return['Life Cycle Map / vijf onderdelen / demo v1 / revisie 2026-10-03','Exportmoment: '+new Date().toISOString(),'Uitsluitend simulatie; geen echte contractinformatie, planning of besluitvorming.','Bekeken per '+fmt(D)+'. Drempel (demo): start binnen 8 weken telt als actie nodig. Rekenregel: uiterlijke start = einde − doorlooptijd; afhankelijkheden schuiven eerder.',document.querySelector('#summary').textContent,...lines,'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'].join('\n\n');
+}
+document.querySelector('#date').addEventListener('input',e=>{step=+e.target.value;draw();});
+document.querySelector('#colheads').addEventListener('click',e=>{const b=e.target.closest('[data-select]');if(!b)return;selected=selected===b.dataset.select?null:b.dataset.select;draw();const n=document.querySelector(`[data-select="${b.dataset.select}"]`);if(n)n.focus();});
+document.querySelector('#details').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const i=items.find(x=>x.id===b.dataset.id);
+ if(b.dataset.action==='confirm'&&!i.confirmed){i.confirmed=true;i.srcStatus='Bevestigd (simulatie), contractbeheer (demo) 2026-10-03';document.querySelector('#message').textContent=`${i.name}: bron bevestigd door contractbeheer (simulatie).`;}
+ if(b.dataset.action==='roadmap'){i.end='2027-03-31';i.full='2027-03-31';i.confirmed=false;i.srcStatus='Herbeoordeling nodig: nieuwe opgave, niet bevestigd';document.querySelector('#message').textContent=`${i.name}: gewijzigde roadmap; einde nu 2027-03-31, opgave onbevestigd.`;}
+ if(b.dataset.action==='enddate'){i.end='2027-01-31';i.full='2027-01-31';i.srcStatus='Vastgesteld in wijzigingsplan (simulatie)';document.querySelector('#message').textContent=`${i.name}: einddatum vastgesteld op 2027-01-31 (simulatie).`;}
+ draw();});
+document.querySelector('#reset').addEventListener('click',()=>{initialize();step=0;selected='rooster';document.querySelector('#date').value=0;draw();document.querySelector('#message').textContent='Beginstand hersteld; peildatum en brongegevens opnieuw geladen.';});
+document.querySelector('#copy').addEventListener('click',async()=>{const text=summary();document.querySelector('#export').hidden=false;document.querySelector('#export-text').value=text;try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Planningsoverzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

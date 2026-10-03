@@ -130,6 +130,11 @@ footer { padding: 26px 0 6px; font-size: 13.5px; color: var(--muted); max-width:
 .now-list li span:last-child { min-width: 0; }
 @media (max-width: 900px) { .panels { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .panel dl { grid-template-columns: 1fr; gap: 3px; } .panel dd { margin-bottom: 8px; } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
     </style>
   </head>
   <body>
