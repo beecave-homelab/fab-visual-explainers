@@ -42,6 +42,9 @@ TASK_FILES = (
     "fab-escalatiekaart.html",
     "fab-risk-control-map.html",
     "fab-pilot-cockpit.html",
+    "fab-data-lineage.html",
+    "fab-release-impact-explorer.html",
+    "fab-adoptiekaart.html",
 )
 
 

@@ -129,6 +129,13 @@ def test_task_views__print_and_nojs(
             expect(page.locator(".register article")).to_have_count(3)
         elif filename == "fab-pilot-cockpit.html":
             expect(page.locator(".register tr[data-static-week]")).to_have_count(8)
+        elif filename == "fab-data-lineage.html":
+            expect(page.locator(".register article")).to_have_count(3)
+        elif filename == "fab-release-impact-explorer.html":
+            expect(page.locator(".register article")).to_have_count(7)
+        elif filename == "fab-adoptiekaart.html":
+            expect(page.locator(".register article")).to_have_count(4)
+            expect(page.locator(".layers-key")).to_be_visible()
         page.emulate_media(media="print")
         expect(page.locator("#copy")).to_be_hidden()
         expect(page.locator("[data-action]:visible")).to_have_count(0)
