@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische risk & control map: volg elk risico door zijn maatregelen en zie welk restrisico aangetoond blijft.">
+    <title>FAB Risk &amp; Control Map — welk risico blijft over?</title>
+    <style>
+:root{--steel:#E6EBEF;--paper:#FBFCFD;--cheese:#E2B13C;--rind:#B5841C;--ink:#1F2A36;--hazard:#9E2A1F;--muted:#56626E;--display:"Athelas","Constantia","Hoefler Text",Georgia,serif;--body:"PT Sans","Corbel","Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--steel);color:var(--ink);font:17px/1.55 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--hazard);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(34px,4.4vw,56px);font-weight:500;line-height:1.12;max-width:20ch}h2{font-family:var(--display);font-size:26px;font-weight:500}h3{font-family:var(--display);font-size:21px;font-weight:500}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--hazard);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #a8b2bc;padding-bottom:14px;font-size:15px}.demo strong{color:var(--hazard)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 30px}.intro{margin-top:18px;max-width:54ch}.context{background:var(--paper);border-top:5px solid var(--ink);padding:18px 20px;font-size:15px}.context p+p{margin-top:8px}
+.tools{display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap;margin:20px 0}.plain{background:var(--paper);border:1px solid var(--ink);border-radius:4px;padding:9px 16px}
+.interactive{display:none}body.ready .interactive{display:flex}
+.tally{font-size:16px;margin:4px 0 22px;padding:10px 14px;background:var(--paper);border-left:5px solid var(--ink)}
+.risk{background:var(--paper);border:1px solid #c4ccd3;margin-bottom:26px}
+.risk-head{padding:16px 20px 0;display:flex;justify-content:space-between;gap:14px;align-items:baseline;flex-wrap:wrap}
+.risk-head h3{font-size:23px}.risk-id{color:var(--muted);font-size:15px}
+.risk-meta{padding:2px 20px 0;font-size:14px;color:var(--muted)}
+.risk-body{display:grid;grid-template-columns:1.6fr .9fr;gap:20px;padding:12px 20px 18px}
+.slice{display:block;width:100%;height:auto}
+.controls{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}
+.control{border-left:4px solid #c4ccd3;padding:4px 0 4px 12px;font-size:15px}
+.control .cname{font-weight:700}.control .state{color:var(--muted)}.control.tested .state{color:var(--ink);font-weight:600}
+.control .evidence{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+.control .cacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.cacts button{background:transparent;border:1px solid var(--ink);border-radius:4px;padding:7px 12px;font-size:14px;min-height:44px}
+.residualbox{align-self:start;border:1px solid #c4ccd3;padding:14px 16px;font-size:15px}
+.residual{font-weight:700}.residual.bad{color:var(--hazard)}
+.expected{margin-top:6px;color:var(--muted)}
+.acceptance{margin-top:10px;border-top:1px dashed #c4ccd3;padding-top:10px}
+.acceptance button{background:transparent;border:1px solid var(--ink);border-radius:4px;padding:8px 14px;font-size:14px;min-height:44px;margin-top:8px}
+.live{min-height:24px;color:var(--hazard);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--paper);padding:22px;border:1px solid #c4ccd3}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid #a8b2bc}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(max-width:900px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}}
+@media(max-width:760px){.risk-body{grid-template-columns:1fr}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:34px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context{font-size:10pt}.tools,.cacts,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action],.acceptance button{display:none!important}.risk{border:1px solid #777;break-inside:avoid}.risk-body{display:block}.residualbox{border:1px solid #777;margin-top:10px}.tally{border-left:3px solid #000}.verdict-keep{break-inside:avoid}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de risico's</a>
+<main class="page">
+<div class="demo"><span>FAB / Risk &amp; Control Map</span><strong>Synthetische demonstratie, geen risicoregister</strong></div>
+<header class="mast">
+<div>
+<h1>Welk risico blijft over als de maatregelen echt zijn getoetst?</h1>
+<p class="intro">Elke rij volgt één risico door zijn maatregelen. Alleen een getoetste, werkzame maatregel maakt de lijn dunner of het gevolg kleiner. Een voorgenomen of alleen uitgevoerde maatregel laat het risico ongemoeid, hoe overtuigend het plan ook is.</p>
+</div>
+<div class="context">
+<p><strong>Teamindeling per wijk</strong></p>
+<p>RFC-2026-118, ECD 2026.4, beoogde livegang 2026-11-02</p>
+<p>Risicoanalyse demo v1, revisie 2026-10-03. Kansklassen en gevolgsoorten zijn demo-afspraken, geen lokaal risicobeleid.</p>
+<p>Gebruiksmoment: overleg bij impactanalyse en overdracht.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Risico's door hun maatregelen</h2>
+<div class="tools interactive">
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer risico-overzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<p class="tally" id="tally" aria-live="polite"></p>
+<div id="risks"></div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Risico-overzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief toetsuitkomsten en acceptaties. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle risico's en maatregelen, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde statussen bovenaan kunnen ervan afwijken en gelden nooit als werkelijke toets of acceptatie. Peildatum 2026-10-03.</p>
+<div class="register">
+<article id="risk-static-R1">
+<h3>R1 — Medewerker ziet cliënten buiten de eigen wijk</h3>
+<p><strong>Inherent:</strong> kans midden, gevolg privacyrisico. <strong>Risico-eigenaar:</strong> gegevenseigenaar cliëntdossier (voorgestelde rol). <strong>Accepteert restrisico:</strong> gegevenseigenaar met privacy officer (voorgestelde rol).</p>
+<p><strong>Maatregelen:</strong> C1 Rolmodel per wijk ingericht — verwacht effect kans naar laag; beginstatus uitgevoerd; bewijs: uitvoering configuratie-export acceptatie 2026-09-30 (demo), toets gepland (negatieve autorisatietest T-02). C2 Inzage buiten de wijk vraagt een reden en wordt gelogd — verwacht effect kans naar laag; beginstatus voorgenomen; geen bewijs.</p>
+<p><strong>Restrisico op de peildatum:</strong> aangetoond midden, privacyrisico (ernstig); verwacht als alle maatregelen werken laag, privacyrisico. <strong>Open punten:</strong> C1 is uitgevoerd maar nog niet getoetst; C2 is alleen voorgenomen.</p>
+</article>
+<article id="risk-static-R2">
+<h3>R2 — Onbekende teamcode in het ketenbericht naar financiën</h3>
+<p><strong>Inherent:</strong> kans hoog, gevolg financiële gevolgen. <strong>Risico-eigenaar:</strong> proceseigenaar financiën (voorgestelde rol). <strong>Accepteert restrisico:</strong> proceseigenaar financiën (voorgestelde rol).</p>
+<p><strong>Maatregelen:</strong> C3 Mappingtabel teamcodes bijgewerkt — verwacht effect kans naar laag; beginstatus werkzaam; bewijs: ketentest K-07, v2, 2026-09-28, beoordeeld door Integratiebeheer (demo), uitkomst werkzaam. C4 Dagelijkse aansluitcontrole op aantallen — verwacht effect gevolg naar hinder (herstel vóór de declaratierun); beginstatus uitgevoerd; bewijs: eerste controle 2026-09-29 (demo), niet getoetst.</p>
+<p><strong>Restrisico op de peildatum:</strong> aangetoond laag, financiële gevolgen; verwacht als alle maatregelen werken laag, hinder. <strong>Open punten:</strong> C4 is uitgevoerd maar nog niet getoetst.</p>
+</article>
+<article id="risk-static-R3">
+<h3>R3 — Wijkplanning toont lege diensten na de overgang</h3>
+<p><strong>Inherent:</strong> kans midden, gevolg stilgevallen zorgondersteuning. <strong>Risico-eigenaar:</strong> proceseigenaar zorg wijkteams (voorgestelde rol). <strong>Accepteert restrisico:</strong> proceseigenaar zorg wijkteams (voorgestelde rol).</p>
+<p><strong>Maatregelen:</strong> C5 Overgang buiten piekuren met controlelijst per wijk — verwacht effect kans naar laag; beginstatus voorgenomen; geen bewijs. C6 Terugval naar papieren dienstlijst volgens het lokale noodplan — verwacht effect gevolg naar hinder; beginstatus voorgenomen; geen bewijs; toets geblokkeerd: het lokale noodplan ontbreekt in deze demo.</p>
+<p><strong>Restrisico op de peildatum:</strong> aangetoond midden, stilgevallen zorgondersteuning (ernstig); verwacht als alle maatregelen werken laag, hinder. <strong>Open punten:</strong> beide maatregelen zijn alleen voorgenomen; C6 is niet te toetsen zonder lokaal noodplan.</p>
+</article>
+</div>
+<p><strong>Rekenregels:</strong> kansklassen lopen van laag via midden naar hoog. Het aangetoonde restrisico gebruikt de laagste van de inherente kans en de kanseffecten van getoetste, werkzame maatregelen; het gevolg komt van de laatste werkzame gevolgmaatregel, anders van het inherente gevolg. Het verwachte restrisico rekent hetzelfde over alle maatregelen ongeacht status en is nooit aangetoond. Ernstig is een aangetoond restrisico met kans hoog, of met gevolg privacyrisico of stilgevallen zorgondersteuning bij een kans die niet laag is. Er is geen totaalscore.</p>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij impactanalyse en overdracht, samen met risico-eigenaren; de uitkomst is een zichtbaar restrisico en een besluitvraag aan de bevoegde rol. FAB accepteert geen restrisico.</p>
+<p><strong>Bron:</strong> synthetische risicoanalyse, demo v1, revisie 2026-10-03; het echte risicoregister of wijzigingsdossier en de bronhouders zijn niet vastgesteld. Herzie bij een gewijzigde maatregel, een nieuwe toets of vóór het Go/No-Go-moment.</p>
+<p><strong>Regels:</strong> alleen een getoetste, werkzame maatregel verlaagt het aangetoonde restrisico; verwacht is niet aangetoond; een wijziging na acceptatie maakt die acceptatie ongeldig; geen totaalscore.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige risicoparagraaf in het wijzigingsdossier op gemiste ongeteste maatregelen, juiste acceptant en herkenning van vervallen acceptaties.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-change-impact-map.html">Change Impact Map</a><a href="fab-test-coverage-map.html">Testsporen en bewijs</a><a href="fab-go-no-go-cockpit.html">Go/No-Go</a><a href="fab-beheerbaarheid-scan.html">Beheerbaarheid Scan</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een gesimuleerde toets of acceptatie is geen echte beoordeling.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const KANS=['laag','midden','hoog'],DIKTE={laag:5,midden:13,hoog:22};
+const RISKS=[
+{id:'R1',title:'Medewerker ziet cliënten buiten de eigen wijk',kans:'midden',gevolg:'Privacyrisico',owner:'Gegevenseigenaar cliëntdossier',acceptor:'Gegevenseigenaar met privacy officer'},
+{id:'R2',title:'Onbekende teamcode in het ketenbericht naar financiën',kans:'hoog',gevolg:'Financiële gevolgen',owner:'Proceseigenaar financiën',acceptor:'Proceseigenaar financiën'},
+{id:'R3',title:'Wijkplanning toont lege diensten na de overgang',kans:'midden',gevolg:'Stilgevallen zorgondersteuning',owner:'Proceseigenaar zorg wijkteams',acceptor:'Proceseigenaar zorg wijkteams'}];
+const CONTROLS=[
+{id:'C1',risk:'R1',name:'Rolmodel per wijk ingericht',effect:{kans:'laag'},status:'uitgevoerd',evidence:'Uitvoering: configuratie-export acceptatie 2026-09-30 (demo). Toets gepland: negatieve autorisatietest T-02.'},
+{id:'C2',risk:'R1',name:'Inzage buiten de wijk vraagt een reden en wordt gelogd',effect:{kans:'laag'},status:'voorgenomen',evidence:'Geen.'},
+{id:'C3',risk:'R2',name:'Mappingtabel teamcodes bijgewerkt',effect:{kans:'laag'},status:'werkzaam',evidence:'Ketentest K-07, v2, 2026-09-28, beoordeeld door Integratiebeheer (demo), uitkomst werkzaam.'},
+{id:'C4',risk:'R2',name:'Dagelijkse aansluitcontrole op aantallen',effect:{gevolg:'Hinder (herstel vóór de declaratierun)'},status:'uitgevoerd',evidence:'Uitvoering: eerste controle 2026-09-29 (demo). Niet getoetst.'},
+{id:'C5',risk:'R3',name:'Overgang buiten piekuren met controlelijst per wijk',effect:{kans:'laag'},status:'voorgenomen',evidence:'Geen.'},
+{id:'C6',risk:'R3',name:'Terugval naar papieren dienstlijst volgens het lokale noodplan',effect:{gevolg:'Hinder'},status:'voorgenomen',evidence:'Geen. Toets niet mogelijk: het lokale noodplan ontbreekt in deze demo.',blocked:true}];
+const STATUS_LABEL={voorgenomen:'Voorgenomen',uitgevoerd:'Uitgevoerd, niet getoetst',werkzaam:'Getoetst, werkzaam',nietwerkzaam:'Getoetst, niet werkzaam',gewijzigd:'Gewijzigd, opnieuw toetsen'};
+let controls,accepted,acceptedSnapshot,voidedAccept;
+function initialize(){
+ controls=CONTROLS.map(c=>({...c}));
+ accepted={R1:false,R2:false,R3:false};
+ acceptedSnapshot={};
+ voidedAccept={R1:false,R2:false,R3:false};
+}
+function lower(s){return s.charAt(0).toLowerCase()+s.slice(1);}
+function controlsOf(rid){return controls.filter(c=>c.risk===rid);}
+function residual(risk,all){
+ const r=RISKS.find(x=>x.id===risk);
+ let kans=r.kans,gevolg=r.gevolg;
+ for(const c of controlsOf(risk)){
+  const usable=all||c.status==='werkzaam';
+  if(!usable)continue;
+  if(c.effect.kans&&KANS.indexOf(c.effect.kans)<KANS.indexOf(kans))kans=c.effect.kans;
+  if(c.effect.gevolg)gevolg=c.effect.gevolg;
+ }
+ return{kans,gevolg};
+}
+function severe(res){
+ return res.kans==='hoog'||((res.gevolg==='Privacyrisico'||res.gevolg==='Stilgevallen zorgondersteuning')&&res.kans!=='laag');
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function resText(res){return`${cap(res.kans)}, ${lower(res.gevolg)}`;}
+function untested(rid){return controlsOf(rid).filter(c=>c.status!=='werkzaam'&&c.status!=='nietwerkzaam').length;}
+function sliceSvg(rid){
+ const cs=controlsOf(rid),r=RISKS.find(x=>x.id===rid);
+ const res=residual(rid,false);
+ const y=75,top=14,bot=138,W=78,skew=14;
+ const xs=cs.map((c,i)=>120+i*(cs.length>1?320/(cs.length-1):0));
+ const parts=[];
+ parts.push(`<circle cx="18" cy="${y}" r="7" fill="var(--hazard)"/>`);
+ parts.push(`<rect x="596" y="10" width="36" height="130" fill="var(--hazard)" fill-opacity=".28" stroke="var(--hazard)" stroke-width="2"/>`);
+ cs.forEach((c,i)=>{
+  const cx=xs[i];
+  const d=`M${cx-W/2+skew} ${top} L${cx+W/2+skew} ${top} L${cx+W/2-skew} ${bot} L${cx-W/2-skew} ${bot} Z`;
+  const holes=[[-20,42,8],[22,96,7],[0,112,9]].map(([dx,dy,r2])=>`<ellipse cx="${cx+dx}" cy="${dy}" rx="${r2}" ry="${r2-2}" fill="var(--paper)"/>`).join('');
+  if(c.status==='voorgenomen'){
+   parts.push(`<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>`);
+  }else if(c.status==='werkzaam'){
+   parts.push(`<path d="${d}" fill="var(--cheese)" stroke="var(--rind)" stroke-width="3"/>${holes}`);
+  }else if(c.status==='nietwerkzaam'){
+   parts.push(`<path d="${d}" fill="var(--cheese)" stroke="var(--rind)" stroke-width="2"/>${holes}<ellipse cx="${cx}" cy="${y}" rx="15" ry="17" fill="var(--paper)"/>`);
+  }else{
+   parts.push(`<path d="${d}" fill="var(--cheese)" fill-opacity=".45" stroke="var(--rind)" stroke-width="2"/>${holes}<ellipse cx="${cx}" cy="${y}" rx="9" ry="11" fill="var(--paper)"/>`);
+  }
+ });
+ let kans=r.kans,prevX=26;
+ cs.forEach((c,i)=>{
+  const cx=xs[i];
+  parts.push(`<line x1="${prevX}" y1="${y}" x2="${cx+W/2+skew}" y2="${y}" stroke="var(--hazard)" stroke-width="${DIKTE[kans]}"/>`);
+  if(c.status==='werkzaam'&&c.effect.kans&&KANS.indexOf(c.effect.kans)<KANS.indexOf(kans))kans=c.effect.kans;
+  prevX=cx+W/2+skew;
+ });
+ parts.push(`<line x1="${prevX}" y1="${y}" x2="598" y2="${y}" stroke="var(--hazard)" stroke-width="${DIKTE[kans]}"/>`);
+ return`<svg class="slice" viewBox="0 0 640 150" role="img" aria-label="Doorsnede van ${rid}: risicolijn door maatregelen" focusable="false">${parts.join('')}</svg>`;
+}
+function draw(){
+ document.querySelector('#risks').innerHTML=RISKS.map(r=>{
+  const res=residual(r.id,false),exp=residual(r.id,true),sev=severe(res);
+  const cs=controlsOf(r.id);
+  const accHtml=accepted[r.id]
+   ?`Geaccepteerd (simulatie): aangetoond restrisico ${acceptedSnapshot[r.id].kans}, ${acceptedSnapshot[r.id].gevolg}, door ${r.acceptor}, ${PEIL}`+(acceptedSnapshot[r.id].open?`; nog niet getoetste maatregelen: ${acceptedSnapshot[r.id].open}`:'')
+   :voidedAccept[r.id]?'Acceptatie vervallen: maatregel gewijzigd na acceptatie':'Restrisico nog niet geaccepteerd';
+  return`<article class="risk" data-risk="${r.id}">
+  <div class="risk-head"><h3>${r.title}</h3><span class="risk-id">${r.id}. Risico-eigenaar: ${r.owner} (voorgestelde rol)</span></div>
+  <p class="risk-meta">Inherent: kans ${r.kans}, gevolg ${lower(r.gevolg)}. Restrisico accepteert: ${r.acceptor} (voorgestelde rol).</p>
+  <div class="risk-body">
+   <div>${sliceSvg(r.id)}
+   <ol class="controls">${cs.map(c=>`<li class="control${(c.status==='werkzaam'||c.status==='nietwerkzaam')?' tested':''}" data-control="${c.id}">
+    <span class="cname">${c.id} ${c.name}</span><br>
+    Verwacht effect: ${c.effect.kans?`kans naar ${c.effect.kans}`:`gevolg naar ${lower(c.effect.gevolg)}`}<br>
+    <span class="state">${STATUS_LABEL[c.status]}</span>
+    <span class="evidence">${c.evidence}</span>
+    <div class="cacts">
+     <button data-action="execute" data-control="${c.id}" ${c.status==='voorgenomen'?'':'disabled'}>Simuleer uitvoering</button>
+     <button data-action="pass" data-control="${c.id}" ${((c.status==='uitgevoerd'||c.status==='gewijzigd')&&!c.blocked)?'':'disabled'}>Simuleer toets: werkzaam</button>
+     <button data-action="fail" data-control="${c.id}" ${((c.status==='uitgevoerd'||c.status==='gewijzigd')&&!c.blocked)?'':'disabled'}>Simuleer toets: niet werkzaam</button>
+     <button data-action="change" data-control="${c.id}" ${c.status!=='voorgenomen'?'':'disabled'}>Simuleer gewijzigde maatregel</button>
+    </div>
+   </li>`).join('')}</ol></div>
+   <div class="residualbox">
+    <p class="residual${sev?' bad':''}">Aangetoond restrisico: ${resText(res)}${sev?'. Ernstig restrisico: vraagt een expliciet besluit vóór livegang':''}</p>
+    <p class="expected">Verwacht als alle maatregelen werken: ${resText(exp)}. Niet aangetoond.</p>
+    <p class="acceptance">${accHtml}<br><button data-action="accept" data-risk="${r.id}" ${accepted[r.id]?'disabled':''}>Simuleer acceptatie restrisico door ${r.acceptor}</button></p>
+   </div>
+  </div>
+  </article>`;
+ }).join('');
+ const acc=RISKS.filter(r=>accepted[r.id]).length;
+ const sev=RISKS.filter(r=>severe(residual(r.id,false))).length;
+ const tested=controls.filter(c=>c.status==='werkzaam'||c.status==='nietwerkzaam').length;
+ document.querySelector('#tally').textContent=`${RISKS.length} risico's: ${acc} met geaccepteerd restrisico, ${RISKS.length-acc} zonder acceptatie, ${sev} met ernstig aangetoond restrisico. ${tested} van ${controls.length} maatregelen getoetst.`;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function invalidate(rid){
+ if(accepted[rid]){accepted[rid]=false;voidedAccept[rid]=true;}
+}
+function summary(){
+ const lines=RISKS.map(r=>{
+  const res=residual(r.id,false),exp=residual(r.id,true);
+  const acc=accepted[r.id]?`Geaccepteerd (simulatie) door ${r.acceptor}, ${PEIL}`:voidedAccept[r.id]?'Acceptatie vervallen: maatregel gewijzigd na acceptatie':'Restrisico nog niet geaccepteerd';
+  const cl=controlsOf(r.id).map(c=>`  ${c.id} ${c.name} — ${STATUS_LABEL[c.status]}; verwacht effect ${c.effect.kans?`kans naar ${c.effect.kans}`:`gevolg naar ${lower(c.effect.gevolg)}`}; bewijs: ${c.evidence}`).join('\n');
+  return`${r.id} ${r.title}\nInherent: kans ${r.kans}, gevolg ${lower(r.gevolg)}; risico-eigenaar ${r.owner}; acceptant ${r.acceptor}\nAangetoond restrisico: ${resText(res)}${severe(res)?' (ernstig)':''}\nVerwacht als alle maatregelen werken: ${resText(exp)}. Niet aangetoond.\nMaatregelen:\n${cl}\nAcceptatie: ${acc}`;
+ });
+ return[
+  'Risk & Control Map / RFC-2026-118 / demo v1 / revisie 2026-10-03',
+  'Exportmoment: '+new Date().toISOString(),
+  'Uitsluitend simulatie; geen echte uitvoering, toets, beoordeling of risicoacceptatie.',
+  document.querySelector('#tally').textContent,
+  ...lines,
+  'Alleen een getoetste, werkzame maatregel verlaagt het aangetoonde restrisico; verwacht is niet aangetoond. Kansklassen en gevolgsoorten zijn demo-afspraken.',
+  'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'
+ ].join('\n\n');
+}
+document.querySelector('#risks').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b)return;
+ const msg=document.querySelector('#message');
+ if(b.dataset.action==='accept'){
+  const rid=b.dataset.risk,r=RISKS.find(x=>x.id===rid),res=residual(rid,false);
+  accepted[rid]=true;voidedAccept[rid]=false;
+  acceptedSnapshot[rid]={kans:lower(res.kans),gevolg:lower(res.gevolg),open:untested(rid)};
+  msg.textContent=`${rid}: restrisico geaccepteerd (simulatie) door ${r.acceptor}.`;
+ }else{
+  const c=controls.find(x=>x.id===b.dataset.control);
+  if(b.dataset.action==='execute'&&c.status==='voorgenomen'){
+   c.status='uitgevoerd';c.evidence='Uitvoering gemeld 2026-10-03 (simulatie). Niet getoetst.'+(c.blocked?' Toets niet mogelijk: het lokale noodplan ontbreekt in deze demo.':'');
+   msg.textContent=`${c.id}: uitvoering gemeld (simulatie).`;
+  }
+  if(b.dataset.action==='pass'&&(c.status==='uitgevoerd'||c.status==='gewijzigd')&&!c.blocked){
+   c.status='werkzaam';c.evidence='Synthetische toets (simulatie), versie demo, 2026-10-03, beoordeeld door Test-/acceptatieverantwoordelijke (demo), uitkomst werkzaam.';
+   msg.textContent=`${c.id}: getoetst, werkzaam (simulatie).`;
+  }
+  if(b.dataset.action==='fail'&&(c.status==='uitgevoerd'||c.status==='gewijzigd')&&!c.blocked){
+   c.status='nietwerkzaam';c.evidence='Synthetische toets (simulatie), versie demo, 2026-10-03, beoordeeld door Test-/acceptatieverantwoordelijke (demo), uitkomst niet werkzaam.';
+   msg.textContent=`${c.id}: getoetst, niet werkzaam (simulatie).`;
+  }
+  if(b.dataset.action==='change'&&c.status!=='voorgenomen'){
+   c.status='gewijzigd';c.evidence='Maatregel gewijzigd (simulatie); eerder toetsbewijs vervallen. Opnieuw toetsen vereist.';
+   msg.textContent=`${c.id}: gewijzigd; eerder toetsbewijs vervallen.`;
+  }
+  invalidate(c.risk);
+ }
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; alle simulaties en acceptaties zijn gewist.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Risico-overzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

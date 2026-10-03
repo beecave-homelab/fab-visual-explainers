@@ -68,3 +68,4 @@ target/
 
 # Brongebonden presentatiekopieën; geen bibliotheekprototypes
 /outputs/
+.vscode/settings.json
