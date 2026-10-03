@@ -219,7 +219,7 @@
       .evidence-rail{border-top:2px solid var(--d-line)}
     }
     @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-  
+
 
 body{background:#cfd3ca;color:#171819}
 #dossier.design{display:block;min-height:100vh}
@@ -231,9 +231,44 @@ body{background:#cfd3ca;color:#171819}
   .review-context p { max-width: none; }
 }
 
+
+/* Het volledige bronmodel blijft leesbaar zonder scripts en in afdruk. */
+[hidden] { display: none !important; }
+.source-register { max-width:1440px; margin:24px auto; padding:24px; border:1px solid currentColor; border-radius:16px; line-height:1.6; overflow-wrap:anywhere; }
+.source-register summary { cursor:pointer; font-weight:700; }
+.source-register article { margin-top:24px; padding-top:16px; border-top:1px solid currentColor; }
+.source-register h3 { font-size:1.2rem; line-height:1.4; }
+.source-register a { color:inherit; }
+.source-register blockquote { margin:16px 0; padding:12px; border-left:3px solid currentColor; }
+.source-register :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+@media screen and (max-width:760px) { .source-register { margin:16px; padding:16px; } }
+@media print {
+  @page { size:A4; margin:12mm; }
+  body { background:white!important; color:black!important; font-size:11pt!important; }
+  .review-context, .source-register { max-width:none!important; width:auto!important; margin:0!important; padding:12pt 0!important; border:0!important; color:black!important; }
+  .source-register { display:block!important; }
+  .review-context, .source-register { line-height:1.45; }
+  .review-context h2, .source-register h2 { font-size:16pt; }
+  .source-register h3 { font-size:13pt; }
+  .source-register article { margin-top:12pt; padding-top:8pt; }
+  .source-register summary { list-style:none; }
+  .source-register summary::marker { content:""; }
+  .source-register article { break-inside:avoid; }
+  .source-register a { text-decoration:none; }
+}
+
+@media print { #dossier { display:none!important; } }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>
+<noscript><style>button, input[type="search"] { display:none!important; }</style>
+<p class="source-register">JavaScript staat uit. Lees alle demo-inhoud in de bronlijst onderaan.</p>
+</noscript>
 <section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
 <h2>Wat moet ik onderbouwen of besluiten over één beheervraag?</h2>
 <p><strong>Fictieve bron:</strong> antwoorden, citaten, bewijsstroken en pilot-/tijdwinstclaims hieronder zijn verzonnen. Een bewijslabel is geen beoordeeld document of uitgevoerd onderzoek; geen aangetoonde gebruikerswaarde.</p>
@@ -280,7 +315,7 @@ body{background:#cfd3ca;color:#171819}
 <div class="source-strip">
 <b>Bronpad</b><span id="sourceTrail">Samenvatting → hoofdstuk 3 → bevinding 4 → bijlage B</span>
 </div>
-<div aria-labelledby="evidenceTitle" aria-modal="false" class="detail-popover" id="evidencePopover" role="dialog">
+<div aria-labelledby="evidenceTitle" aria-modal="false" class="detail-popover" id="evidencePopover" role="dialog" tabindex="-1">
 <header>
 <h3 id="evidenceTitle">Bewijsstuk</h3>
 <button aria-label="Sluit bewijsstuk" id="closeEvidence" type="button">×</button>
@@ -298,6 +333,8 @@ body{background:#cfd3ca;color:#171819}
 </section>
 <script>
 (() => {
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
   const dossierData = {
     main:{
       question:'Wat is de hoofdconclusie?',
@@ -352,6 +389,11 @@ body{background:#cfd3ca;color:#171819}
   const questionButtons = [...document.querySelectorAll('.question-button')];
   const depthButtons = [...document.querySelectorAll('.depth-tabs button')];
   const pop = document.getElementById('evidencePopover');
+  let evidenceOpener = null;
+  function closeEvidence(){
+    pop.classList.remove('open');
+    if(evidenceOpener?.isConnected) evidenceOpener.focus();
+  }
 
   function renderDossier(){
     const d = dossierData[currentQuestion];
@@ -360,11 +402,11 @@ body{background:#cfd3ca;color:#171819}
     const deck = currentDepth === 'short' ? d.short : currentDepth === 'medium' ? d.medium : d.source;
     document.getElementById('briefDeck').textContent = deck;
     const bodyText = currentDepth === 'short' ? d.medium : currentDepth === 'medium' ? d.source : 'Bronlaag actief: gebruik de bewijsstroken rechts om afzonderlijke onderbouwingen en beperkingen te openen.';
-    document.getElementById('briefBody').innerHTML = `<p>${bodyText}</p><aside class="margin-note"><strong>Wat je hiervan onthoudt</strong>${d.takeaway}</aside>`;
+    document.getElementById('briefBody').innerHTML = `<p>${escapeHtml(bodyText)}</p><aside class="margin-note"><strong>Wat je hiervan onthoudt</strong>${escapeHtml(d.takeaway)}</aside>`;
     document.getElementById('sourceTrail').textContent = d.trail;
     document.getElementById('briefCount').textContent = `1 kernantwoord · ${d.evidence.length} bewijsstukken`;
     const list = document.getElementById('evidenceList');
-    list.innerHTML = d.evidence.map((e,i)=>`<div class="evidence-item" data-kind="${e.kind}"><button type="button" data-evidence="${i}"><div class="tag">${e.tag}</div><p>${e.text}</p></button></div>`).join('');
+    list.innerHTML = d.evidence.map((e,i)=>`<div class="evidence-item" data-kind="${escapeHtml(e.kind)}"><button type="button" data-evidence="${i}"><div class="tag">${escapeHtml(e.tag)}</div><p>${escapeHtml(e.text)}</p></button></div>`).join('');
     [...list.querySelectorAll('button')].forEach(btn=>btn.addEventListener('click',()=>openEvidence(Number(btn.dataset.evidence))));
     pop.classList.remove('open');
   }
@@ -372,22 +414,101 @@ body{background:#cfd3ca;color:#171819}
     const e = dossierData[currentQuestion].evidence[i]; if(!e) return;
     document.getElementById('evidenceTitle').textContent = e.tag;
     document.getElementById('evidenceDetail').textContent = e.detail;
+    evidenceOpener = document.activeElement;
     pop.classList.add('open');
+    document.getElementById('closeEvidence').focus();
   }
   questionButtons.forEach(btn=>btn.addEventListener('click',()=>{
     currentQuestion = btn.dataset.question;
-    questionButtons.forEach(b=>b.classList.toggle('active',b===btn));
+    questionButtons.forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',String(b===btn));});
     renderDossier();
   }));
   depthButtons.forEach(btn=>btn.addEventListener('click',()=>{
     currentDepth = btn.dataset.depth;
-    depthButtons.forEach(b=>b.classList.toggle('active',b===btn));
+    depthButtons.forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-pressed',String(b===btn));});
     renderDossier();
   }));
-  document.getElementById('closeEvidence').addEventListener('click',()=>pop.classList.remove('open'));
+  document.getElementById('closeEvidence').addEventListener('click',closeEvidence);
+  pop.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeEvidence();}});
+  questionButtons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.question===currentQuestion)));
+  depthButtons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.depth===currentDepth)));
   renderDossier();
 
 })();
 </script>
+<section class="source-register" aria-label="Volledig leesbaar bronmodel">
+<h2>VraagDossier — volledig bronmodel</h2>
+<details id="source-register" open>
+<summary>Alle demo-inhoud als leesbare bronlijst</summary>
+<p>Dit register bevat alle thema’s, antwoorden, onderbouwingen en beperkingen van het synthetische bronmodel (demo v3, revisie 2026-10-01). Verwijzingen en onderzoeksclaims zijn fictief; bronhouder onbekend, niet lokaal gevalideerd. Het is een lees- en afdrukalternatief voor dezelfde demo, geen echte bron of afzonderlijke registratie.</p>
+<article id="source-section-0" data-source-key="main">
+<h3>Mensen gebruiken complexe informatie beter wanneer ze niet alles tegelijk hoeven te zien.</h3>
+<p>Wat is de hoofdconclusie?</p>
+<p>De bron wijst steeds in dezelfde richting: eerst een compacte betekenislaag, daarna gericht kunnen doorklikken naar bewijs en nuance.</p>
+<p>Wanneer mensen een grote informatiebron openen, proberen ze eerst te bepalen wat relevant is. Een interface die die oriëntatie ondersteunt met duidelijke vragen en verdiepingsniveaus verlaagt de mentale belasting. De volledigheid blijft beschikbaar, maar hoeft niet de eerste indruk te domineren.</p>
+<p>De conclusie is opgebouwd uit gebruiksobservaties, tijdmetingen en interviews. De sterkste ondersteuning zit in de pilotresultaten; causale claims blijven beperkt omdat de steekproef klein is.</p>
+<p>De interface moet keuzes maken vóór de gebruiker dat zelf moet doen.</p>
+<p>Fictief bronpad: Samenvatting → hoofdstuk 3 → bevinding 4 → bijlage B</p>
+<ul>
+<li>Meting [evidence]: Gebruikers vonden hoofdpunten sneller. In de pilot daalde de zoektijd vooral bij taken waarbij deelnemers één concrete vraag moesten beantwoorden.</li>
+<li>Observatie [context]: Minder heen-en-weer tussen hoofdstukken. Deelnemers bleven langer in dezelfde context wanneer kernpunten en bronpaden naast elkaar stonden.</li>
+<li>Beperking [risk]: Kleine pilotgroep beperkt generaliseerbaarheid. De uitkomst is richtinggevend, niet definitief. Een bredere test is nodig voordat harde effectclaims worden gedaan.</li>
+</ul>
+</article><article id="source-section-1" data-source-key="why">
+<h3>De grootste frictie zit vóór het lezen: mensen moeten eerst zelf een structuur uit losse informatie bouwen.</h3>
+<p>Waarom gebeurt dit?</p>
+<p>Versnipperde definities, uitzonderingen en bewijs zorgen ervoor dat lezers veel energie kwijt zijn aan oriënteren voordat ze inhoudelijk kunnen beoordelen.</p>
+<p>Bij grote bronnen ontstaat vaak een verborgen taak: de lezer moet zelf reconstrueren welke onderdelen hoofdzaak, bewijs, context of uitzondering zijn. Dat is precies het werk dat de interface kan overnemen door relaties expliciet te maken en informatie in betekenisvolle lagen aan te bieden.</p>
+<p>Deze verklaring is vooral gebaseerd op observaties en interviewdata. De bron beschrijft het patroon consistent, maar meet cognitieve belasting niet rechtstreeks.</p>
+<p>Niet te weinig informatie, maar te weinig structuur veroorzaakt de eerste vertraging.</p>
+<p>Fictief bronpad: Hoofdstuk 2 → observatiepatronen → interviewthema 1</p>
+<ul>
+<li>Patroon [context]: Dezelfde begrippen verschijnen op meerdere plekken. Dat dwingt lezers om definities en uitzonderingen zelf over het document heen samen te voegen.</li>
+<li>Interview [evidence]: Lezers vragen eerst: waar moet ik beginnen? De eerste vragen gaan opvallend vaak over route en prioriteit, niet over inhoudelijke betekenis.</li>
+<li>Nuance [risk]: Experts ervaren minder oriëntatieproblemen. Vakinhoudelijke voorkennis compenseert een deel van de slechte structuur, waardoor het effect per doelgroep verschilt.</li>
+</ul>
+</article><article id="source-section-2" data-source-key="impact">
+<h3>Een goede eerste laag verkort de route naar relevante details zonder transparantie op te offeren.</h3>
+<p>Wat verandert hierdoor?</p>
+<p>De lezer krijgt sneller een bruikbaar mentaal model en kan daarna selectief controleren, vergelijken of verdiepen.</p>
+<p>De winst zit niet alleen in snelheid. Wanneer conclusies, bewijs en onzekerheden zichtbaar van elkaar verschillen, wordt ook duidelijker waarom een uitspraak sterk of juist voorlopig is. Dat ondersteunt betere gesprekken over de inhoud.</p>
+<p>De effectbeschrijving combineert tijdmetingen met kwalitatieve feedback. De bron toont samenhang, maar geen langetermijneffect op besluitkwaliteit.</p>
+<p>Snelheid en controleerbaarheid kunnen tegelijk verbeteren als detail op het juiste moment verschijnt.</p>
+<p>Fictief bronpad: Pilotmeting → evaluatie → thema vertrouwen</p>
+<ul>
+<li>Tijd [evidence]: Kortere route naar specifieke bevindingen. De grootste tijdswinst zit bij gerichte zoektaken, niet bij volledig documentlezen.</li>
+<li>Gedrag [context]: Lezers openen meer relevante bronpassages. Omdat het bronpad zichtbaar blijft, wordt verdieping een korte actie in plaats van een nieuwe zoektocht.</li>
+<li>Nog onbekend [risk]: Langetermijneffect is niet gemeten. De test zegt vooral iets over eerste begrip en navigatie, niet over kennisretentie na weken of maanden.</li>
+</ul>
+</article><article id="source-section-3" data-source-key="conditions">
+<h3>Zonder bronbeheer en duidelijke definities wordt een mooie samenvatting snel onbetrouwbaar.</h3>
+<p>Wat moet eerst geregeld zijn?</p>
+<p>Een interactieve laag is pas waardevol wanneer versie, eigenaar, definities en bronverwijzingen consequent worden bijgehouden.</p>
+<p>De visuele vorm kan alleen betrouwbaar blijven als er achter de schermen een heldere informatiehuishouding bestaat. Elke conclusie moet terug te leiden zijn naar een bronpassage, wijzigingen moeten herkenbaar zijn en iemand moet inhoudelijk eigenaar zijn.</p>
+<p>De randvoorwaarden komen uit het governancegedeelte van de bron en uit fouten die tijdens de pilot aan het licht kwamen.</p>
+<p>Ontwerp lost informatiebeheer niet op. Het maakt goed beheer alleen veel bruikbaarder.</p>
+<p>Fictief bronpad: Governance → paragraaf 6.2 → wijzigingsproces</p>
+<ul>
+<li>Eigenaarschap [context]: Elke samenvatting heeft een inhoudelijke eigenaar. Die eigenaar bewaakt interpretatie, actualiteit en de koppeling naar bronmateriaal.</li>
+<li>Controle [evidence]: Versie en bronpad blijven zichtbaar. Daarmee kan een lezer controleren of de gepresenteerde kern nog overeenkomt met de actuele bron.</li>
+<li>Risico [risk]: Handmatig onderhoud kan achterlopen. Zonder expliciet wijzigingsproces kan de interactieve laag verouderen terwijl de bron wel wordt bijgewerkt.</li>
+</ul>
+</article><article id="source-section-4" data-source-key="uncertainty">
+<h3>De richting is duidelijker dan de precieze omvang van het effect.</h3>
+<p>Wat weten we nog niet?</p>
+<p>De bron ondersteunt dat gelaagde informatie helpt bij oriëntatie, maar de pilot is te klein om universele prestatiewinst te claimen.</p>
+<p>De bevindingen zijn sterk genoeg om het ontwerpprincipe verder te testen, maar niet om één vaste interfacevorm als bewezen beste oplossing te presenteren. Doelgroep, inhoudstype en voorkennis blijven belangrijke variabelen.</p>
+<p>Deze grens komt expliciet uit de methodologische beperkingen en de kleine omvang van de gebruikerstest.</p>
+<p>Gebruik onzekerheid als navigatie-informatie, niet als voetnoot onderaan.</p>
+<p>Fictief bronpad: Methodologie → beperkingen → aanbevelingen voor vervolgonderzoek</p>
+<ul>
+<li>Steekproef [risk]: Beperkt aantal deelnemers. De pilot geeft sterke signalen, maar laat geen betrouwbare uitsplitsing naar doelgroep toe.</li>
+<li>Variatie [context]: Niet elk informatietype vraagt dezelfde navigatie. Een normenkader, onderzoeksrapport en operationeel draaiboek hebben verschillende leespatronen.</li>
+<li>Consistent [evidence]: Oriëntatiewinst kwam in meerdere sessies terug. Ondanks de kleine groep kwam dezelfde behoefte aan een duidelijke eerste laag herhaaldelijk naar voren.</li>
+</ul>
+</article>
+</details>
+</section>
+<script>document.getElementById('source-register').open = false;</script>
 </body>
 </html>

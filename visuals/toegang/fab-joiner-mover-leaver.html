@@ -296,6 +296,26 @@ function list() {
   return [`Controlelijst — fictieve ${META.version}: ${s.title}`, `Bron: ${META.source}; revisie 2026-10-01; export ${new Date().toISOString()}`, META.review, `${s.zero}: ${fmt(0, { day: 'numeric', month: 'long', year: 'numeric' })}`, 'Inclusieve dagintervallen: laatste actieve dag getoond, stoppen aan begin volgende dag. Geen feitelijke toegangsverklaring.', '',
     ...s.rows.map(r => `- ${r.n} [${r.kind}]; uitvoerder ${r.owner}; model ${span(r.plan)}; gesimuleerd feitelijk ${span(r.act)}; scope ${r.scope}; goedkeuring ${r.approval}; bewijs ${r.check}; controle ${r.cp}${r.slip ? '; afwijking ' + r.slip : ''}`)].join('\n');
 }
+function manualCopy(text, status) {
+  if (!status.isConnected) return;
+  document.getElementById('manualCopyBox')?.remove();
+  const box = document.createElement('div');
+  box.id = 'manualCopyBox';
+  const label = document.createElement('label');
+  label.htmlFor = 'manualCopy';
+  label.textContent = 'Exporttekst om handmatig te kopiëren';
+  const area = document.createElement('textarea');
+  area.id = 'manualCopy';
+  area.value = text;
+  area.readOnly = true;
+  area.rows = 12;
+  area.style.cssText = 'display:block;width:100%;margin-top:8px;font:inherit';
+  box.append(label, area);
+  status.closest('#rowpanel, #detail').append(box);
+  status.textContent = 'Kopiëren niet beschikbaar. Selecteer en kopieer de exporttekst handmatig.';
+  area.focus();
+  area.select();
+}
 document.addEventListener('click', async e => {
   const b = e.target.closest('button'), c = e.target.closest('.c[data-d]');
   if (b && b.dataset.k) { key = b.dataset.k; selRow = 0; day = 0; build(); }
@@ -304,8 +324,8 @@ document.addEventListener('click', async e => {
   else if (b && b.classList.contains('name')) { selRow = +b.dataset.i; update(); }
   else if (b && b.id === 'copy') {
     const st = $('#status'), t = list();
-    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(t); st.textContent = 'Gekopieerd.'; }
-    catch { const a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); try { document.execCommand('copy'); st.textContent = 'Gekopieerd.'; } catch { st.textContent = 'Kopiëren lukt niet. Selecteer de tekst handmatig.'; } a.remove(); }
+    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(t); if(st.isConnected) st.textContent = 'Gekopieerd.'; }
+    catch { manualCopy(t, st); }
   } else if (c) {
     day = +c.dataset.d; const rw = c.closest('.cells[data-i]'); if (rw) selRow = +rw.dataset.i;
     $('#day').value = day; update();

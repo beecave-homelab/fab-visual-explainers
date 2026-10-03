@@ -33,6 +33,11 @@ nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.fo
 @media(max-width:480px){.page{padding:16px 12px}h1{font-size:40px}.lightbox{padding:22px 12px}.row{grid-template-columns:1fr}.row.off{grid-template-columns:1fr;gap:2px}.plate{position:static;width:100%}.plates{height:auto;display:grid;gap:8px}.row.k-diff .plate-prod,.row.k-stale .plate-prod,.row.k-unknown .plate-prod{transform:none}.plate-prod{border-color:var(--magenta)}}
 @media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context{font-size:10pt}.tools,.row-actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.lightbox{background:white;padding:0;border:0}.regmark{display:none}.row{display:block;border-bottom:1px solid #777;break-inside:avoid}.row.off h3,.row.off .state{opacity:1}.untouched{display:none}.plates{height:auto;display:grid;gap:6px}.plate{position:static;width:100%;min-height:0;transform:none!important;mix-blend-mode:normal}.plate-env{border-style:solid}.plate-prod{border-color:#000}.work-grid{display:block}.panel{position:static;border:1px solid #777;margin-top:14px;break-inside:avoid}.reference{break-before:page}details>:not(summary){display:block!important}.register tr{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

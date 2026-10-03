@@ -80,6 +80,11 @@ button{font:inherit;color:inherit}
   .radar .core { position: static; translate: none; }
   .radar .node { translate: none; transform: none; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

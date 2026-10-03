@@ -16,12 +16,14 @@ De prototypes staan onder `visuals/`, ingedeeld naar hoofdtaak. Ieder bestand he
 
 | Map onder `visuals/`        | HTML-bestanden |
 | --------------------------- | -------------- |
-| `incident_en_continuiteit/` | 5              |
-| `wijziging_en_acceptatie/`  | 6              |
-| `landschap_en_processen/`   | 2              |
+| `incident_en_continuiteit/` | 7              |
+| `wijziging_en_acceptatie/`  | 11             |
+| `landschap_en_processen/`   | 3              |
 | `toegang/`                  | 2              |
-| `gegevens_en_ketens/`       | 3              |
+| `gegevens_en_ketens/`       | 4              |
 | `bronnen_en_kennis/`        | 5              |
+
+De bibliotheek bevat 32 HTML-bestanden voor 31 concepten; de twee incidentvarianten tellen als één concept. De [visuele review van 4 oktober 2026](docs/visual-review-2026-10-04.md) beschrijft sterke punten, verbeteringen en resterende grenzen per prototype.
 
 De ideeënnotitie bevat links naar alle prototypes. Documentatie en configuratie staan in de root; regressietests staan in `test/`.
 

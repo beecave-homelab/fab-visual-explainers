@@ -44,7 +44,7 @@ Elke kopie noemt hoofdvraag, doelgroep, gebruiksmoment, bron met versie/peildatu
 - Gebruik controleerbare bronlinks met sectie/pagina en vaste versie. Een tekst als “hoofdstuk 3” is geen klikbare bronlocatie. Verrijk waar nodig het gekozen datamodel en de renderer om echte links veilig te maken; valideer toegestane doelen voordat je een `href` zet.
 - Repareer relatieve links én fragmenten na kopiëren. Verwijder navigatie naar irrelevante demo's; kopieer niet de hele bibliotheek om links te laten werken. Het resultaat moet op een andere plek kunnen openen zonder checkout. Externe bronlinks zijn toegestaan, automatisch laden van fonts/scripts/data niet; vervang in de algemene incidentkopie Google Fonts door de bestaande lokale fallback.
 - Inspecteer de **daadwerkelijke** statische inhoud. Een door JavaScript gevulde lijst werkt niet zonder JavaScript. Voeg in de kopie een complete leesbare lijst/tabel toe met dezelfde inhoud en bronverwijzingen; toon die bij JavaScript uit en in print. Verberg daar niet-werkende controles. Een `<noscript>`-waarschuwing alleen is onvoldoende.
-- De vijf bron-/kennispatronen hebben geen eigen `@media print` of volledige no-JS-leeslaag. Voeg die in de kopie toe. Een compact beginpaneel is geen alternatief voor alle achterliggende passages.
+- De vijf bron-/kennispatronen hebben een volledige statische bronlijst in `#source-register` en eigen printregels. Werk alle artikelen en bronvindplaatsen in deze lijst samen met de JavaScript-data bij; de lijst is geen automatisch gesynchroniseerde export. Behoud ook de statische verbandenlijst in Kennisatlas. Toets ingeklapte details op werkelijke zichtbaarheid in afdruk, ook zonder JavaScript; alleen `display: block` is daarvoor niet genoeg in Chrome.
 - Scores, relaties en simulated controles zijn geen gemeten betrouwbaarheid, bewezen oorzaak of bevoegd akkoord. In een echte toestandsweergave mogen oefenknoppen nooit de echte bronstatus wijzigen; laat ze weg of plaats ze in een expliciet afzonderlijke simulatie met aparte export.
 
 ## Bestandskaarten
@@ -59,7 +59,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **JavaScript-data:** `topics`: `id`, `kind`, `label`, `summary`, `bullets`, `fragment`, `status`.
 - **Samen aanpassen:** `selectedId`, `visibleIds`, `renderNavigation()`, `selectTopic()`, reset en volgende-knop; thematische ankers zijn ook statische IDs.
 - **Regels en export:** Geen berekening of export. `supported` is een inhoudslabel, geen onafhankelijk gecontroleerd bewijs. Fragmentinterpolatie en bullets veilig renderen.
-- **Leeslaag en afdruk:** Geen volledige no-JS-leeslaag/printregels; maak een statisch register voor alle topics.
+- **Leeslaag en afdruk:** `#source-register` bevat alle topics, bullets en passages; werk de lijst en JavaScript samen bij. Print toont de volledige lijst.
 
 ### bron-scanner.html
 
@@ -67,9 +67,9 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 
 - **Statische inhoud:** Sectietitel, metering-labels, intro en initiële quote/bewijsblokken.
 - **JavaScript-data:** `data`: secties met `title`, `weight`, `confidence`, `evidence`, `impact`, `summary`, `takeaways`, `quote`, `why`, `caution`, `related`, `proofs`.
-- **Samen aanpassen:** `active`, `renderMap()`, `select()`, `filter()`, vorige/volgende en voortgang; **`${index+1}/8` is hardcoded**, vervang door `data.length`.
+- **Samen aanpassen:** `active`, `visibleIndices`, `renderMap()`, `select()`, `filter()`, vorige/volgende en voortgang gebruiken dezelfde secties. Aantallen volgen `data.length`; vorige/volgende en pijltjes volgen alleen zichtbare zoekresultaten. Broncontextlinks openen `source-section-*` in het volledige register.
 - **Regels en export:** `label()` gebruikt drempels 88/75; bars en indices zijn handgekozen demo’s. Geen onderbouwde schaal: verwijder meters én bijbehorende rendercode/labels in de kopie, geen nul als schijnmeting. Export: geen.
-- **Leeslaag en afdruk:** Geen volledige no-JS-leeslaag/printregels; register voor alle secties met vindplaatsen en zonder fictieve bewijspercentages.
+- **Leeslaag en afdruk:** `#source-register` bevat alle secties, citaten, bewijsblokken, beperkingen en als fictief gemarkeerde demo-indices. Vervang ook de registerartikelen en `source-section-*`-doelen; ontbrekende scoregrondslag betekent geen echte bewijspercentages.
 
 ### kennisatlas.html
 
@@ -79,7 +79,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **JavaScript-data:** `atlasData`: `type`, `title`, `summary`, `why`, `evidence`, `source`.
 - **Samen aanpassen:** Data-object, HTML-nodekeys, labels/posities en SVG-verbindingen zijn afzonderlijk vastgelegd; `setAtlasNode()` en `applyRoute()` gebruiken ze samen. Statische aantallen en beginpaneel apart vervangen. Lange koppen, kaartlabels en node-labels kunnen de mobiele indeling laten overlopen; pas in de kopie waar nodig de positie/breedte of een gestapelde leesroute aan, met relaties ook in de relatietabel.
 - **Regels en export:** Geen automatische relatie-afleiding, berekening of export. Teken alleen aangetoonde of expliciet voorgestelde relaties, geen causaal effect uit co-occurrence.
-- **Leeslaag en afdruk:** Geen volledige no-JS-leeslaag/printregels; lijst van alle inzichten plus expliciete relatietabel, niet alleen geselecteerd detail.
+- **Leeslaag en afdruk:** `#source-register` bevat alle inzichten en de volledige verbandenlijst; houd die gelijk aan `.atlas-relations`. Afdruk toont het register, niet alleen het geselecteerde detail.
 
 ### vraagdossier.html
 
@@ -89,7 +89,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **JavaScript-data:** `dossierData`: `question`, `title`, `short`, `medium`, `source`, `takeaway`, `trail`, `evidence` (`kind`, `tag`, `text`, `detail`).
 - **Samen aanpassen:** `currentQuestion`, `currentDepth`, HTML-vraagkeys, `renderDossier()` en `openEvidence()`; bewijsindex en bronpad moeten bij de gekozen vraag horen. Lange bronpaden vragen controle van minimale kolombreedte en regelafbreking in `.brief-body` en `.source-strip`.
 - **Regels en export:** `briefCount` telt bewijsitems, geen bewijskracht. Geen score/export. Sluiten/nieuwe selectie mag geen vorige bewijsinhoud zichtbaar laten.
-- **Leeslaag en afdruk:** Geen volledige no-JS-leeslaag/printregels; statische vragen met alle dieptes, bewijsdetails en bronpaden.
+- **Leeslaag en afdruk:** `#source-register` bevat alle vragen, dieptes, bewijsdetails en bronpaden. De bewijsdialoog krijgt focus bij openen; sluiten/Escape geeft focus terug aan de opener.
 
 ### vraagkompas.html
 
@@ -99,7 +99,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **JavaScript-data:** `items`: `title`, `short`, `bullets`, `source`, `refs`, `related`; `order`.
 - **Samen aanpassen:** `active`, `mode`, `order`, HTML-knoppen en `related`-doelkeys samen wijzigen; lange documentkoppen en bronstempels vragen regelafbreking en minimale kolombreedte in `.mast`/`.source-stamp`; pijlnavigatie en zoeken volgen `order`.
 - **Regels en export:** Geen score/export. Zoeken kiest de eerste match en wist selectie niet bij lege zoektekst; beloof geen volledige resultatenlijst. Vervang hardcoded demo-bronuitleg in de source-renderbranch.
-- **Leeslaag en afdruk:** Geen volledige no-JS-leeslaag/printregels; statische antwoorden, passages, verwijzingen en vervolgvraagrelaties.
+- **Leeslaag en afdruk:** `#source-register` bevat alle antwoorden, passages, verwijzingen en vervolgvraagrelaties. Het register en `items` moeten samen wijzigen; de kopie is geen automatische synchronisatie.
 
 ### incident-onepager.html
 

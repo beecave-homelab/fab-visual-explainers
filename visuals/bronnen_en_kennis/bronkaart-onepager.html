@@ -549,9 +549,44 @@
 @media screen and (max-width: 430px) {
   .topic-map { grid-template-columns: 1fr; }
 }
+
+/* Het volledige bronmodel blijft leesbaar zonder scripts en in afdruk. */
+[hidden] { display: none !important; }
+.source-register { max-width:1440px; margin:24px auto; padding:24px; border:1px solid currentColor; border-radius:16px; line-height:1.6; overflow-wrap:anywhere; }
+.source-register summary { cursor:pointer; font-weight:700; }
+.source-register article { margin-top:24px; padding-top:16px; border-top:1px solid currentColor; }
+.source-register h3 { font-size:1.2rem; line-height:1.4; }
+.source-register a { color:inherit; }
+.source-register blockquote { margin:16px 0; padding:12px; border-left:3px solid currentColor; }
+.source-register :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+@media screen and (max-width:760px) { .source-register { margin:16px; padding:16px; } }
+@media print {
+  @page { size:A4; margin:12mm; }
+  body { background:white!important; color:black!important; font-size:11pt!important; }
+  .review-context, .source-register { max-width:none!important; width:auto!important; margin:0!important; padding:12pt 0!important; border:0!important; color:black!important; }
+  .source-register { display:block!important; }
+  .review-context, .source-register { line-height:1.45; }
+  .review-context h2, .source-register h2 { font-size:16pt; }
+  .source-register h3 { font-size:13pt; }
+  .source-register article { margin-top:12pt; padding-top:8pt; }
+  .source-register summary { list-style:none; }
+  .source-register summary::marker { content:""; }
+  .source-register article { break-inside:avoid; }
+  .source-register a { text-decoration:none; }
+}
+
+@media print { main.page { display:none!important; } }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>
+    <noscript><style>button, input[type="search"] { display:none!important; }</style>
+      <p class="source-register">JavaScript staat uit. Lees alle demo-inhoud in de bronlijst onderaan.</p>
+    </noscript>
     <section class="review-context"
              aria-label="Beheerkaart en bronstatus"
              style="max-width:1440px;
@@ -636,6 +671,7 @@
       </div>
     </main>
     <script>
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
     const topics = [
       {
         id: 'context',
@@ -736,7 +772,7 @@
         scanButton.className = 'scan-item';
         scanButton.dataset.id = topic.id;
         scanButton.setAttribute('aria-current', String(topic.id === selectedId));
-        scanButton.innerHTML = `<span class="kind">${topic.kind}</span><span class="label">${topic.label}</span>`;
+        scanButton.innerHTML = `<span class="kind">${escapeHtml(topic.kind)}</span><span class="label">${escapeHtml(topic.label)}</span>`;
         scanButton.addEventListener('click', () => selectTopic(topic.id));
         scanList.appendChild(scanButton);
 
@@ -745,7 +781,7 @@
         mapButton.className = 'map-node';
         mapButton.dataset.id = topic.id;
         mapButton.setAttribute('aria-pressed', String(topic.id === selectedId));
-        mapButton.innerHTML = `<span><i class="dot"></i><strong>${topic.label}</strong></span><small>${topic.kind}</small>`;
+        mapButton.innerHTML = `<span><i class="dot"></i><strong>${escapeHtml(topic.label)}</strong></span><small>${escapeHtml(topic.kind)}</small>`;
         mapButton.addEventListener('click', () => selectTopic(topic.id));
         topicMap.appendChild(mapButton);
       });
@@ -776,8 +812,8 @@
       detailKind.textContent = topic.kind;
       detailTitle.textContent = topic.label;
       detailSummary.textContent = topic.summary;
-      detailList.innerHTML = topic.bullets.map(item => `<li>${item}</li>`).join('');
-      sourceFragment.innerHTML = `<strong>Onderliggende passage</strong>${topic.fragment}`;
+      detailList.innerHTML = topic.bullets.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      sourceFragment.innerHTML = `<strong>Onderliggende passage</strong>${escapeHtml(topic.fragment)}`;
       sourceFragment.classList.remove('is-open');
       sourceButton.setAttribute('aria-expanded', 'false');
       sourceButton.textContent = 'Toon bronfragment';
@@ -824,5 +860,74 @@
     renderNavigation();
     selectTopic(selectedId, false);
     </script>
+    <section class="source-register" aria-label="Volledig leesbaar bronmodel">
+      <h2>Bronkaart — volledig bronmodel</h2>
+      <details id="source-register" open>
+        <summary>Alle demo-inhoud als leesbare bronlijst</summary>
+        <p>Dit register bevat alle thema’s, antwoorden, onderbouwingen en beperkingen van het synthetische bronmodel (demo v3, revisie 2026-10-01). Verwijzingen en onderzoeksclaims zijn fictief; bronhouder onbekend, niet lokaal gevalideerd. Het is een lees- en afdrukalternatief voor dezelfde demo, geen echte bron of afzonderlijke registratie.</p>
+        <article id="source-section-0" data-source-key="0">
+          <h3>Waarom deze bron ertoe doet</h3>
+          <p>Context · ondersteund binnen de fictieve demo</p>
+          <p>De evaluatie onderzoekt niet alleen gebruik, maar vooral waar digitale dienstverlening tijd wint, waar mensen afhaken en welke randvoorwaarden nodig zijn.</p>
+          <ul>
+            <li>De bron combineert gebruiksdata, interviews en procesmetingen.</li>
+            <li>De centrale vraag is: waar verbetert digitaal echt de dienstverlening?</li>
+            <li>Resultaten verschillen per doelgroep en type proces.</li>
+          </ul>
+          <blockquote>
+            Bronfragment (demo): “De toegevoegde waarde is het grootst wanneer digitaal contact een eenvoudige stap vervangt, niet wanneer een complex gesprek wordt gedigitaliseerd.”
+          </blockquote>
+        </article><article id="source-section-1" data-source-key="1">
+          <h3>Gebruik stijgt, winst verschilt sterk</h3>
+          <p>Kernbevinding · ondersteund binnen de fictieve demo</p>
+          <p>Het algemene gebruik neemt toe, maar gemiddelde groei maskeert grote verschillen. Eenvoudige taken verschuiven snel naar digitaal; complexe taken veel minder.</p>
+          <ul>
+            <li>Sterke groei bij herhaalhandelingen en statusvragen.</li>
+            <li>Beperkte groei bij situaties met uitleg, twijfel of uitzonderingen.</li>
+            <li>Gemiddelden zijn daarom minder bruikbaar dan uitsplitsing per taak.</li>
+          </ul>
+          <blockquote>
+            Bronfragment (demo): “De adoptie groeide in totaal, maar 71% van de verschuiving kwam uit drie routinematige processen.”
+          </blockquote>
+        </article><article id="source-section-2" data-source-key="2">
+          <h3>Drie soorten bewijs versterken elkaar</h3>
+          <p>Onderbouwing · ondersteund binnen de fictieve demo</p>
+          <p>De sterkste conclusies worden gedragen door meerdere typen bewijs. Losse cijfers krijgen pas betekenis wanneer procesdata en ervaringen hetzelfde patroon laten zien.</p>
+          <ul>
+            <li>Gebruiksdata toont wat mensen daadwerkelijk doen.</li>
+            <li>Procesmetingen tonen tijd, wachtrijen en overdrachtsmomenten.</li>
+            <li>Interviews verklaren waarom bepaald gedrag optreedt.</li>
+          </ul>
+          <blockquote>
+            Bronfragment (demo): “Waar kwantitatieve en kwalitatieve signalen overeenkomen, beoordelen we de bevinding als robuust.”
+          </blockquote>
+        </article><article id="source-section-3" data-source-key="3">
+          <h3>Ontwerp op taak, niet op kanaal</h3>
+          <p>Betekenis · ondersteund binnen de fictieve demo</p>
+          <p>De praktische consequentie is dat “meer digitaal” geen doel op zichzelf hoort te zijn. Het type taak bepaalt of digitaal, persoonlijk of hybride het beste past.</p>
+          <ul>
+            <li>Automatiseer voorspelbare stappen, niet de uitzonderingen.</li>
+            <li>Bied een duidelijke uitweg naar persoonlijk contact.</li>
+            <li>Meet succes op afgeronde taken en ervaren moeite, niet alleen gebruik.</li>
+          </ul>
+          <blockquote>
+            Bronfragment (demo): “Kanaalsturing zonder taakdifferentiatie vergroot uitval bij complexe vragen.”
+          </blockquote>
+        </article><article id="source-section-4" data-source-key="4">
+          <h3>Effect op kwetsbare groepen blijft onzeker</h3>
+          <p>Open vraag · onzeker</p>
+          <p>De bron bevat aanwijzingen dat sommige groepen minder profiteren, maar de steekproef is te klein om harde uitspraken over afzonderlijke groepen te doen.</p>
+          <ul>
+            <li>De signalen zijn consistent, maar aantallen zijn beperkt.</li>
+            <li>Vervolgonderzoek moet uitval en hulpvragen per doelgroep volgen.</li>
+            <li>De interface markeert dit bewust als onzekerheid, niet als conclusie.</li>
+          </ul>
+          <blockquote>
+            Bronfragment (demo): “Subgroepanalyses zijn indicatief; aantallen zijn onvoldoende voor statistisch betrouwbare vergelijkingen.”
+          </blockquote>
+        </article>
+      </details>
+    </section>
+    <script>document.getElementById('source-register').open = false;</script>
   </body>
 </html>

@@ -272,6 +272,11 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .crit .leader { display: none; }
   .crit .crit-status { grid-column: 1 / -1; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>

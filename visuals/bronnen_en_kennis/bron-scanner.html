@@ -363,9 +363,44 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
 @media screen and (max-width: 460px) {
   .map { grid-template-columns: 1fr; }
 }
+
+/* Het volledige bronmodel blijft leesbaar zonder scripts en in afdruk. */
+[hidden] { display: none !important; }
+.source-register { max-width:1440px; margin:24px auto; padding:24px; border:1px solid currentColor; border-radius:16px; line-height:1.6; overflow-wrap:anywhere; }
+.source-register summary { cursor:pointer; font-weight:700; }
+.source-register article { margin-top:24px; padding-top:16px; border-top:1px solid currentColor; }
+.source-register h3 { font-size:1.2rem; line-height:1.4; }
+.source-register a { color:inherit; }
+.source-register blockquote { margin:16px 0; padding:12px; border-left:3px solid currentColor; }
+.source-register :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+@media screen and (max-width:760px) { .source-register { margin:16px; padding:16px; } }
+@media print {
+  @page { size:A4; margin:12mm; }
+  body { background:white!important; color:black!important; font-size:11pt!important; }
+  .review-context, .source-register { max-width:none!important; width:auto!important; margin:0!important; padding:12pt 0!important; border:0!important; color:black!important; }
+  .source-register { display:block!important; }
+  .review-context, .source-register { line-height:1.45; }
+  .review-context h2, .source-register h2 { font-size:16pt; }
+  .source-register h3 { font-size:13pt; }
+  .source-register article { margin-top:12pt; padding-top:8pt; }
+  .source-register summary { list-style:none; }
+  .source-register summary::marker { content:""; }
+  .source-register article { break-inside:avoid; }
+  .source-register a { text-decoration:none; }
+}
+
+@media print { main.shell { display:none!important; } }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>
+    <noscript><style>button, input[type="search"] { display:none!important; }</style>
+      <p class="source-register">JavaScript staat uit. Lees alle demo-inhoud in de bronlijst onderaan.</p>
+    </noscript>
     <section class="review-context"
              aria-label="Beheerkaart en bronstatus"
              style="max-width:1440px;
@@ -412,6 +447,7 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
             <h2>Bron als strook</h2>
             <p>Hoogte van de blauwe balk toont een handgekozen demo-index, geen gemeten informatiedichtheid.</p>
           </div>
+          <p id="search-status" role="status"></p>
           <nav class="map" id="map" aria-label="Secties">
           </nav>
         </aside>
@@ -485,6 +521,8 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
     </main>
     <script>
 (() => {
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
   const data = [
     {
       title:"Aanleiding en context", weight:82, confidence:92, evidence:88, impact:74,
@@ -621,6 +659,7 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
   const prev = document.getElementById("prev");
   const next = document.getElementById("next");
   let active = 0;
+  let visibleIndices = data.map((_, index) => index);
 
   const label = value => value >= 88 ? "sterk" : value >= 75 ? "redelijk" : "beperkt";
 
@@ -633,7 +672,7 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
       button.dataset.index = index;
       button.style.setProperty("--weight", item.weight + "%");
       button.setAttribute("aria-current", index === active ? "true" : "false");
-      button.innerHTML = `<span class="bar" aria-hidden="true"></span><span class="copy"><b>${item.title}</b><small>demo-index ${item.confidence}/100 · niet gemeten</small></span><span class="count">${index+1}/8</span>`;
+      button.innerHTML = `<span class="bar" aria-hidden="true"></span><span class="copy"><b>${escapeHtml(item.title)}</b><small>demo-index ${item.confidence}/100 · niet gemeten</small></span><span class="count">${index+1}/${data.length}</span>`;
       button.addEventListener("click",()=>select(index));
       map.appendChild(button);
     });
@@ -655,7 +694,7 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
     meta.textContent=`Sectie ${active+1} van ${data.length}`;
     confidence.textContent=item.confidence+"/100";
     summary.textContent=item.summary;
-    takeaways.innerHTML=item.takeaways.map(x=>`<li>${x}</li>`).join("");
+    takeaways.innerHTML=item.takeaways.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
     quote.textContent=item.quote;
     why.textContent=item.why;
     caution.textContent=item.caution;
@@ -664,39 +703,224 @@ mark{background:var(--amber-soft);color:inherit;padding:0 .08em}
     impactMeter.style.setProperty("--meter",item.impact+"%");
     evidenceLabel.textContent=label(item.evidence);
     impactLabel.textContent=item.impact>=88?"hoog":item.impact>=72?"middel":"beperkt";
-    evidence.innerHTML=item.proofs.map(p=>`<div class="evidence-block"><b>${p[0]}</b><p>${p[1]}</p><button type="button" tabindex="0">Bekijk broncontext</button></div>`).join("");
-    evidence.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
-      const note=btn.previousElementSibling.textContent;
-      alert("Demo: in een echte bron opent hier de exacte passage of bronverwijzing.\n\n"+note);
+    evidence.innerHTML=item.proofs.map(p=>`<div class="evidence-block"><b>${escapeHtml(p[0])}</b><p>${escapeHtml(p[1])}</p><a href="#source-section-${active}">Lees demo-broncontext</a></div>`).join("");
+    evidence.querySelectorAll("a").forEach(link=>link.addEventListener("click",()=>{
+      document.getElementById("source-register").open = true;
     }));
     [...map.querySelectorAll(".strip")].forEach((b,i)=>b.setAttribute("aria-current",i===active?"true":"false"));
     renderProgress();
-    prev.disabled=active===0;
-    next.disabled=active===data.length-1;
+    const position = visibleIndices.indexOf(active);
+    prev.disabled=position<=0;
+    next.disabled=position<0 || position===visibleIndices.length-1;
   }
 
   function filter(){
     const q=search.value.trim().toLowerCase();
+    visibleIndices=[];
     [...map.querySelectorAll(".strip")].forEach((button,index)=>{
       const item=data[index];
-      const hay=[item.title,item.summary,item.related,...item.takeaways].join(" ").toLowerCase();
+      const hay=[item.title,item.summary,item.related,item.caution,...item.takeaways,...item.proofs.flat()].join(" ").toLowerCase();
       button.hidden=q!=="" && !hay.includes(q);
+      if(!button.hidden) visibleIndices.push(index);
     });
+    const empty=visibleIndices.length===0;
+    document.querySelector(".focus").hidden=empty;
+    document.querySelector(".side-right").hidden=empty;
+    document.getElementById("search-status").textContent=empty
+      ? "Geen secties gevonden. Pas je zoekterm aan."
+      : `${visibleIndices.length} van ${data.length} secties gevonden.`;
+    if(empty) { prev.disabled=true; next.disabled=true; }
+    else select(visibleIndices.includes(active)?active:visibleIndices[0]);
   }
 
-  prev.addEventListener("click",()=>select(active-1));
-  next.addEventListener("click",()=>select(active+1));
+  function step(offset, focus=false){
+    const position=visibleIndices.indexOf(active);
+    const index=visibleIndices[position+offset];
+    if(index===undefined) return;
+    select(index);
+    if(focus) map.querySelector(`[data-index="${active}"]`).focus();
+  }
+  prev.addEventListener("click",()=>step(-1));
+  next.addEventListener("click",()=>step(1));
   search.addEventListener("input",filter);
-  app.addEventListener("keydown",event=>{
-    const tag=event.target.tagName;
-    if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT") return;
-    if(event.key==="ArrowLeft"){event.preventDefault();select(active-1)}
-    if(event.key==="ArrowRight"){event.preventDefault();select(active+1)}
+  map.addEventListener("keydown",event=>{
+    if(!event.target.matches(".strip")) return;
+    if(event.key==="ArrowLeft" || event.key==="ArrowUp"){event.preventDefault();step(-1,true)}
+    if(event.key==="ArrowRight" || event.key==="ArrowDown"){event.preventDefault();step(1,true)}
   });
 
   renderMap();
-  select(0);
+  filter();
 })();
     </script>
+    <section class="source-register" aria-label="Volledig leesbaar bronmodel">
+      <h2>BronScanner — volledig bronmodel</h2>
+      <details id="source-register" open>
+        <summary>Alle demo-inhoud als leesbare bronlijst</summary>
+        <p>Dit register bevat alle thema’s, antwoorden, onderbouwingen en beperkingen van het synthetische bronmodel (demo v3, revisie 2026-10-01). Verwijzingen en onderzoeksclaims zijn fictief; bronhouder onbekend, niet lokaal gevalideerd. Het is een lees- en afdrukalternatief voor dezelfde demo, geen echte bron of afzonderlijke registratie.</p>
+        <article id="source-section-0" data-source-key="0">
+          <h3>Aanleiding en context</h3>
+          <p>De organisatie wil informatie sneller vindbaar maken zonder de oorspronkelijke nuance kwijt te raken. De bron beschrijft waarom bestaande rapportages te veel leestijd vragen en te weinig richting geven.</p>
+          <ul>
+            <li>De huidige informatie is inhoudelijk rijk, maar versnipperd.</li>
+            <li>Lezers zoeken meestal een antwoord, niet het volledige document.</li>
+            <li>Samenvatten zonder broncontext vergroot het risico op verkeerde interpretatie.</li>
+          </ul>
+          <blockquote>
+            “De centrale opgave is niet minder informatie aanbieden, maar sneller zichtbaar maken welke informatie op dat moment relevant is.”
+          </blockquote>
+          <p>Relevantie: Legt het probleem vast dat alle volgende keuzes probeert op te lossen.</p>
+          <p>Beperking: De bron meet leestijd niet rechtstreeks; dit is gebaseerd op interviews.</p>
+          <p>Verwant: Gebruikersonderzoek, informatiearchitectuur, zoekgedrag</p>
+          <ul>
+            <li>Interviews: 12 semigestructureerde gesprekken met eindgebruikers.</li>
+            <li>Analyse bestaand materiaal: 42 pagina’s, 31 bronverwijzingen en 8 hoofdsecties.</li>
+            <li>Beperking: Geen observatiestudie van feitelijk leesgedrag uitgevoerd.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 82/100; betrouwbaarheid 92/100; onderbouwing 88/100; impact 74/100.</p>
+        </article><article id="source-section-1" data-source-key="1">
+          <h3>Gebruikersbehoeften</h3>
+          <p>Gebruikers willen eerst weten wat belangrijk is, daarna waarom dat zo is en pas daarna de volledige onderbouwing kunnen openen. Die volgorde komt in vrijwel alle gesprekken terug.</p>
+          <ul>
+            <li>Oriëntatie moet binnen enkele seconden mogelijk zijn.</li>
+            <li>Details moeten beschikbaar blijven zonder het hoofdoverzicht te verdringen.</li>
+            <li>Dezelfde bron moet meerdere leesroutes ondersteunen.</li>
+          </ul>
+          <blockquote>
+            “Ik wil eerst weten waar ik moet kijken. Daarna beslis ik zelf hoe diep ik ga.”
+          </blockquote>
+          <p>Relevantie: Bepaalt de gewenste volgorde van informatie in de interface.</p>
+          <p>Beperking: Behoeften verschillen per rol; één standaardweergave is niet altijd genoeg.</p>
+          <p>Verwant: Progressive disclosure, rollen, filters</p>
+          <ul>
+            <li>Patroon: 10 van 12 deelnemers beschrijven dezelfde leesvolgorde.</li>
+            <li>Variatie: Managers starten vaker bij conclusies; specialisten vaker bij bewijs.</li>
+            <li>Open punt: Rolprofielen zijn nog niet formeel gevalideerd.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 67/100; betrouwbaarheid 87/100; onderbouwing 82/100; impact 90/100.</p>
+        </article><article id="source-section-2" data-source-key="2">
+          <h3>Informatiehiërarchie</h3>
+          <p>De bron onderscheidt vier informatielagen: kernboodschap, duiding, bewijs en broncontext. Een interface moet die lagen niet mengen, maar wel direct aan elkaar koppelbaar houden.</p>
+          <ul>
+            <li>Kernboodschappen moeten zelfstandig leesbaar zijn.</li>
+            <li>Bewijs hoort één klik van de conclusie verwijderd te zijn.</li>
+            <li>Broncontext moet zichtbaar blijven bij verdieping.</li>
+          </ul>
+          <blockquote>
+            “Een goede samenvatting verbergt de bron niet; ze maakt de route ernaartoe korter.”
+          </blockquote>
+          <p>Relevantie: Dit vormt het structurele model waarop de hele informatiepresentatie rust.</p>
+          <p>Beperking: Niet iedere bron bevat even duidelijk bewijs of onzekerheidsinformatie.</p>
+          <p>Verwant: Bronverwijzingen, detailniveau, context</p>
+          <ul>
+            <li>Documentanalyse: Alle 8 secties konden in de vier lagen worden ingedeeld.</li>
+            <li>Validatie: Indeling besproken met 6 inhoudsdeskundigen.</li>
+            <li>Risico: Automatische extractie kan nuance verkeerd classificeren.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 91/100; betrouwbaarheid 95/100; onderbouwing 93/100; impact 96/100.</p>
+        </article><article id="source-section-3" data-source-key="3">
+          <h3>Navigatiepatronen</h3>
+          <p>Niet scrolllengte maar keuzevrijheid blijkt bepalend voor ervaren overzicht. Gebruikers waarderen vaste ankerpunten, voorspelbare labels en terugkeer naar een bekende positie.</p>
+          <ul>
+            <li>Beperk gelijktijdig zichtbare keuzes.</li>
+            <li>Laat selectie altijd zichtbaar blijven.</li>
+            <li>Gebruik zoeken als versneller, niet als enige navigatie.</li>
+          </ul>
+          <blockquote>
+            “Als ik weet waar ik ben, voelt een groot document ineens veel kleiner.”
+          </blockquote>
+          <p>Relevantie: Vertaalt de informatiehiërarchie naar concreet interactiegedrag.</p>
+          <p>Beperking: Op mobiel moeten navigatie en detailweergave anders herschikken.</p>
+          <p>Verwant: Zoeken, filters, focusstates</p>
+          <ul>
+            <li>Prototype-test: 8 van 9 testers konden na verdieping terugkeren zonder hulp.</li>
+            <li>Mobiel: Op kleine schermen nam de zoektijd toe bij een te brede navigatiestructuur.</li>
+            <li>Aanbeveling: Houd primaire keuzes binnen één zichtbare reeks.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 74/100; betrouwbaarheid 85/100; onderbouwing 79/100; impact 88/100.</p>
+        </article><article id="source-section-4" data-source-key="4">
+          <h3>Bronkwaliteit</h3>
+          <p>Niet alle onderdelen van de bron zijn even sterk onderbouwd. De presentatie moet daarom onderscheid maken tussen feiten, interpretaties, aannames en open vragen.</p>
+          <ul>
+            <li>Laat onzekerheid zichtbaar zijn vóór verdieping.</li>
+            <li>Maak herkomst van uitspraken traceerbaar.</li>
+            <li>Gebruik geen visuele zekerheid waar de bron die niet biedt.</li>
+          </ul>
+          <blockquote>
+            “Betrouwbaarheid is zelf informatie en hoort dus in het ontwerp thuis.”
+          </blockquote>
+          <p>Relevantie: Voorkomt dat een compacte presentatie stelliger wordt dan de bron.</p>
+          <p>Beperking: Een enkel percentage kan schijnprecisie suggereren; combineer cijfers met tekst.</p>
+          <p>Verwant: Bewijs, aannames, onzekerheid</p>
+          <ul>
+            <li>Classificatie: 31 verwijzingen verdeeld over primaire en secundaire bronnen.</li>
+            <li>Hiaten: 6 uitspraken hebben geen directe bronverwijzing.</li>
+            <li>Proces: Open punten gemarkeerd voor inhoudelijke verificatie.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 58/100; betrouwbaarheid 81/100; onderbouwing 76/100; impact 79/100.</p>
+        </article><article id="source-section-5" data-source-key="5">
+          <h3>Implementatie</h3>
+          <p>De voorgestelde aanpak begint met een vaste inhoudsstructuur en pas daarna met automatisering. Zo blijft controleerbaar welke informatie uit de bron waar terechtkomt.</p>
+          <ul>
+            <li>Start met expliciete velden voor kern, bewijs, context en onzekerheid.</li>
+            <li>Houd bronverwijzingen machineleesbaar.</li>
+            <li>Test met echte lezers vóór verdere automatisering.</li>
+          </ul>
+          <blockquote>
+            “Automatiseer pas nadat de structuur handmatig begrijpelijk en bruikbaar is.”
+          </blockquote>
+          <p>Relevantie: Maakt de ontwerpprincipes uitvoerbaar zonder afhankelijk te zijn van één platform.</p>
+          <p>Beperking: Automatisering lost een onduidelijke bronstructuur niet vanzelf op.</p>
+          <p>Verwant: Datamodel, extractie, validatie</p>
+          <ul>
+            <li>Pilot: Twee documenten handmatig gemodelleerd.</li>
+            <li>Techniek: Structuur kan als JSON worden opgeslagen en door HTML worden gerenderd.</li>
+            <li>Volgende stap: Automatische extractie nog apart valideren.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 76/100; betrouwbaarheid 89/100; onderbouwing 84/100; impact 83/100.</p>
+        </article><article id="source-section-6" data-source-key="6">
+          <h3>Risico&#x27;s en randvoorwaarden</h3>
+          <p>De grootste risico’s zijn verlies van nuance, verouderde broninformatie en een interface die te veel zekerheid suggereert. Governance rond actualiteit en herkomst is daarom onderdeel van het ontwerp.</p>
+          <ul>
+            <li>Toon altijd datum en bronstatus.</li>
+            <li>Bewaar letterlijke bronpassages naast samenvattingen.</li>
+            <li>Maak onduidelijkheid zichtbaar in plaats van die weg te poetsen.</li>
+          </ul>
+          <blockquote>
+            “Een snelle interface is alleen betrouwbaar als ook zichtbaar is waar haar grenzen liggen.”
+          </blockquote>
+          <p>Relevantie: Bepaalt wanneer compacte informatiepresentatie verantwoord gebruikt kan worden.</p>
+          <p>Beperking: Demo-interfaces kunnen vollediger lijken dan de onderliggende inhoud werkelijk is.</p>
+          <p>Verwant: Actualiteit, governance, betrouwbaarheid</p>
+          <ul>
+            <li>Risicoworkshop: Vier kernrisico’s benoemd met inhouds- en beheerrollen.</li>
+            <li>Beheereis: Elke samenvatting moet naar een herleidbare bronpassage verwijzen.</li>
+            <li>Open punt: Eigenaarschap van periodieke herbeoordeling is nog niet toegewezen.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 63/100; betrouwbaarheid 86/100; onderbouwing 80/100; impact 92/100.</p>
+        </article><article id="source-section-7" data-source-key="7">
+          <h3>Aanbevolen vervolgstap</h3>
+          <p>Bouw één inhoudelijk realistische pilot en laat gebruikers drie taken uitvoeren: oriënteren, bewijs vinden en onzekerheid herkennen. Meet waar zij vastlopen voordat nieuwe functies worden toegevoegd.</p>
+          <ul>
+            <li>Test het informatiemodel, niet alleen de vormgeving.</li>
+            <li>Gebruik echte complexe broninhoud.</li>
+            <li>Meet zoektijd, begrip en terugvindbaarheid.</li>
+          </ul>
+          <blockquote>
+            “De beste volgende stap is een kleine pilot met echte complexiteit.”
+          </blockquote>
+          <p>Relevantie: Zet analyse om in een concrete, toetsbare vervolgactie.</p>
+          <p>Beperking: Een positieve demo-ervaring zegt nog niets over schaalbaarheid naar honderden bronnen.</p>
+          <p>Verwant: Pilot, gebruikerstest, meetplan</p>
+          <ul>
+            <li>Doel: Valideren of gebruikers binnen 30 seconden de juiste kern vinden.</li>
+            <li>Taak: Laat deelnemers bij iedere conclusie ook de onderbouwing terugvinden.</li>
+            <li>Succescriterium: Gebruikers herkennen expliciet wanneer informatie onzeker is.</li>
+          </ul>
+          <p>Handgekozen demo-indices, niet gemeten: dichtheid 48/100; betrouwbaarheid 90/100; onderbouwing 85/100; impact 94/100.</p>
+        </article>
+      </details>
+    </section>
+    <script>document.getElementById('source-register').open = false;</script>
   </body>
 </html>

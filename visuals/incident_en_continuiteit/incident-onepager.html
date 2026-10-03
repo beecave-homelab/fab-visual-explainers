@@ -520,6 +520,11 @@
   .node .name { align-self: end; }
   .node .meta { align-self: start; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>

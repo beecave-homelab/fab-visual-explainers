@@ -37,6 +37,11 @@ nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.fo
 @media(max-width:760px){.page{padding:16px 12px}h1{font-size:42px}.mast{grid-template-columns:1fr;gap:25px}.context{padding-left:16px}.almanac{border:0;background:transparent}.colheads,.plotwrap{display:none}.statelines{display:none}.almanac-list{display:grid;gap:14px}.mini{background:var(--page);border:1px solid var(--rule);padding:14px 16px}.mini h3{font-size:19px}.mini .mbar{position:relative;height:16px;margin:10px 0 6px}.mini .mbar .seg{position:absolute;top:0;bottom:0}.mini .mbar .full{background:rgba(34,38,43,.85)}.mini .mbar .secg{background:repeating-linear-gradient(45deg,rgba(34,38,43,.85) 0 5px,transparent 5px 10px)}.mini .mbar .unk{border:2px dashed rgba(34,38,43,.7);left:0;right:0}.mini .mbar .now{position:absolute;top:-4px;bottom:-4px;border-left:4px solid var(--signal)}.mini p{font-size:14px;margin-top:4px}.detail-grid{grid-template-columns:1fr}.detail dl{grid-template-columns:1fr}.detail dd{margin-bottom:8px}.tools .plain{margin-left:0}}
 @media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context{font-size:10pt}.tools,.detail-actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.almanac{border:0}.plot{height:640px}.band{border:1px solid #000}.endlabel,.startlabel,.deplabel,.stateline,.peillabel,.leadlabel{font-size:8pt}.detail{border:1px solid #777;break-inside:avoid}.detail[hidden]{display:block!important}.notice{font-size:11pt}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

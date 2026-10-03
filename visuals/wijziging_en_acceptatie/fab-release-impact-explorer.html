@@ -60,6 +60,11 @@ nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.fo
 @media(max-width:480px){.page{padding:16px 12px}h1{font-size:32px}}
 @media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:24pt}.demo strong,.live,a{color:#000}.context,.tally,.detail,.groupview{border:1px solid #777;background:white;break-inside:avoid}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.tools,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action],.inbox,.cabinet{display:none!important}.board{display:block}.detail{position:static;margin-top:12px}.points li{break-inside:avoid}.export textarea{min-height:260px}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}*{box-shadow:none!important}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

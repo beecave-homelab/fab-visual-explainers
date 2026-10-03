@@ -263,6 +263,11 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 @media screen and (max-width: 900px) {
   .lvl-btn .cell-app { flex-basis: 100%; min-width: 0; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>

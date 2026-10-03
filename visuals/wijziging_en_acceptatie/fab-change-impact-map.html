@@ -234,6 +234,11 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .src-block { padding: 12px 0; grid-template-columns: 1fr 2fr; gap: 4px 24px; }
   .src-block .src-meta { font-size: 11px; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>

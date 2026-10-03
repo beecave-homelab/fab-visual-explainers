@@ -298,6 +298,26 @@ function summary() {
     ...(n.l > 1 ? ['', 'Raakt dashboardgetallen:', ...u.map(x => `- ${tName(x)}`)] : []),
     '', `Controlepunt: ${n.cp}`, tainted(sel) ? 'Onzeker door gesimuleerde bronachterstand; geen actuele meting.' : 'Geen gesimuleerde achterstand; inhoudelijke juistheid niet bewezen.'].join('\n');
 }
+function manualCopy(text, status) {
+  if (!status.isConnected) return;
+  document.getElementById('manualCopyBox')?.remove();
+  const box = document.createElement('div');
+  box.id = 'manualCopyBox';
+  const label = document.createElement('label');
+  label.htmlFor = 'manualCopy';
+  label.textContent = 'Exporttekst om handmatig te kopiëren';
+  const area = document.createElement('textarea');
+  area.id = 'manualCopy';
+  area.value = text;
+  area.readOnly = true;
+  area.rows = 12;
+  area.style.cssText = 'display:block;width:100%;margin-top:8px;font:inherit';
+  box.append(label, area);
+  status.closest('#rowpanel, #detail').append(box);
+  status.textContent = 'Kopiëren niet beschikbaar. Selecteer en kopieer de exporttekst handmatig.';
+  area.focus();
+  area.select();
+}
 document.addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.id) { sel = sel === b.dataset.id ? null : b.dataset.id; paint(); }
@@ -306,9 +326,9 @@ document.addEventListener('click', async e => {
   else if (b.id === 'reset') { stale.clear(); paint(); }
   else if (b.id === 'clear') { sel = null; paint(); }
   else if (b.id === 'copy') {
-    const st = $('#status');
-    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(summary()); st.textContent = 'Gekopieerd.'; }
-    catch { const t = document.createElement('textarea'); t.value = summary(); document.body.append(t); t.select(); try { document.execCommand('copy'); st.textContent = 'Gekopieerd.'; } catch { st.textContent = 'Kopiëren lukt niet. Selecteer de tekst handmatig.'; } t.remove(); }
+    const st = $('#status'), text = summary();
+    try { if (!navigator.clipboard || !window.isSecureContext) throw 0; await navigator.clipboard.writeText(text); if(st.isConnected) st.textContent = 'Gekopieerd.'; }
+    catch { manualCopy(text, st); }
   }
 });
 addEventListener('resize', drawVeins);

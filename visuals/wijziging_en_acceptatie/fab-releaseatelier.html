@@ -61,6 +61,11 @@ button{font:inherit;color:inherit}
   .phase-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspace { padding-top: 0; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

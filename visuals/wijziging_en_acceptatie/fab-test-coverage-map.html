@@ -15,6 +15,11 @@
 @media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:30pt}.mast{gap:20px;padding:12px 0}.tools,.actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.track.filter-hidden{display:block!important}.spool{display:block!important;padding:0;border:0}.detail[hidden]{display:block!important}.detail{background:white;padding:10px;border:1px solid #777;break-inside:avoid}.thread{gap:12px}.track{break-inside:avoid}.stop{background:white}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
 @media print{.mast{grid-template-columns:1fr 1fr;align-items:start;padding:12px 0}.mast h1{font-size:26pt}.intro,.context{font-size:10pt}.spool-head{flex-direction:row;padding:12px 0}.spool-head h2{font-size:17pt}.spool-head p{font-size:9pt;max-width:40ch}.thread{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-grid{grid-template-columns:1fr 1fr;gap:18px}.detail dl{grid-template-columns:80px 1fr;gap:5px 10px}.detail dl,.detail p,.stop span{font-size:9pt}.detail h3{font-size:12pt}.track{padding:14px 0}.track-top{margin-bottom:8px}.detail{margin-top:12px}.notice{font-size:11pt;padding:12px 0}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

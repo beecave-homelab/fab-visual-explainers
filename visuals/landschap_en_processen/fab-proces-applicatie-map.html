@@ -261,6 +261,11 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .review-context { width: min(1440px, calc(100% - 32px)); }
   .review-context p { max-width: none; }
 }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>

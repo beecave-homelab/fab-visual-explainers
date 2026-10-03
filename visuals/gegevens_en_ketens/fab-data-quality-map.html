@@ -15,6 +15,11 @@
 @media print{body{color:black;background:white;font-size:10pt}.page{padding:0;max-width:none}.skip,.interactive,.actions,.status-line,nav{display:none!important}body.ready .interactive{display:none!important}.hero{grid-template-columns:1.1fr 1fr;gap:20px;margin:15px 0}.hero-copy h1{font-size:28pt}.lens{padding:18px;border:1px solid black;border-radius:24px 24px 0 0;break-inside:avoid}.population{grid-template-columns:repeat(20,minmax(0,1fr));gap:5px}.quality{display:block!important}.rule-button{background:white!important;color:black!important;padding:10px;grid-template-columns:70px 1fr 180px}.rule-button .symbol{display:none}.rule-detail[hidden]{display:block!important}.rule-detail{padding:12px}.rule-body{gap:20px}.rule{break-inside:avoid}.register{break-before:page}.register details>:not(summary){display:block!important}.register article{break-inside:avoid}.foot{color:black}.overlap-note{gap:24px}.export[hidden]{display:none!important}}
 @media print{.quality-head{margin:12px 0}.quality-head h2{font-size:18pt}.quality-head p{font-size:9pt}.rule{break-inside:auto}.rule-button strong{font-size:11pt}.rule-button .count{font-size:9pt}.rule-detail p,.rule-body p,.facts{font-size:9pt}.rule-body h3{font-size:11pt;margin-top:12px}.facts{grid-template-columns:95px 1fr;gap:6px 12px}.effects span{font-size:9pt}.safe{margin-top:12px}.rule-detail .state{font-size:10pt}.overlap-note{padding:16px 0}.overlap-note h2{font-size:18pt}.overlap-note p{font-size:9pt}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

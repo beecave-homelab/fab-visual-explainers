@@ -323,9 +323,44 @@ button{cursor:pointer}
 @media screen and (max-width: 430px) {
   .question-ring { grid-template-columns: 1fr; }
 }
+
+/* Het volledige bronmodel blijft leesbaar zonder scripts en in afdruk. */
+[hidden] { display: none !important; }
+.source-register { max-width:1440px; margin:24px auto; padding:24px; border:1px solid currentColor; border-radius:16px; line-height:1.6; overflow-wrap:anywhere; }
+.source-register summary { cursor:pointer; font-weight:700; }
+.source-register article { margin-top:24px; padding-top:16px; border-top:1px solid currentColor; }
+.source-register h3 { font-size:1.2rem; line-height:1.4; }
+.source-register a { color:inherit; }
+.source-register blockquote { margin:16px 0; padding:12px; border-left:3px solid currentColor; }
+.source-register :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+@media screen and (max-width:760px) { .source-register { margin:16px; padding:16px; } }
+@media print {
+  @page { size:A4; margin:12mm; }
+  body { background:white!important; color:black!important; font-size:11pt!important; }
+  .review-context, .source-register { max-width:none!important; width:auto!important; margin:0!important; padding:12pt 0!important; border:0!important; color:black!important; }
+  .source-register { display:block!important; }
+  .review-context, .source-register { line-height:1.45; }
+  .review-context h2, .source-register h2 { font-size:16pt; }
+  .source-register h3 { font-size:13pt; }
+  .source-register article { margin-top:12pt; padding-top:8pt; }
+  .source-register summary { list-style:none; }
+  .source-register summary::marker { content:""; }
+  .source-register article { break-inside:avoid; }
+  .source-register a { text-decoration:none; }
+}
+
+@media print { main.page { display:none!important; } }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
     </style>
   </head>
   <body>
+    <noscript><style>button, input[type="search"] { display:none!important; }</style>
+      <p class="source-register">JavaScript staat uit. Lees alle demo-inhoud in de bronlijst onderaan.</p>
+    </noscript>
     <section class="review-context"
              aria-label="Beheerkaart en bronstatus"
              style="max-width:1440px;
@@ -427,6 +462,8 @@ button{cursor:pointer}
     </main>
     <script>
 (() => {
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
   const items = {
     why:{
       title:"Waarom is dit nodig?",
@@ -497,19 +534,19 @@ button{cursor:pointer}
     document.querySelectorAll(".mode").forEach(btn=>btn.setAttribute("aria-pressed",btn.dataset.mode===mode?"true":"false"));
 
     if(mode==="short"){
-      response.innerHTML=`<p class="big">${item.short}</p>`;
+      response.innerHTML=`<p class="big">${escapeHtml(item.short)}</p>`;
     } else if(mode==="deep"){
-      response.innerHTML=`<p class="big">${item.short}</p><ul>${item.bullets.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+      response.innerHTML=`<p class="big">${escapeHtml(item.short)}</p><ul>${item.bullets.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
     } else {
-      response.innerHTML=`<p class="big">Letterlijke passage uit de demo-bron:</p><blockquote>${item.source}</blockquote><ul><li>Deze passage is een fictief voorbeeld van hoe broncontext zichtbaar blijft.</li><li>In een echte implementatie opent hier ook paginanummer, documentversie en directe bronlocatie.</li></ul>`;
+      response.innerHTML=`<p class="big">Letterlijke passage uit de demo-bron:</p><blockquote>${escapeHtml(item.source)}</blockquote><ul><li>Deze passage is een fictief voorbeeld van hoe broncontext zichtbaar blijft.</li><li>In een echte implementatie opent hier ook paginanummer, documentversie en directe bronlocatie.</li></ul>`;
     }
 
-    sources.innerHTML=item.refs.map(r=>`<div class="source-card"><b>${r[0]}</b><p>${r[1]}</p></div>`).join("");
-    related.innerHTML=item.related.map(r=>`<button type="button" data-id="${r[0]}">${r[1]}</button>`).join("");
-    related.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{active=btn.dataset.id;mode="short";render()}));
+    sources.innerHTML=item.refs.map(r=>`<div class="source-card"><b>${escapeHtml(r[0])}</b><p>${escapeHtml(r[1])}</p></div>`).join("");
+    related.innerHTML=item.related.map(r=>`<button type="button" data-id="${escapeHtml(r[0])}">${escapeHtml(r[1])}</button>`).join("");
+    related.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{active=btn.dataset.id;mode="short";render();document.querySelector(`.q[data-id="${active}"]`).focus()}));
   }
 
-  document.querySelectorAll(".q").forEach(btn=>btn.addEventListener("click",()=>{active=btn.dataset.id;mode="short";render()}));
+  document.querySelectorAll(".q").forEach(btn=>btn.addEventListener("click",()=>{active=btn.dataset.id;mode="short";render();document.querySelector(`.q[data-id="${active}"]`).focus()}));
   document.querySelectorAll(".mode").forEach(btn=>btn.addEventListener("click",()=>{mode=btn.dataset.mode;render()}));
 
   search.addEventListener("input",()=>{
@@ -523,10 +560,12 @@ button{cursor:pointer}
       active=best;
       mode="deep";
       render();
+      document.querySelector(`.q[data-id="${active}"]`).focus();
     }
   });
 
-  app.addEventListener("keydown",event=>{
+  document.querySelector(".question-ring").addEventListener("keydown",event=>{
+    if(!event.target.matches(".q")) return;
     const tag=event.target.tagName;
     if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT") return;
     if(event.key==="ArrowRight"||event.key==="ArrowDown"){
@@ -534,17 +573,130 @@ button{cursor:pointer}
       active=order[(order.indexOf(active)+1)%order.length];
       mode="short";
       render();
+      document.querySelector(`.q[data-id="${active}"]`).focus();
     }
     if(event.key==="ArrowLeft"||event.key==="ArrowUp"){
       event.preventDefault();
       active=order[(order.indexOf(active)-1+order.length)%order.length];
       mode="short";
       render();
+      document.querySelector(`.q[data-id="${active}"]`).focus();
     }
   });
 
   render();
 })();
     </script>
+    <section class="source-register" aria-label="Volledig leesbaar bronmodel">
+      <h2>VraagKompas — volledig bronmodel</h2>
+      <details id="source-register" open>
+        <summary>Alle demo-inhoud als leesbare bronlijst</summary>
+        <p>Dit register bevat alle thema’s, antwoorden, onderbouwingen en beperkingen van het synthetische bronmodel (demo v3, revisie 2026-10-01). Verwijzingen en onderzoeksclaims zijn fictief; bronhouder onbekend, niet lokaal gevalideerd. Het is een lees- en afdrukalternatief voor dezelfde demo, geen echte bron of afzonderlijke registratie.</p>
+        <article id="source-section-0" data-source-key="why">
+          <h3>Waarom is dit nodig?</h3>
+          <p>De informatie is inhoudelijk rijk, maar kost te veel tijd om te doorgronden. Lezers zoeken meestal één antwoord en moeten nu zelf door tientallen pagina’s navigeren om hoofdzaak, bewijs en nuance bij elkaar te brengen.</p>
+          <ul>
+            <li>Dezelfde informatie wordt door verschillende rollen anders gelezen.</li>
+            <li>Belangrijke conclusies en hun bewijs staan te ver uit elkaar.</li>
+            <li>Een compacte presentatie mag de oorspronkelijke nuance niet verbergen.</li>
+          </ul>
+          <blockquote>
+            “De centrale opgave is niet minder informatie aanbieden, maar sneller zichtbaar maken welke informatie op dat moment relevant is.”
+          </blockquote>
+          <ul>
+            <li>§1.2 Aanleiding: Interviews en analyse bestaand materiaal</li>
+            <li>§2.1 Gebruikersbehoeften: 10 van 12 deelnemers beschrijven dezelfde leesvolgorde</li>
+            <li>Bijlage A: Inventaris van 42 pagina’s en 31 verwijzingen</li>
+          </ul>
+          <p>Verwante vragen: Wat verandert er?, Wie merkt dit?</p>
+        </article><article id="source-section-1" data-source-key="what">
+          <h3>Wat verandert er?</h3>
+          <p>De bron wordt niet meer als één lineaire tekst aangeboden. Informatie wordt opgesplitst in kern, duiding, bewijs en context, zodat lezers eerst kunnen oriënteren en daarna gericht verdiepen.</p>
+          <ul>
+            <li>Kernboodschap en bewijs blijven direct aan elkaar gekoppeld.</li>
+            <li>De interface ondersteunt meerdere leesroutes door dezelfde bron.</li>
+            <li>Zoeken versnelt navigatie, maar vervangt de structuur niet.</li>
+          </ul>
+          <blockquote>
+            “Een goede samenvatting verbergt de bron niet; ze maakt de route ernaartoe korter.”
+          </blockquote>
+          <ul>
+            <li>§3.1 Informatiemodel: Vier informatielagen als basis</li>
+            <li>§3.4 Navigatie: Vaste ankerpunten en zichtbare selectie</li>
+            <li>Prototype B: Terugvinden van bewijs getest met 9 deelnemers</li>
+          </ul>
+          <p>Verwante vragen: Waar blijkt dat uit?, Wat moeten we doen?</p>
+        </article><article id="source-section-2" data-source-key="evidence">
+          <h3>Waar blijkt dat uit?</h3>
+          <p>De sterkste onderbouwing komt uit gebruikersinterviews, documentanalyse en een kleine prototypetest. De bron maakt ook expliciet welke conclusies nog niet rechtstreeks zijn gemeten.</p>
+          <ul>
+            <li>12 semigestructureerde interviews vormen de belangrijkste kwalitatieve basis.</li>
+            <li>42 pagina’s bronmateriaal zijn handmatig geanalyseerd.</li>
+            <li>Prototypegedrag is getest met 9 deelnemers, maar nog niet op schaal.</li>
+          </ul>
+          <blockquote>
+            “Betrouwbaarheid is zelf informatie en hoort dus in het ontwerp thuis.”
+          </blockquote>
+          <ul>
+            <li>Onderzoeksmethode: 12 interviews, 6 inhoudsdeskundigen</li>
+            <li>Documentanalyse: 31 bronverwijzingen geclassificeerd</li>
+            <li>Prototype-test: 9 deelnemers, drie kerntaken</li>
+          </ul>
+          <p>Verwante vragen: Wat kan misgaan?, Waarom is dit nodig?</p>
+        </article><article id="source-section-3" data-source-key="risk">
+          <h3>Wat kan misgaan?</h3>
+          <p>Een compacte weergave kan stelliger lijken dan de bron werkelijk is. De grootste risico’s zijn verlies van nuance, verouderde informatie, zwakke bronverwijzingen en automatisering die context verkeerd classificeert.</p>
+          <ul>
+            <li>Laat onzekerheid vóór verdieping al zichtbaar zijn.</li>
+            <li>Bewaar letterlijke passages naast samenvattingen.</li>
+            <li>Toon datum, status en herkomst van belangrijke uitspraken.</li>
+          </ul>
+          <blockquote>
+            “Een snelle interface is alleen betrouwbaar als ook zichtbaar is waar haar grenzen liggen.”
+          </blockquote>
+          <ul>
+            <li>§5.2 Risicoanalyse: Vier kernrisico’s met beheersmaatregelen</li>
+            <li>§4.3 Bronkwaliteit: 6 uitspraken zonder directe verwijzing</li>
+            <li>Open punt 7: Eigenaarschap periodieke herbeoordeling nog niet toegewezen</li>
+          </ul>
+          <p>Verwante vragen: Waar blijkt dat uit?, Wat moeten we doen?</p>
+        </article><article id="source-section-4" data-source-key="action">
+          <h3>Wat moeten we doen?</h3>
+          <p>Start klein met één realistische bron. Test of gebruikers snel de kern vinden, de onderbouwing kunnen terughalen en onzekerheid herkennen. Automatiseer pas nadat die structuur handmatig werkt.</p>
+          <ul>
+            <li>Modelleer eerst kern, bewijs, context en onzekerheid expliciet.</li>
+            <li>Gebruik echte complexe inhoud in plaats van een opgeschoonde demo.</li>
+            <li>Meet zoektijd, begrip en terugvindbaarheid.</li>
+          </ul>
+          <blockquote>
+            “De beste volgende stap is een kleine pilot met echte complexiteit.”
+          </blockquote>
+          <ul>
+            <li>§6 Implementatie: Handmatig informatiemodel als eerste stap</li>
+            <li>§8 Vervolg: Pilot met drie gebruikerstaken</li>
+            <li>Meetplan: Doel: kern binnen 30 seconden vinden</li>
+          </ul>
+          <p>Verwante vragen: Wat verandert er?, Wie merkt dit?</p>
+        </article><article id="source-section-5" data-source-key="who">
+          <h3>Wie merkt dit?</h3>
+          <p>Iedere lezer krijgt dezelfde bron, maar niet dezelfde ingang. Managers starten vaker bij conclusies, specialisten bij bewijs en beheerders bij actualiteit en herkomst.</p>
+          <ul>
+            <li>Rolverschillen zitten vooral in startpunt en gewenste diepte.</li>
+            <li>De bron zelf blijft gelijk; alleen de leesroute verandert.</li>
+            <li>Rolprofielen zijn nog indicatief en moeten verder worden gevalideerd.</li>
+          </ul>
+          <blockquote>
+            “Ik wil eerst weten waar ik moet kijken. Daarna beslis ik zelf hoe diep ik ga.”
+          </blockquote>
+          <ul>
+            <li>§2.2 Rollen: Verschillen in startpunt per gebruikersgroep</li>
+            <li>Interview 08: Voorkeur voor conclusie gevolgd door onderbouwing</li>
+            <li>Open punt 3: Rolprofielen nog niet formeel gevalideerd</li>
+          </ul>
+          <p>Verwante vragen: Waarom is dit nodig?, Wat moeten we doen?</p>
+        </article>
+      </details>
+    </section>
+    <script>document.getElementById('source-register').open = false;</script>
   </body>
 </html>
