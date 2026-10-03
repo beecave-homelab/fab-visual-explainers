@@ -16,6 +16,9 @@ Deze gids is de centrale selectie- en bewerkkaart voor de prototypes. Gebruik he
 | Systemen, processen en verantwoordelijkheden         | Applicatielandschap, Proces × Applicatie-map of Life Cycle Map                                                                                                  | Ketenkaart bij berichtverwerking; Rapportage Lineage bij een KPI-definitie; Life Cycle Map bij ondersteuningstermijnen.                                       |
 | Toegang en overgangsmomenten                         | Autorisatielandschap of Joiner-Mover-Leaver                                                                                                                     | Rechtenmatrix voor model/feitelijk/uitzondering; tijdlijn voor afzonderlijke eindmomenten.                                                                    |
 | Gegevensstromen, afwijkingen of rapportagedefinities | Ketenkaart, Data Quality Map of Rapportage Lineage                                                                                                              | Geen totaalscore toevoegen zonder expliciete brondefinitie.                                                                                                   |
+| Ketenafwijking op één gegeven                        | Data Lineage                                                                                                                                                    | Ketenkaart bij berichtverwerking in het algemeen; Rapportage Lineage bij een KPI-definitie.                                                                   |
+| Leveranciers- of releasedocument                     | Release Impact Explorer                                                                                                                                         | BronScanner bij puur verkennend lezen; Change Impact Map als geen doelgroepverdeling nodig is.                                                                |
+| Invoering en nazorg                                  | Adoptiekaart                                                                                                                                                    | Pilot Cockpit bij een begrensde proef met hypothese en stopcriteria.                                                                                          |
 
 De twee incidentvarianten hebben hetzelfde inhoudelijke patroon. De vijf bron-/kennispatronen passen ook bij openbare documenten buiten FAB; pas de doelgroep en beheerkaart daarop aan. Operationele patronen zijn geen generieke rapportdecoratie: ontbrekende beslis-, bewijs- of herstelvoorwaarden mogen niet worden ingevuld met verzonnen zekerheden.
 
@@ -337,6 +340,36 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 - **Samen aanpassen:** Node-ID, `down`-verwijzingen, laagindex, selectie `k1` en verbindingen `drawVeins()`; stale-bronsimulatie.
 - **Regels en export:** Waarden zijn voorbeelden, geen live KPI-berekening. Teller/noemer/periode/populatie/uitsluitingen expliciet maken; `summary()` export consistent met node/bronstatus.
 - **Leeslaag en afdruk:** Print aanwezig; lagen worden met JS opgebouwd. Voeg volledige KPI-definitie-/lineagetabel toe zonder JS.
+
+### fab-data-lineage.html
+
+[Open origineel](../visuals/gegevens_en_ketens/fab-data-lineage.html). **Taak:** één gegeven door de keten volgen en de plek van een onverklaard verschil versmallen.
+
+- **Statische inhoud:** `.register article` per steekproef (`lin-static-DEMO-IND-01` … `-03`) met getoonde waarde, beginstatus, transformatie en beginplek; de transformatielijst met document en eigenaar, het afnemersgevolg en de regelalinea.
+- **JavaScript-data:** `HOPS` (naam, vorm, `transform`, `doc`, `refresh`, `owner`), `SAMPLES` (`changed`, `shown`, `after`, `compared`), `loaded`, `proposals`, `PEIL`.
+- **Samen aanpassen:** hop-ID's (`data-hop`, `.hop`), steekproef-ID's (`#sample`, `lin-static-<id>`), `initialize()`, `draw()`, `trace()` en de acties `compare`/`load`/`propose`/`approve` samen bijwerken; scherm, `#locus`, `#proposal` en `summary()` volgen `trace()`.
+- **Regels en export:** `fresh()` vergelijkt verversingsmoment met het wijzigingsmoment in de bron; `validComp()` vraagt verversing én geldige vergelijking; de verwachte waarde volgt uit de dichtstbijzijnde geldige basis en de vastgelegde transformaties ertussen; `load` maakt vergelijkingen van geladen stappen in alle steekproeven ongeldig. Een voorstel geldt alleen bij een aangrenzend gelokaliseerd paar en vervalt als die plek wegvalt; akkoord bewijst geen herstel.
+- **Leeslaag en afdruk:** Print en statisch register aanwezig; werk stempels, statuszinnen, plek, voorstel en register tegelijk bij.
+
+### fab-release-impact-explorer.html
+
+[Open origineel](../visuals/wijziging_en_acceptatie/fab-release-impact-explorer.html). **Taak:** releasenotes vertalen naar lokaal gevolg, doelgroep, test of actie en eigenaar.
+
+- **Statische inhoud:** `.register article` per releasepunt (`rel-static-RN-01` … `RN-07`) met leverancierstekst, vindplaats, instelling, lokale waarde, beginstatus en bevestiger; de v1.1-alinea en de indeelregels; `.points`-lijst per punt.
+- **JavaScript-data:** `POINTS`/`BASE` (`text`, `where`, `setting`, `local`, `groups`, `impact`, `action`, `owner`, `confirmer`, `ask`, `reason`, `status`), `RN03_V11`, `RN08`, `GROUPS`, `PEIL`.
+- **Samen aanpassen:** punt-ID's (`data-rn`, `.slip`, `rel-static-<id>`), doelgroepkeys (`data-group`, `data-group-filter`), `initialize()`, `draw()`, `drawDetail()` en de acties `compare`/`ask`/`confirm`/`notes` samen bijwerken; vakken, `#tally`, `#open`, `#group-view` en `summary()` volgen `classify()`.
+- **Regels en export:** `classify()` volgt vaste volgorde: onvergeleken, inrichting onbekend, lokaal gevolg of onderbouwd geen gevolg; een gewijzigde releasetekst maakt de beoordeling ongeldig; bevestiging is een aparte stap van een bevoegde rol. Geen score of release-akkoord.
+- **Leeslaag en afdruk:** Print en statisch register aanwezig; de `.points`-lijst is het leesbare alternatief — werk kast, lijst, telling, detail en register tegelijk bij.
+
+### fab-adoptiekaart.html
+
+[Open origineel](../visuals/wijziging_en_acceptatie/fab-adoptiekaart.html). **Taak:** per afdeling zien of een nieuwe werkwijze bekend, getraind, gebruikt, beheerst en geborgd is.
+
+- **Statische inhoud:** `.layers-key` met de vijf lagen, signaal, grens en bron; `.register article` per afdeling (`adopt-static-esdoorn` …) met laagstatussen, stand, signalen en advies; de regelalinea.
+- **JavaScript-data:** `DEPTS` (`l1` met meetstatus, `l2`/`l3`/`l4` met teller en noemer, `prog`, `sample`), `LAYERS` met grenzen en steekproefminimum, `INSTR_V1`/`INSTR_V2_OPEN`/`INSTR_V2`, `PEIL`.
+- **Samen aanpassen:** afdelings- en laag-ID's (`data-dept`, `data-layer`, `adopt-static-<id>`), `initialize()`, `draw()`, `assess()` en de acties `confirm`/`train`/`sample`/`embed`/`instr-change`/`instr-adopt` samen bijwerken; muren, `#tally` en `summary()` volgen `assess()`.
+- **Regels en export:** `layerLies()` laat een laag pas liggen op gemeten signaal boven de grens (steekproef < 20 ligt niet); een laag boven een ontbrekende laag draagt niet; `assess()` geeft stand, signalen en advies in vaste volgorde; een gewijzigde werkinstructie onttrekt Bekend en Geborgd. Niet gemeten is onbekend; geen totaalscore.
+- **Leeslaag en afdruk:** Print en statisch register aanwezig; de lagentabel per afdeling is het leesbare alternatief — werk muren, statussen, stand, signalen, advies en register tegelijk bij.
 
 ## Uitgewerkt voorbeeld: openbare bron
 

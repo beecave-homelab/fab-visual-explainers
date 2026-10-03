@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische postvakkenkast: ieder releasepunt krijgt na vergelijking met de lokale inrichting een vak per doelgroep, met test of actie en eigenaar.">
+    <title>FAB Release Impact Explorer — wat betekent deze release bij ons?</title>
+    <style>
+:root{--wall:#D5DAD2;--steel:#5F6F66;--cell:#EEF1EC;--slip:#E9DDB5;--ink:#1E2622;--select:#1F5FA8;--flag:#9C2F4F;--display:"Arial Rounded MT Bold","Arial Rounded MT","Nunito",sans-serif;--body:"Geneva","Segoe UI","Noto Sans",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--wall);color:var(--ink);font:15px/1.6 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--select);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(32px,4.4vw,54px);font-weight:700;line-height:1.1;max-width:20ch}h2{font-family:var(--display);font-size:25px}h3{font-family:var(--display);font-size:19px}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--select);outline-offset:3px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:var(--cell);padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1440px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--steel);padding-bottom:14px;font-size:15px}.demo strong{color:var(--flag)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 26px}.intro{margin-top:18px;max-width:54ch}.context{background:var(--cell);border-left:6px solid var(--steel);padding:16px 20px;font-size:15px}.context p+p{margin-top:8px}
+.tools{display:flex;gap:12px 20px;align-items:flex-start;flex-wrap:wrap;margin:18px 0}.plain{background:var(--cell);border:1px solid var(--steel);border-radius:4px;padding:9px 16px}
+.interactive{display:none}body.ready .interactive{display:flex}
+.tally{background:var(--cell);border:1px solid var(--steel);padding:12px 16px;font-size:15px;max-width:90ch}.tally p+p{margin-top:4px}
+.board{display:grid;grid-template-columns:1fr;gap:26px;margin-top:24px;align-items:start}
+.sortzone{display:grid;grid-template-columns:195px minmax(0,1fr);gap:0 18px;align-items:stretch}
+.inbox{border:2px dashed var(--steel);padding:10px;background:var(--cell)}
+.inbox h3{font-size:16px;margin-bottom:8px}
+.inbox .slip{margin-bottom:8px}
+.inbox .why{display:block;font-size:12.5px;color:var(--ink);opacity:.8}
+.cabinet{border:10px solid var(--steel);background:var(--steel);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cell{background:var(--cell);min-height:150px;padding:8px 8px 10px;display:flex;flex-direction:column;gap:8px}
+.cell.dim{opacity:.45}
+.plate{font-family:var(--display);font-weight:700;background:var(--steel);color:var(--cell);border:1px solid var(--steel);border-radius:3px;padding:8px 10px;width:100%;text-align:left;font-size:14.5px;min-height:44px}
+.plate[aria-pressed="true"]{outline:3px solid var(--select);outline-offset:2px}
+.slipwrap{display:flex;flex-direction:column;gap:6px}
+.slip{background:var(--slip);color:var(--ink);border:1px solid #b8a96f;border-radius:2px 2px 0 0;padding:7px 10px 8px;text-align:left;font-size:13.5px;box-shadow:0 -3px 0 rgba(0,0,0,.06);transition:transform .3s}
+.slip .rn{font-family:var(--display);font-weight:700;display:block}
+.slip.sel{border:2px solid var(--select);transform:translateY(-4px)}
+.slip.rel{border-style:dashed}
+.slip:hover{border-color:var(--select)}
+.drawer{grid-column:1/-1;background:#4c5a52;border:2px solid var(--steel);padding:8px 12px;color:var(--cell)}
+.drawer h3{font-size:15px;margin-bottom:6px}
+.drawer .slipwrap{flex-direction:row;flex-wrap:wrap}
+.drawer .slip{min-width:150px}
+.detail{background:var(--cell);border:1px solid var(--steel);padding:18px 20px}
+.detail h3{margin-bottom:8px}
+.detail dt{font-weight:700;margin-top:10px}.detail dd{margin:2px 0}
+.detail blockquote{margin:4px 0 0;font-style:italic;border-left:3px solid var(--steel);padding-left:12px}
+.state{font-weight:700;margin-top:10px}.state.flag{color:var(--flag)}
+.detail .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.detail .acts button{background:transparent;border:1px solid var(--select);border-radius:4px;padding:8px 14px;color:var(--select)}
+.groupview{background:var(--cell);border:1px solid var(--steel);padding:16px 20px;margin-top:22px}
+.groupview h3{margin-bottom:8px}
+.groupview article{border-top:1px solid var(--steel);padding:10px 0}
+.groupview p{margin:3px 0;font-size:14.5px}
+.points{list-style:none;padding:0;margin-top:22px;max-width:100ch}
+.points li{border-top:1px solid var(--steel);padding:10px 0;display:flex;gap:14px;flex-wrap:wrap}
+.points .rn{font-family:var(--display);font-weight:700;min-width:64px}
+.points .t{flex:1;min-width:200px}
+.points .state{margin-top:0;flex-basis:100%;font-weight:400}
+.live{min-height:24px;color:var(--flag);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--cell);padding:22px;border:1px solid var(--steel)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid var(--steel)}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(min-width:1100px){.board{grid-template-columns:minmax(0,1fr) 360px}.detail{position:sticky;top:20px}}
+@media(max-width:760px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}.sortzone{grid-template-columns:1fr}.inbox{margin-bottom:16px}.cabinet{grid-template-columns:1fr;border-width:6px}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:32px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:24pt}.demo strong,.live,a{color:#000}.context,.tally,.detail,.groupview{border:1px solid #777;background:white;break-inside:avoid}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.tools,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action],.inbox,.cabinet{display:none!important}.board{display:block}.detail{position:static;margin-top:12px}.points li{break-inside:avoid}.export textarea{min-height:260px}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de postvakkenkast</a>
+<main class="page">
+<div class="demo"><span>FAB / Release Impact Explorer</span><strong>Synthetische demonstratie, geen releaseregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Wat betekent deze release bij ons, en voor wie?</h1>
+<p class="intro">Elk releasepunt komt binnen in het inbakje. Pas na vergelijking met onze inrichting krijgt het een vak per doelgroep, met een test of actie en een eigenaar. ‘Geen lokaal gevolg’ vraagt net zo goed een onderbouwing.</p>
+</div>
+<div class="context">
+<p><strong>Leveranciersrelease ECD 2026.5 (fictief)</strong></p>
+<p id="notes-version">Releasenotes v1.0 van 2026-09-26</p>
+<p>Installatie in acceptatie 2026-10-20, in productie 2026-11-16 (demo). Lokale inrichting: momentopname INR-DEMO van 2026-09-30.</p>
+<p>Eigenaar: wijzigingscoördinator met FAB (voorgestelde rollen). Gebruiksmoment: overleg bij de wijzigingsintake.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Postvakkenkast van de release</h2>
+<div class="tools interactive">
+<button class="plain" data-action="notes">Simuleer releasenotes v1.1</button>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer releaseoverzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="tally">
+<p id="tally" aria-live="polite"></p>
+<p id="open"></p>
+</div>
+<div class="board">
+<div class="sortzone">
+<div class="inbox" id="inbox">
+<h3>Inbakje</h3>
+<div class="slipwrap" id="inbox-slips"></div>
+</div>
+<div class="cabinet" id="cabinet"></div>
+<div class="drawer" id="drawer" style="grid-column:1/-1">
+<h3>Geen lokaal gevolg, met onderbouwing</h3>
+<div class="slipwrap" id="drawer-slips"></div>
+</div>
+</div>
+<aside class="detail" id="detail" aria-labelledby="detail-title">
+<h3 id="detail-title">Detail van het geselecteerde punt</h3>
+<div id="detail-body"></div>
+</aside>
+</div>
+<div class="groupview" id="group-view" aria-live="polite"></div>
+<ul class="points" id="points">
+</ul>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Releaseoverzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief vergelijkingen, navraag en bevestigingen. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle releasepunten, ook zonder interactie</h2>
+<p>Dit register toont de beginstand bij releasenotes v1.0 en blijft leesbaar zonder JavaScript. De gesimuleerde indeling bovenaan kan ervan afwijken. Peildatum 2026-10-03; alle gegevens zijn synthetisch.</p>
+<div class="register">
+<article id="rel-static-RN-01">
+<h3>RN-01 — Medicatieaftekenlijst: reden verplicht bij niet gegeven</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “Bij ‘Niet gegeven’ is een reden voortaan verplicht. Bestaande aftekeningen blijven ongewijzigd.” Vindplaats: v1.0, §2.1.</p>
+<p><strong>Instelling:</strong> module medicatie; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> aan. <strong>Beginstatus:</strong> lokaal gevolg, bevestigd door proceseigenaar medicatieproces op 2026-10-01.</p>
+<p><strong>Doelgroepen:</strong> zorgmedewerkers, kerngebruikers, functioneel beheer. <strong>Zorgimpact:</strong> zorgproces verandert: medicatieregistratie. <strong>Test of actie:</strong> test in acceptatie aftekenen met en zonder reden, ook de negatieve route; pas de werkinstructie medicatie aan. <strong>Eigenaar:</strong> proceseigenaar medicatieproces met FAB. <strong>Bevestiger:</strong> proceseigenaar medicatieproces.</p>
+</article>
+<article id="rel-static-RN-02">
+<h3>RN-02 — Planningsbericht: teamcode verplicht</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “Berichten naar de planningskoppeling zonder teamcode worden geweigerd.” Vindplaats: v1.0, §4.3.</p>
+<p><strong>Instelling:</strong> koppeling met planning; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> aan. <strong>Beginstatus:</strong> lokaal gevolg, doelgroepimpact nog niet bevestigd.</p>
+<p><strong>Doelgroepen:</strong> integratie en ketenpartners, functioneel beheer, planners. <strong>Zorgimpact:</strong> mogelijk stilgevallen zorgondersteuning: geweigerde berichten geven lege diensten. <strong>Test of actie:</strong> ketentest met en zonder teamcode; controleer de mapping van teamcodes. <strong>Eigenaar:</strong> integratiebeheer met FAB. <strong>Bevestiger:</strong> proceseigenaar planning.</p>
+</article>
+<article id="rel-static-RN-03">
+<h3>RN-03 — Cliëntportaal: inzage door naasten</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “Naasten kunnen rapportages inzien als de cliënt daarvoor toestemming geeft.” Vindplaats: v1.0, §5.2.</p>
+<p><strong>Instelling:</strong> inzage naasten in het cliëntportaal; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> uit. <strong>Beginstatus:</strong> geen lokaal gevolg — inzage naasten staat uit in onze inrichting (INR-DEMO 2026-09-30); herbeoordelen als die instelling verandert.</p>
+<p><strong>Doelgroepen:</strong> geen bij deze inrichting. <strong>Beoordeling:</strong> FAB (demo), 2026-10-01.</p>
+</article>
+<article id="rel-static-RN-04">
+<h3>RN-04 — Declaratie: nieuwe exportindeling</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “De declaratie-export krijgt een nieuwe indeling volgens de demo-standaard 2027.” Vindplaats: v1.0, §6.1.</p>
+<p><strong>Instelling:</strong> declaratiemodule van het ECD; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> uit. <strong>Beginstatus:</strong> geen lokaal gevolg — declaratie loopt via de Zorgadministratie, niet via de declaratiemodule van het ECD (INR-DEMO 2026-09-30).</p>
+<p><strong>Doelgroepen:</strong> geen bij deze inrichting. <strong>Beoordeling:</strong> FAB (demo), 2026-10-01.</p>
+</article>
+<article id="rel-static-RN-05">
+<h3>RN-05 — Zoeken in gearchiveerde rapportages</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “De zoekfunctie doorzoekt ook gearchiveerde rapportages, binnen de bestaande autorisatie.” Vindplaats: v1.0, §3.4.</p>
+<p><strong>Instelling:</strong> archiefmodule; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> onbekend; nagevraagd bij technisch beheer ECD: aan. <strong>Beginstatus:</strong> nog niet vergeleken met de inrichting.</p>
+<p><strong>Doelgroepen bij gevolg:</strong> zorgmedewerkers, functioneel beheer. <strong>Zorgimpact:</strong> privacyrisico: gearchiveerde rapportages verschijnen in zoekresultaten. <strong>Test of actie:</strong> negatieve autorisatietest op gearchiveerde dossiers; informeer zorgmedewerkers. <strong>Eigenaar:</strong> autorisatieverantwoordelijke met FAB. <strong>Bevestiger:</strong> gegevenseigenaar cliëntdossier.</p>
+</article>
+<article id="rel-static-RN-06">
+<h3>RN-06 — Sneller openen van het dossier</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “Het openen van een cliëntdossier is technisch verbeterd.” Vindplaats: v1.0, §1.2.</p>
+<p><strong>Instelling:</strong> geen instelling; geldt altijd. <strong>Lokaal (INR-DEMO):</strong> niet van toepassing. <strong>Beginstatus:</strong> lokaal gevolg, doelgroepimpact nog niet bevestigd.</p>
+<p><strong>Doelgroepen:</strong> functioneel beheer. <strong>Zorgimpact:</strong> hinder als het misgaat. <strong>Test of actie:</strong> regressietest dossier openen in acceptatie; geen communicatie nodig. <strong>Eigenaar:</strong> FAB. <strong>Bevestiger:</strong> applicatie-eigenaar ECD.</p>
+</article>
+<article id="rel-static-RN-07">
+<h3>RN-07 — Weekoverzicht planning standaard 14 dagen</h3>
+<p><strong>Leverancierstekst (synthetisch):</strong> “Het weekoverzicht toont standaard 14 dagen in plaats van 7.” Vindplaats: v1.0, §4.1.</p>
+<p><strong>Instelling:</strong> module planning; geldt als die aan staat. <strong>Lokaal (INR-DEMO):</strong> aan. <strong>Beginstatus:</strong> nog niet vergeleken met de inrichting.</p>
+<p><strong>Doelgroepen bij gevolg:</strong> planners, kerngebruikers. <strong>Zorgimpact:</strong> hinder: ander standaardoverzicht. <strong>Test of actie:</strong> korte instructie voor planners; kerngebruiker test het weekoverzicht. <strong>Eigenaar:</strong> proceseigenaar planning. <strong>Bevestiger:</strong> proceseigenaar planning.</p>
+</article>
+<p><strong>Releasenotes v1.1 van 2026-10-02 (demo):</strong> RN-03 is gewijzigd — inzage naasten staat na installatie standaard aan bij organisaties die het cliëntportaal gebruiken; de eerdere beoordeling vervalt. Nieuw punt RN-08 ‘Inloggen: verouderde inlogmethode vervalt’: inloggen met een lokaal wachtwoord zonder tweede factor kan na deze release niet meer; tijdelijke medewerkers gebruiken dat nog (demo).</p>
+<p><strong>Indeelregels in volgorde:</strong> nog niet vergeleken blijft in het inbakje; na vergelijking geldt een onbekende inrichting als open vraag bij de aangewezen rol; een punt dat altijd geldt of waarvan de instelling lokaal aan staat krijgt een vak per doelgroep; anders gaat het met onderbouwing naar de lade; een gewijzigde releasetekst maakt de eerdere beoordeling ongeldig; lokaal gevolg is pas bevestigd als de aangewezen bevestiger dat doet.</p>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij de wijzigingsintake, met de wijzigingscoördinator en proceseigenaren; de uitkomst is per releasepunt een lokaal gevolg of een onderbouwd ‘geen gevolg’, met doelgroep, test of actie en eigenaar. Geen akkoord op installatie of livegang.</p>
+<p><strong>Bron:</strong> synthetische releasenotes en een synthetische inrichtingsmomentopname, demo v1, revisie 2026-10-03; de echte releasenotes, inrichtingsregistratie en bronhouder (wijzigingscoördinator met FAB) zijn niet vastgesteld. Herzie bij iedere nieuwe versie van de releasenotes of een gewijzigde inrichting.</p>
+<p><strong>Regels:</strong> zonder vergelijking met de inrichting geen oordeel; onbekende inrichting blijft open; ook ‘geen gevolg’ heeft een onderbouwing; een gewijzigde releasetekst maakt de eerdere beoordeling ongeldig; FAB beoordeelt, de proceseigenaar bevestigt de doelgroepimpact.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige release-intake (releasenotes plus checklist) op gemiste lokale gevolgen, juiste doelgroep en eigenaar, en herkenning van gewijzigde releaseteksten.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-releaseatelier.html">Releaseatelier</a><a href="fab-change-impact-map.html">Change Impact Map</a><a href="fab-test-coverage-map.html">Testsporen en bewijs</a><a href="fab-omgevingsvergelijker.html">Omgevingsvergelijker</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een gesimuleerde beoordeling is geen echte release-acceptatie.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const GROUP_ORDER=['zorg','plan','cadm','kern','fab','keten'];
+const GROUPS={zorg:'Zorgmedewerkers',plan:'Planners',cadm:'Cliëntadministratie',kern:'Kerngebruikers',fab:'Functioneel beheer',keten:'Integratie en ketenpartners'};
+const BASE=[
+{id:'RN-01',title:'Medicatieaftekenlijst: reden verplicht bij niet gegeven',text:"Bij 'Niet gegeven' is een reden voortaan verplicht. Bestaande aftekeningen blijven ongewijzigd.",where:'v1.0, §2.1',setting:'Module medicatie; geldt als die aan staat',local:'aan',groups:['zorg','kern','fab'],impact:'Zorgproces verandert: medicatieregistratie',action:'Test in acceptatie aftekenen met en zonder reden, ook de negatieve route; pas de werkinstructie medicatie aan',owner:'Proceseigenaar medicatieproces met FAB',confirmer:'Proceseigenaar medicatieproces',ask:null,reason:null,
+ status:'impact',confirmed:{by:'Proceseigenaar medicatieproces',date:'2026-10-01',sim:false}},
+{id:'RN-02',title:'Planningsbericht: teamcode verplicht',text:'Berichten naar de planningskoppeling zonder teamcode worden geweigerd.',where:'v1.0, §4.3',setting:'Koppeling met planning; geldt als die aan staat',local:'aan',groups:['keten','fab','plan'],impact:'Mogelijk stilgevallen zorgondersteuning: geweigerde berichten geven lege diensten',action:'Ketentest met en zonder teamcode; controleer de mapping van teamcodes',owner:'Integratiebeheer met FAB',confirmer:'Proceseigenaar planning',ask:null,reason:null,status:'impact',confirmed:null},
+{id:'RN-03',title:'Cliëntportaal: inzage door naasten',text:'Naasten kunnen rapportages inzien als de cliënt daarvoor toestemming geeft.',where:'v1.0, §5.2',setting:'Inzage naasten in het cliëntportaal; geldt als die aan staat',local:'uit',groups:[],impact:null,action:null,owner:null,confirmer:null,ask:null,reason:'Inzage naasten staat uit in onze inrichting (INR-DEMO 2026-09-30). Herbeoordelen als die instelling verandert.',status:'none',confirmed:null,assessed:'FAB (demo), 2026-10-01'},
+{id:'RN-04',title:'Declaratie: nieuwe exportindeling',text:'De declaratie-export krijgt een nieuwe indeling volgens de demo-standaard 2027.',where:'v1.0, §6.1',setting:'Declaratiemodule van het ECD; geldt als die aan staat',local:'uit',groups:[],impact:null,action:null,owner:null,confirmer:null,ask:null,reason:'Declaratie loopt via de Zorgadministratie, niet via de declaratiemodule van het ECD (INR-DEMO 2026-09-30).',status:'none',confirmed:null,assessed:'FAB (demo), 2026-10-01'},
+{id:'RN-05',title:'Zoeken in gearchiveerde rapportages',text:'De zoekfunctie doorzoekt ook gearchiveerde rapportages, binnen de bestaande autorisatie.',where:'v1.0, §3.4',setting:'Archiefmodule; geldt als die aan staat',local:'onbekend',groups:['zorg','fab'],impact:'Privacyrisico: gearchiveerde rapportages verschijnen in zoekresultaten',action:'Negatieve autorisatietest op gearchiveerde dossiers; informeer zorgmedewerkers',owner:'Autorisatieverantwoordelijke met FAB',confirmer:'Gegevenseigenaar cliëntdossier',ask:'Technisch beheer ECD',reason:null,status:'uncompared',confirmed:null},
+{id:'RN-06',title:'Sneller openen van het dossier',text:'Het openen van een cliëntdossier is technisch verbeterd.',where:'v1.0, §1.2',setting:'Geen instelling; geldt altijd',local:'nvt',groups:['fab'],impact:'Hinder als het misgaat',action:'Regressietest dossier openen in acceptatie; geen communicatie nodig',owner:'FAB',confirmer:'Applicatie-eigenaar ECD',ask:null,reason:null,status:'impact',confirmed:null},
+{id:'RN-07',title:'Weekoverzicht planning standaard 14 dagen',text:'Het weekoverzicht toont standaard 14 dagen in plaats van 7.',where:'v1.0, §4.1',setting:'Module planning; geldt als die aan staat',local:'aan',groups:['plan','kern'],impact:'Hinder: ander standaardoverzicht',action:'Korte instructie voor planners; kerngebruiker test het weekoverzicht',owner:'Proceseigenaar planning',confirmer:'Proceseigenaar planning',ask:null,reason:null,status:'uncompared',confirmed:null}];
+const RN08={id:'RN-08',title:'Inloggen: verouderde inlogmethode vervalt',text:'Inloggen met een lokaal wachtwoord zonder tweede factor is na deze release niet meer mogelijk.',where:'v1.1, §7.1',setting:'Lokale wachtwoorden in gebruik; geldt als dat zo is',local:'aan',groups:['zorg','kern','fab'],impact:'Mogelijk stilgevallen zorgondersteuning: tijdelijke medewerkers kunnen niet inloggen',action:'Test inloggen met een tijdelijk testaccount; regel vóór productie een andere inlogmethode',owner:'Applicatie-eigenaar ECD met IAM',confirmer:'Applicatie-eigenaar ECD',ask:null,reason:null,status:'uncompared',confirmed:null};
+const RN03_V11={text:'Naasten kunnen rapportages inzien als de cliënt daarvoor toestemming geeft. Na installatie staat inzage naasten standaard aan bij organisaties die het cliëntportaal gebruiken.',where:'v1.1, §5.2',setting:'Cliëntportaal in gebruik; geldt als dat zo is',local:'aan',groups:['cadm','zorg','fab'],impact:'Privacyrisico: naasten krijgen mogelijk inzage zonder ingerichte toestemming',action:'Zet inzage naasten direct na installatie uit in acceptatie en productie, of richt de toestemming in; negatieve autorisatietest',owner:'Gegevenseigenaar cliëntdossier met privacy officer',confirmer:'Gegevenseigenaar cliëntdossier'};
+let points,selected,filter,notesDone;
+function initialize(){
+ points=BASE.map(p=>({...p,groups:[...p.groups],confirmed:p.confirmed?{...p.confirmed}:null,voided:false,asked:false,compared:['impact','none'].includes(p.status)}));
+ selected='RN-05';selectedSlip=null;filter=null;notesDone=false;
+}
+function classify(p){
+ if(p.status==='uncompared')return{cls:'uncompared',state:p.voided?'Releasenotes gewijzigd na beoordeling; opnieuw vergelijken':'Nog niet vergeleken met de inrichting'};
+ if(p.status==='unknown')return{cls:'unknown',state:`Inrichting onbekend: vraag na bij ${p.ask}`};
+ if(p.status==='none')return{cls:'none',state:`Geen lokaal gevolg: ${p.reason}`};
+ if(p.confirmed)return{cls:'impact',state:`Lokaal gevolg, bevestigd door ${p.confirmed.by}, ${p.confirmed.date}${p.confirmed.sim?' (simulatie)':''}`};
+ return{cls:'impact',state:'Lokaal gevolg, door FAB beoordeeld; doelgroepimpact nog niet bevestigd'};
+}
+function compare(p){
+ if(p.local==='onbekend'&&!p.asked){p.status='unknown';return;}
+ if(p.local==='uit'){p.status='none';}
+ else p.status='impact';
+ p.compared=true;
+}
+function tally(){
+ const a=points.filter(p=>p.status==='uncompared').length;
+ const b=points.filter(p=>p.status==='unknown').length;
+ const c=points.filter(p=>p.status==='impact').length;
+ const d=points.filter(p=>p.status==='impact'&&p.confirmed).length;
+ const e=points.filter(p=>p.status==='none').length;
+ return{n:points.length,a,b,c,d,e};
+}
+let selectedSlip=null;
+function renderSlip(p,group){
+ const sel=selectedSlip&&selectedSlip.rn===p.id&&selectedSlip.group===group;
+ const rel=!sel&&p.id===selected;
+ return`<button class="slip${sel?' sel':''}${rel?' rel':''}" data-rn="${p.id}" data-group="${group}" aria-pressed="${p.id===selected}"><span class="rn">${p.id}</span>${p.title}</button>`;
+}
+function draw(){
+ const cab=document.querySelector('#cabinet');
+ cab.innerHTML=GROUP_ORDER.map(g=>{
+  const slips=points.filter(p=>p.status==='impact'&&p.groups.includes(g));
+  return`<div class="cell${filter&&filter!==g?' dim':''}" data-cell="${g}">
+  <button class="plate" data-group-filter="${g}" aria-pressed="${filter===g}">${GROUPS[g]} (${slips.length})</button>
+  <div class="slipwrap">${slips.map(p=>renderSlip(p,g)).join('')}</div>
+  </div>`;
+ }).join('');
+ const inbox=points.filter(p=>p.status==='uncompared'||p.status==='unknown');
+ document.querySelector('#inbox-slips').innerHTML=inbox.map(p=>renderSlip(p,'inbox').replace('</button>',`<span class="why">${p.status==='unknown'?'Inrichting onbekend':'Nog niet vergeleken'}</span></button>`)).join('')||'<p class="why">Geen punten in het inbakje.</p>';
+ const drawer=points.filter(p=>p.status==='none');
+ document.querySelector('#drawer-slips').innerHTML=drawer.map(p=>renderSlip(p,'archive')).join('')||'<p class="why">Nog geen onderbouwde punten.</p>';
+ const t=tally();
+ document.querySelector('#tally').textContent=`${t.n} releasepunten: ${t.a} nog niet vergeleken, ${t.b} inrichting onbekend, ${t.c} met lokaal gevolg waarvan ${t.d} bevestigd, ${t.e} zonder lokaal gevolg.`;
+ const open=t.a+t.b+(t.c-t.d);
+ document.querySelector('#open').textContent=open>0?`Open voor de intake: ${t.a} nog niet vergeleken, ${t.b} inrichting onbekend, ${t.c-t.d} gevolgen niet bevestigd.`:'Geen open punten in dit overzicht. Dit is geen akkoord op de release; de wijzigingscoördinator beslist.';
+ drawDetail();drawGroup();drawList();
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function drawDetail(){
+ const p=points.find(x=>x.id===selected),c=classify(p);
+ const localText=p.local==='onbekend'?'onbekend':p.local==='nvt'?'niet van toepassing (geldt altijd)':p.local;
+ document.querySelector('#detail-body').innerHTML=`
+ <p><strong>${p.id} — ${p.title}</strong></p>
+ <dl>
+ <dt>Bron</dt><dd><blockquote>${p.text}</blockquote>Vindplaats: releasenotes ${p.where}.</dd>
+ <dt>Lokaal gevolg</dt><dd>${p.setting}. Lokale inrichting (INR-DEMO 2026-09-30): ${localText}.${p.asked?' Inrichting nagevraagd 2026-10-03 (simulatie).':''}</dd>
+ <dt>Doelgroepen</dt><dd>${p.groups.length?p.groups.map(g=>GROUPS[g]).join(', '):'geen bij deze inrichting'}</dd>
+ <dt>Zorgimpact</dt><dd>${p.impact||'—'}</dd>
+ <dt>Test of actie</dt><dd>${p.action||'—'}</dd>
+ <dt>Eigenaar</dt><dd>${p.owner||'—'}${p.owner?' (voorgestelde rol)':''}</dd>
+ <dt>Bevestiger</dt><dd>${p.confirmer||'—'}</dd>
+ </dl>
+ <p class="state${c.cls==='unknown'?' flag':''}">${c.state}</p>
+ <div class="acts">
+ <button data-action="compare" ${p.status==='uncompared'?'':'disabled'}>Simuleer vergelijking met de inrichting</button>
+ <button data-action="ask" ${p.status==='unknown'?'':'disabled'}>Simuleer antwoord van ${p.ask||'de beheerder'}</button>
+ <button data-action="confirm" ${p.status==='impact'&&!p.confirmed?'':'disabled'}>Simuleer bevestiging door ${p.confirmer||'de bevestiger'}</button>
+ </div>`;
+}
+function drawGroup(){
+ const el=document.querySelector('#group-view');
+ if(!filter){el.innerHTML='<p>Kies een doelgroep om te zien wat er voor die groep verandert.</p>';return;}
+ const rows=points.filter(p=>p.status==='impact'&&p.groups.includes(filter));
+ el.innerHTML=`<h3>Doelgroep ${GROUPS[filter]}</h3>`+(rows.length?rows.map(p=>`<article><p><strong>${p.id} — ${p.title}</strong></p><p>Zorgimpact: ${p.impact}</p><p>Test of actie: ${p.action}</p><p>Eigenaar: ${p.owner}</p><p class="state">${classify(p).state}</p></article>`).join(''):'<p>Geen punten met gevolgen voor deze doelgroep.</p>');
+}
+function drawList(){
+ document.querySelector('#points').innerHTML=points.map(p=>`<li data-rn="${p.id}"><span class="rn">${p.id}</span><span class="t">${p.title}</span><span class="state">${classify(p).state}</span></li>`).join('');
+}
+function summary(){
+ const t=tally();
+ const lines=[
+ 'Release Impact Explorer / ECD 2026.5 / demo v1 / revisie 2026-10-03',
+ 'Exportmoment: '+new Date().toISOString(),
+ 'Uitsluitend simulatie; geen echte releasetoetsing, navraag of bevestiging.',
+ `Versie releasenotes: ${document.querySelector('#notes-version').textContent}. Installatie acceptatie 2026-10-20, productie 2026-11-16 (demo). Lokale inrichting INR-DEMO van 2026-09-30.`,
+ `Telling: ${t.n} releasepunten: ${t.a} nog niet vergeleken, ${t.b} inrichting onbekend, ${t.c} met lokaal gevolg waarvan ${t.d} bevestigd, ${t.e} zonder lokaal gevolg.`];
+ for(const p of points){
+  const c=classify(p);
+  lines.push(`${p.id} — ${p.title}\nBron (${p.where}): ${p.text}\nInstelling: ${p.setting}. Lokale inrichting: ${p.local==='nvt'?'n.v.t.':p.local}${p.asked?' (nagevraagd 2026-10-03, simulatie)':''}.\nStatus: ${c.state}\nDoelgroepen: ${p.groups.length?p.groups.map(g=>GROUPS[g]).join(', '):'geen'}\nZorgimpact: ${p.impact||'—'}\nTest of actie: ${p.action||'—'}\nEigenaar: ${p.owner||'—'}\nBevestiging: ${p.confirmed?`bevestigd door ${p.confirmed.by}, ${p.confirmed.date}${p.confirmed.sim?' (simulatie)':''}`:(p.confirmer?`nog niet bevestigd (bevestiger: ${p.confirmer})`:'—')}`);
+ }
+ lines.push('FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.');
+ return lines.join('\n\n');
+}
+document.querySelector('#cabinet').addEventListener('click',e=>{
+ const f=e.target.closest('[data-group-filter]');
+ if(f){filter=filter===f.dataset.groupFilter?null:f.dataset.groupFilter;draw();return;}
+ const s=e.target.closest('.slip');
+ if(s){selected=s.dataset.rn;selectedSlip={rn:s.dataset.rn,group:s.dataset.group};draw();}
+});
+document.querySelector('#inbox').addEventListener('click',e=>{
+ const s=e.target.closest('.slip');if(!s)return;
+ selected=s.dataset.rn;selectedSlip={rn:s.dataset.rn,group:s.dataset.group};draw();
+});
+document.querySelector('#drawer').addEventListener('click',e=>{
+ const s=e.target.closest('.slip');if(!s)return;
+ selected=s.dataset.rn;selectedSlip={rn:s.dataset.rn,group:s.dataset.group};draw();
+});
+document.querySelector('#detail').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b||b.disabled)return;
+ const p=points.find(x=>x.id===selected);
+ if(b.dataset.action==='compare'&&p.status==='uncompared'){
+  compare(p);
+  document.querySelector('#message').textContent=`${p.id} vergeleken met INR-DEMO (simulatie).`;
+ }
+ if(b.dataset.action==='ask'&&p.status==='unknown'){
+  p.asked=true;p.local='aan';compare(p);
+  document.querySelector('#message').textContent=`${p.ask}: de instelling staat aan (simulatie). ${p.id} opnieuw ingedeeld.`;
+ }
+ if(b.dataset.action==='confirm'&&p.status==='impact'&&!p.confirmed){
+  p.confirmed={by:p.confirmer,date:PEIL,sim:true};
+  document.querySelector('#message').textContent=`${p.id}: doelgroepimpact bevestigd door ${p.confirmer} (simulatie).`;
+ }
+ draw();
+});
+document.querySelector('.tools').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action="notes"]');if(!b||b.disabled||notesDone)return;
+ notesDone=true;b.disabled=true;
+ const r3=points.find(p=>p.id==='RN-03');
+ Object.assign(r3,RN03_V11,{status:'uncompared',voided:true,asked:false,compared:false,confirmed:null});
+ points.push({...RN08,groups:[...RN08.groups],confirmed:null,voided:false,asked:false,compared:false});
+ document.querySelector('#notes-version').textContent='Releasenotes v1.1 van 2026-10-02';
+ selected='RN-03';
+ document.querySelector('#message').textContent='Releasenotes v1.1 gesimuleerd: RN-03 gewijzigd (eerdere beoordeling vervallen), RN-08 nieuw in het inbakje.';
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();document.querySelector('[data-action="notes"]').disabled=false;
+ document.querySelector('#notes-version').textContent='Releasenotes v1.0 van 2026-09-26';
+ draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; vergelijkingen, navraag, bevestigingen en releasenotes v1.1 zijn teruggedraaid.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Releaseoverzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

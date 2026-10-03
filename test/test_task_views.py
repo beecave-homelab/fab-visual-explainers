@@ -13,6 +13,9 @@ FILES = [
     "fab-escalatiekaart.html",
     "fab-risk-control-map.html",
     "fab-pilot-cockpit.html",
+    "fab-data-lineage.html",
+    "fab-release-impact-explorer.html",
+    "fab-adoptiekaart.html",
 ]
 
 
@@ -860,4 +863,419 @@ def test_pilot__counted_weeks_brakes_and_advice(page: Page) -> None:
     ensure(
         "Nog niet te beoordelen" in page.locator("#advice").inner_text(),
         "Pilot: reset restores the starting state",
+    )
+
+
+def test_lineage__stale_hops_diff_and_proposal(page: Page) -> None:
+    """Alleen geldig vergeleken, ververste stappen tellen; een lading maakt vergelijkingen ongeldig."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async text => {window.copiedText = text;}}})"
+    )
+    open_file(page, FILES[9])
+
+    def hop(n: str):
+        """Stempelblok van stap n."""
+        return page.locator(f'[data-hop="{n}"]')
+
+    ensure(
+        hop("h3").locator(".state").inner_text()
+        == "Klopt met de vastgelegde transformaties vanaf Zorgdossier (ECD)",
+        "Lineage: h3 traces back to the dossier past uncompared h2",
+    )
+    ensure(
+        hop("h5").locator(".state").inner_text()
+        == "Onverklaard verschil: verwacht 2027-03-31, getoond 2027-03-30",
+        "Lineage: double day-shift at the BI step is unexplained",
+    )
+    ensure(
+        hop("h2").locator(".state").inner_text() == "Niet vergeleken: onbekend"
+        and hop("h4").locator(".state").inner_text() == "Niet vergeleken: onbekend",
+        "Lineage: uncompared steps stay unknown",
+    )
+    ensure(
+        "ergens tussen Zorgadministratie en BI-overzicht verloopt binnen 30 dagen"
+        in page.locator("#locus").inner_text()
+        and "Vergelijk Datawarehouse" in page.locator("#locus").inner_text(),
+        "Lineage: locus names the enclosing compared pair and the gap",
+    )
+    ensure(
+        page.locator('[data-action="propose"]').is_disabled(),
+        "Lineage: no proposal before adjacent localization",
+    )
+    hop("h4").locator('[data-action="compare"]').click()
+    ensure(
+        hop("h4").locator(".state").inner_text() == "Klopt met de vastgelegde transformatie",
+        "Lineage: h4 matches its documented transform",
+    )
+    ensure(
+        "veranderde tussen Datawarehouse en BI-overzicht verloopt binnen 30 dagen"
+        in page.locator("#locus").inner_text(),
+        "Lineage: locus narrows to the adjacent pair",
+    )
+    page.locator('[data-action="propose"]').click()
+    ensure(
+        "nog niet beoordeeld" in page.locator("#proposal").inner_text()
+        and "Rapportage-eigenaar met BI" in page.locator("#proposal").inner_text(),
+        "Lineage: proposal names the step owner and stays unreviewed",
+    )
+    page.locator('[data-action="approve"]').click()
+    ensure(
+        "Akkoord gegevenseigenaar (simulatie)" in page.locator("#proposal").inner_text()
+        and "herstel is nog niet aangetoond" in page.locator("#proposal").inner_text(),
+        "Lineage: approval does not claim repair",
+    )
+    page.locator('[data-action="load"]').click()
+    ensure(
+        hop("h5").locator(".state").inner_text()
+        == "Niet vergeleken: opnieuw vergelijken, lading na de vorige vergelijking",
+        "Lineage: nightly load voids the h5 comparison",
+    )
+    ensure(
+        "Voorstel vervallen" in page.locator("#proposal").inner_text(),
+        "Lineage: proposal falls away when its comparison is void",
+    )
+    ensure(
+        "Nog niet vergeleken: 3. Nog niet ververst: 0." in page.locator("#locus").inner_text(),
+        "Lineage: locus counts uncompared and stale steps separately",
+    )
+    ensure(
+        page.locator('[data-action="load"]').is_disabled(),
+        "Lineage: the nightly load runs once",
+    )
+    page.locator("#sample").select_option("DEMO-IND-02")
+    page.locator("#sample").select_option("DEMO-IND-01")
+    ensure(
+        "opnieuw vergelijken" in hop("h5").locator(".state").inner_text()
+        and "Voorstel vervallen" in page.locator("#proposal").inner_text(),
+        "Lineage: switching samples keeps each sample's comparisons and proposal",
+    )
+    page.locator("#reset").click()
+    page.locator("#sample").select_option("DEMO-IND-02")
+    ensure(
+        "Nog niet vergeleken: 4. Nog niet ververst: 0." in page.locator("#locus").inner_text(),
+        "Lineage: second sample starts with four uncompared steps",
+    )
+    for n in ("h2", "h3", "h4", "h5"):
+        hop(n).locator('[data-action="compare"]').click()
+    ensure(
+        "Klopt" in hop("h4").locator(".state").inner_text()
+        and "Niet in het overzicht" in hop("h5").locator(".value").inner_text(),
+        "Lineage: empty source date stays explainable through the chain",
+    )
+    ensure(
+        "Geen onverklaard verschil in steekproef DEMO-IND-02" in page.locator("#locus").inner_text()
+        and "bewijst niet" in page.locator("#locus").inner_text(),
+        "Lineage: a clean sample proves nothing for all clients",
+    )
+    page.locator("#reset").click()
+    page.locator("#sample").select_option("DEMO-IND-03")
+    ensure(
+        "Nog niet ververst: geladen 2026-10-02" in hop("h4").locator(".state").inner_text()
+        and "Nog niet ververst: geladen 2026-10-02" in hop("h5").locator(".state").inner_text(),
+        "Lineage: steps loaded before the source change are stale",
+    )
+    ensure(
+        hop("h4").locator('[data-action="compare"]').is_disabled()
+        and hop("h5").locator('[data-action="compare"]').is_disabled(),
+        "Lineage: stale steps cannot be compared yet",
+    )
+    ensure(
+        "Nog niet vergeleken: 2. Nog niet ververst: 2." in page.locator("#locus").inner_text(),
+        "Lineage: stale steps are counted separately",
+    )
+    page.locator('[data-action="load"]').click()
+    ensure(
+        "opnieuw vergelijken" in hop("h5").locator(".state").inner_text(),
+        "Lineage: the earlier h5 comparison is void after loading",
+    )
+    hop("h5").locator('[data-action="compare"]').click()
+    ensure(
+        hop("h5").locator(".state").inner_text()
+        == "Onverklaard verschil: verwacht 2027-06-30, getoond 2027-06-29",
+        "Lineage: renewed sample still shows the undocumented day-shift",
+    )
+    ensure(
+        "Vergelijk Integratielaag, Zorgadministratie en Datawarehouse"
+        in page.locator("#locus").inner_text(),
+        "Lineage: all uncompared intermediate steps narrow the locus",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Data Lineage / SIG-DEMO-0912 / demo v1 / revisie 2026-10-03")
+        and "2027-06-29" in exported
+        and "DWH-laadspecificatie v4" in exported
+        and "Afnemersgevolg" in exported,
+        "Lineage: export carries values, states, transforms and impact per sample",
+    )
+    page.locator("#reset").click()
+    ensure(
+        hop("h5").locator(".state").inner_text()
+        == "Onverklaard verschil: verwacht 2027-03-31, getoond 2027-03-30"
+        and page.locator('[data-action="load"]').is_enabled(),
+        "Lineage: reset restores the starting state",
+    )
+
+
+def test_release_impact__inbox_cells_and_drawer(page: Page) -> None:
+    """Vergelijking met de inrichting bepaalt het vak; gewijzigde notes maken beoordelingen ongeldig."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async text => {window.copiedText = text;}}})"
+    )
+    open_file(page, FILES[10])
+
+    def point(n: str):
+        """Leesrij van releasepunt n."""
+        return page.locator(f'.points li[data-rn="{n}"]')
+
+    ensure(
+        page.locator("#tally").inner_text()
+        == "7 releasepunten: 2 nog niet vergeleken, 0 inrichting onbekend, "
+        "3 met lokaal gevolg waarvan 1 bevestigd, 2 zonder lokaal gevolg.",
+        "Release: starting tally counts every class",
+    )
+    ensure(
+        "2 gevolgen niet bevestigd" in page.locator("#open").inner_text(),
+        "Release: unconfirmed impacts stay open for the intake",
+    )
+    for group in ("zorg", "kern", "fab"):
+        ensure(
+            page.locator(f'.slip[data-rn="RN-01"][data-group="{group}"]').count() == 1,
+            f"Release: RN-01 slip present for {group}",
+        )
+    ensure(
+        "Inzage naasten staat uit" in point("RN-03").locator(".state").inner_text(),
+        "Release: no-impact point keeps its written rationale",
+    )
+    ensure(
+        "(1)" in page.locator('[data-group-filter="zorg"]').inner_text()
+        and "(1)" in page.locator('[data-group-filter="plan"]').inner_text()
+        and "(3)" in page.locator('[data-group-filter="fab"]').inner_text()
+        and "(0)" in page.locator('[data-group-filter="cadm"]').inner_text(),
+        "Release: nameplates count slips per audience",
+    )
+    page.locator("#detail").locator('[data-action="compare"]').click()
+    ensure(
+        "Inrichting onbekend: vraag na bij Technisch beheer ECD"
+        in page.locator("#detail").locator(".state").inner_text(),
+        "Release: unknown local setting asks the named role",
+    )
+    ensure(
+        "1 nog niet vergeleken, 1 inrichting onbekend" in page.locator("#tally").inner_text(),
+        "Release: unknown setting is counted separately",
+    )
+    page.locator("#detail").locator('[data-action="ask"]').click()
+    ensure(
+        "Lokaal gevolg, door FAB beoordeeld"
+        in page.locator("#detail").locator(".state").inner_text()
+        and page.locator('.slip[data-rn="RN-05"][data-group="zorg"]').count() == 1,
+        "Release: answered inquiry files the point per audience",
+    )
+    page.locator('.slip[data-rn="RN-07"][data-group="inbox"]').click()
+    page.locator("#detail").locator('[data-action="compare"]').click()
+    ensure(
+        page.locator('.slip[data-rn="RN-07"][data-group="plan"]').count() == 1
+        and page.locator('.slip[data-rn="RN-07"][data-group="kern"]').count() == 1,
+        "Release: RN-07 gets a slip for planners and key users",
+    )
+    page.locator("#detail").locator('[data-action="confirm"]').click()
+    ensure(
+        "bevestigd door Proceseigenaar planning"
+        in page.locator("#detail").locator(".state").inner_text(),
+        "Release: confirmation is recorded by the named role",
+    )
+    page.locator('[data-group-filter="plan"]').click()
+    ensure(
+        "Planningsbericht: teamcode verplicht" in page.locator("#group-view").inner_text()
+        and "Weekoverzicht planning" in page.locator("#group-view").inner_text()
+        and "Medicatieaftekenlijst" not in page.locator("#group-view").inner_text(),
+        "Release: the audience filter lists only that group's points",
+    )
+    page.locator('[data-action="notes"]').click()
+    ensure(
+        page.locator("#notes-version").inner_text() == "Releasenotes v1.1 van 2026-10-02",
+        "Release: notes simulation updates the version",
+    )
+    ensure(
+        "Releasenotes gewijzigd na beoordeling; opnieuw vergelijken"
+        in point("RN-03").locator(".state").inner_text(),
+        "Release: changed note text voids the earlier assessment",
+    )
+    ensure(
+        page.locator('.slip[data-rn="RN-08"][data-group="inbox"]').count() == 1
+        and page.locator("#tally").inner_text().startswith("8 releasepunten"),
+        "Release: RN-08 arrives uncompared and the tally grows",
+    )
+    page.locator('.slip[data-rn="RN-03"][data-group="inbox"]').click()
+    page.locator("#detail").locator('[data-action="compare"]').click()
+    ensure(
+        "Lokaal gevolg" in page.locator("#detail").locator(".state").inner_text()
+        and "Privacyrisico" in page.locator("#detail").inner_text()
+        and page.locator('.slip[data-rn="RN-03"][data-group="cadm"]').count() == 1,
+        "Release: changed RN-03 gets an impact with a cadm slip",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Release Impact Explorer / ECD 2026.5 / demo v1 / revisie 2026-10-03")
+        and "v1.1" in exported
+        and "v1.0, §2.1" in exported
+        and "Bevestiging" in exported,
+        "Release: export carries notes version, locations, states and confirmation",
+    )
+    page.locator("#reset").click()
+    ensure(
+        page.locator("#notes-version").inner_text() == "Releasenotes v1.0 van 2026-09-26"
+        and page.locator("#tally").inner_text().startswith("7 releasepunten")
+        and "Releasenotes v1.1" not in page.locator("#notes-version").inner_text(),
+        "Release: reset restores v1.0 and the starting state",
+    )
+
+
+def test_adoption__layers_signals_and_advice(page: Page) -> None:
+    """Een laag ligt pas op gemeten signaal; gebruik zonder beheersing blijft een risico."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async text => {window.copiedText = text;}}})"
+    )
+    open_file(page, FILES[11])
+
+    def wall(dept: str):
+        """Muursectie van een afdeling."""
+        return page.locator(f'[data-dept="{dept}"]')
+
+    def layer(dept: str, n: str):
+        """Laag n van een afdelingsmuur."""
+        return wall(dept).locator(f'[data-layer="{n}"]')
+
+    ensure(
+        wall("esdoorn").locator(".stand").inner_text() == "Stand: beheerst"
+        and wall("hazelaar").locator(".stand").inner_text() == "Stand: bekend"
+        and wall("beuk").locator(".stand").inner_text() == "Stand: gebruikt"
+        and wall("wilg").locator(".stand").inner_text() == "Stand: nog niets aangetoond",
+        "Adoption: stands follow the highest unbroken layer",
+    )
+    ensure(
+        layer("hazelaar", "l2").locator(".state").inner_text()
+        == "Gemeten, onder de grens: 25 van 28 (89,3 %), grens 90 %",
+        "Adoption: training under the threshold does not lie",
+    )
+    ensure(
+        "Gemeten, haalt de grens: 50 van 56 (89,3 %), grens 85 %"
+        in layer("hazelaar", "l3").locator(".state").inner_text()
+        and "Ligt, maar draagt niet: Getraind ontbreekt"
+        in layer("hazelaar", "l3").locator(".state").inner_text(),
+        "Adoption: use above a gap does not carry",
+    )
+    ensure(
+        wall("hazelaar").locator(".signals").inner_text() == "Gebruik zonder aangetoonde training",
+        "Adoption: signal names the missing training",
+    )
+    ensure(
+        wall("hazelaar").locator(".advice").inner_text().startswith("Plan praktijkinstructie")
+        and wall("beuk").locator(".advice").inner_text().startswith("Laat de kwaliteitsmedewerker")
+        and wall("wilg").locator(".advice").inner_text().startswith("Vraag de teamleider"),
+        "Adoption: each wall gets its fitting support advice",
+    )
+    ensure(
+        "Niet aangetoond: nog niet in het inwerkprogramma"
+        in layer("esdoorn", "l5").locator(".state").inner_text()
+        and "Neem de werkinstructie op" in wall("esdoorn").locator(".advice").inner_text(),
+        "Adoption: anchoring requires the inwork programme",
+    )
+    ensure(
+        page.locator("#tally").inner_text()
+        == "Esdoorn: beheerst. Hazelaar: bekend. Beuk: gebruikt. "
+        "Wilg: nog niets aangetoond. 2 afdelingen met gebruik zonder "
+        "aangetoonde training of beheersing.",
+        "Adoption: tally counts risk signals without a total score",
+    )
+    wall("hazelaar").locator('[data-action="train"]').click()
+    ensure(
+        "28 van 28 (100,0 %), grens 90 %" in layer("hazelaar", "l2").locator(".state").inner_text()
+        and wall("hazelaar").locator(".stand").inner_text() == "Stand: beheerst"
+        and "draagt niet" not in layer("hazelaar", "l3").locator(".state").inner_text()
+        and wall("hazelaar").locator('[data-action="train"]').is_disabled()
+        and page.locator("#tally")
+        .inner_text()
+        .endswith("1 afdeling met gebruik zonder aangetoonde training of beheersing."),
+        "Adoption: extra training lets the layer lie and the wall carry",
+    )
+    wall("beuk").locator('[data-action="sample"]').click()
+    ensure(
+        "Gemeten, onder de grens: 17 van 22 (77,3 %), grens 90 %"
+        in layer("beuk", "l4").locator(".state").inner_text()
+        and wall("beuk").locator(".stand").inner_text() == "Stand: gebruikt"
+        and wall("beuk")
+        .locator(".advice")
+        .inner_text()
+        .startswith("Bespreek de ontbrekende onderdelen"),
+        "Adoption: a failing mastery sample keeps the stand at gebruikt",
+    )
+    wall("wilg").locator('[data-action="sample"]').click()
+    ensure(
+        "Gemeten, steekproef te klein: 12 van minimaal 20"
+        in layer("wilg", "l4").locator(".state").inner_text()
+        and wall("wilg").locator(".advice").inner_text().startswith("Vraag de teamleider"),
+        "Adoption: too-small sample stays short of evidence",
+    )
+    wall("wilg").locator('[data-action="train"]').click()
+    ensure(
+        "25 van 30 (83,3 %)" in layer("wilg", "l2").locator(".state").inner_text(),
+        "Adoption: first training round stays under the threshold",
+    )
+    wall("wilg").locator('[data-action="train"]').click()
+    ensure(
+        "28 van 30 (93,3 %)" in layer("wilg", "l2").locator(".state").inner_text(),
+        "Adoption: second training round reaches the threshold",
+    )
+    wall("esdoorn").locator('[data-action="embed"]').click()
+    ensure(
+        wall("esdoorn").locator(".stand").inner_text() == "Stand: geborgd"
+        and wall("esdoorn").locator(".advice").inner_text().startswith("Borging aangetoond"),
+        "Adoption: embedding in the inwork programme completes the wall",
+    )
+    page.locator('[data-action="instr-change"]').click()
+    ensure(
+        all(
+            "teamleider bevestigt opnieuw" in layer(dept, "l1").locator(".state").inner_text()
+            and "Niet gemeten" in layer(dept, "l1").locator(".state").inner_text()
+            for dept in ("esdoorn", "hazelaar", "beuk", "wilg")
+        ),
+        "Adoption: a changed instruction unmeasures every Bekend layer",
+    )
+    ensure(
+        wall("esdoorn").locator(".stand").inner_text() == "Stand: nog niets aangetoond"
+        and "Ligt, maar draagt niet: Bekend ontbreekt"
+        in layer("esdoorn", "l2").locator(".state").inner_text()
+        and "Niet aangetoond: werkinstructie gewijzigd, nog niet vastgesteld"
+        in layer("esdoorn", "l5").locator(".state").inner_text()
+        and wall("esdoorn").locator(".advice").inner_text().startswith("Vraag de teamleider"),
+        "Adoption: changed instruction breaks the base and the anchoring",
+    )
+    wall("esdoorn").locator('[data-action="confirm"]').click()
+    ensure(
+        wall("esdoorn").locator(".stand").inner_text() == "Stand: beheerst"
+        and "Laat de gewijzigde werkinstructie vaststellen"
+        in wall("esdoorn").locator(".advice").inner_text(),
+        "Adoption: reconfirmed uitleg restores the stand, not the anchoring",
+    )
+    page.locator('[data-action="instr-adopt"]').click()
+    ensure(
+        wall("esdoorn").locator(".stand").inner_text() == "Stand: geborgd",
+        "Adoption: establishing v2 completes the anchored wall",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Adoptiekaart / ADOPT-DEMO-04 / demo v1 / revisie 2026-10-03")
+        and "grens 90 %" in exported
+        and "werkinstructie" in exported.lower()
+        and "Advies" in exported,
+        "Adoption: export carries layers, instruction version, stands and advice",
+    )
+    page.locator("#reset").click()
+    ensure(
+        wall("hazelaar").locator(".stand").inner_text() == "Stand: bekend"
+        and "2 afdelingen" in page.locator("#tally").inner_text(),
+        "Adoption: reset restores the starting state",
     )

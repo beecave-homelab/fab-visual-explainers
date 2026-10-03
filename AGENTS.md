@@ -2,7 +2,7 @@
 
 ## Opzet
 
-Deze map bevat 29 zelfstandige HTML-prototypes voor 28 concepten: 23 FAB-concepten en 5 bron-/kennispatronen. De twee incidentvarianten tonen dezelfde inhoud met andere vormgeving. CSS, JavaScript en synthetische voorbeelddata staan in ieder HTML-bestand; er is geen backend, buildstap of gekoppelde dossierregistratie.
+Deze map bevat 32 zelfstandige HTML-prototypes voor 31 concepten: 26 FAB-concepten en 5 bron-/kennispatronen. De twee incidentvarianten tonen dezelfde inhoud met andere vormgeving. CSS, JavaScript en synthetische voorbeelddata staan in ieder HTML-bestand; er is geen backend, buildstap of gekoppelde dossierregistratie.
 
 De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de inventaris, selectie en actuele status. De blijvende werkafspraken uit de ideeënnotitie en de VVT-review zijn op 1 oktober 2026 hier samengebracht; AGENTS.md is daarvoor de centrale instructiebron. Het afzonderlijke reviewrapport is na verwerking verwijderd en blijft terug te vinden in de Git-historie. De functiebeschrijving is het aangeleverde toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 

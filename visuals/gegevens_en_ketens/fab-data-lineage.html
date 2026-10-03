@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetisch gegevenspaspoort: volg één gegeven door de keten en lokaliseer waar de getoonde waarde van de vastgelegde transformatie afwijkt.">
+    <title>FAB Data Lineage — waar veranderde dit gegeven?</title>
+    <style>
+:root{--cover:#5E1A2A;--leaf:#EAF0EC;--guilloche:#BFD2C9;--ink:#1F2433;--stamp:#4E3A86;--void:#B3243A;--muted:#56606B;--display:"Didot","Bodoni 72","Bodoni MT","Noto Serif Display",serif;--body:"Palatino","Palatino Linotype","Book Antiqua",Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--cover);color:var(--leaf);font:16.5px/1.65 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--guilloche);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(34px,4.6vw,56px);font-weight:400;line-height:1.12;max-width:20ch}h2{font-family:var(--display);font-size:26px;font-weight:400}h3{font-family:var(--display);font-size:20px;font-weight:400}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--guilloche);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:var(--leaf);color:var(--ink);padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid rgba(234,240,236,.4);padding-bottom:14px;font-size:15px}.demo strong{color:var(--guilloche)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 30px}.intro{margin-top:18px;max-width:54ch}.context{border-left:4px solid var(--guilloche);padding:14px 18px;font-size:15px}.context p+p{margin-top:8px}
+.tools{display:flex;gap:12px 20px;align-items:flex-start;flex-wrap:wrap;margin:20px 0}.tools>label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}select{max-width:100%;min-width:0;min-height:44px;background:var(--leaf);border:1px solid var(--muted);color:var(--ink);padding:8px 12px}.plain{background:var(--leaf);border:1px solid var(--guilloche);border-radius:4px;padding:9px 16px;color:var(--ink)}
+.interactive{display:none}body.ready .interactive{display:flex}
+.passport{display:grid;grid-template-columns:1fr;gap:0;background:var(--leaf);color:var(--ink);padding:0;position:relative;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.leaf{min-width:0;padding:26px 30px;background-color:var(--leaf);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23BFD2C9' stroke-width='0.7'%3E%3Cpath d='M0 60 Q 30 20 60 60 T 120 60'/%3E%3Cpath d='M0 60 Q 30 100 60 60 T 120 60'/%3E%3Cpath d='M60 0 Q 20 30 60 60 T 60 120'/%3E%3Cpath d='M60 0 Q 100 30 60 60 T 60 120'/%3E%3C/g%3E%3C/svg%3E")}
+.leaf.data{border-bottom:2px dashed var(--muted)}
+.spine{display:none}
+.leaf h3{margin-bottom:10px}
+.deflist{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:15px;max-width:60ch}.deflist dt{font-weight:700}.deflist dd{margin:0}
+.samplebox{margin-top:16px;border-top:1px solid var(--guilloche);padding-top:12px;font-size:15px}.samplebox p+p{margin-top:6px}
+.visas{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;min-width:0}
+.hop{position:relative;padding:6px 0 6px 18px;min-width:0}
+.hop.zone{border-left:5px solid var(--void)}
+.hop-zone{color:var(--void);font-size:14px;font-weight:700;margin:2px 0 8px}
+.stamp{width:190px;min-height:120px;border:3px double var(--stamp);color:var(--stamp);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:10px;transform:rotate(var(--rot,0deg));margin-bottom:12px;position:relative;transition:transform .2s}
+.stamp.s-round{border-radius:50%;width:150px;height:150px;min-height:150px}
+.stamp.s-rect{border-radius:3px}
+.stamp.s-oval{border-radius:50%/60%;width:200px;height:130px;min-height:130px}
+.stamp.s-oct{clip-path:polygon(12% 0,88% 0,100% 15%,100% 85%,88% 100%,12% 100%,0 85%,0 15%);border:none;outline:3px double var(--stamp);outline-offset:-3px}
+.stamp.s-clip{clip-path:polygon(0 0,88% 0,100% 18%,100% 100%,12% 100%,0 82%);border:none;outline:3px double var(--stamp);outline-offset:-3px}
+.stamp-sys{font-family:var(--display);font-size:16px;max-width:100%}
+.stamp .value{font-size:19px;font-weight:700;margin-top:2px;max-width:100%}
+.stamp .sdate{font-size:12.5px;margin-top:4px}
+.stamp .sword{font-size:13px;font-weight:700;margin-top:4px}
+.stamp.st-ok{opacity:1}
+.stamp.st-diff .sword{color:var(--void)}
+.stamp.st-diff::after{content:"";position:absolute;left:-8%;right:-8%;top:50%;height:9px;background:var(--void);opacity:.85;transform:rotate(-14deg)}
+.stamp.st-stale{opacity:.45}
+.stamp.st-none{border-style:dashed;opacity:.75;background:transparent}
+.stamp.landed{animation:land .2s}
+@keyframes land{from{transform:rotate(var(--rot,0deg)) scale(1.04)}to{transform:rotate(var(--rot,0deg)) scale(1)}}
+.hop-info{min-width:0;overflow-wrap:break-word}
+.hop-info .transform{font-size:15px}.hop-info .doc{color:var(--muted);font-size:14px}.refresh{color:var(--muted);font-size:14px;margin-top:2px}
+.state{font-weight:700;margin-top:8px}.state.diff{color:var(--void)}
+.compare-info{color:var(--muted);font-size:14px;margin-top:4px}
+.pagenr{position:absolute;top:2px;right:0;font-size:11.5px;color:var(--muted)}
+.hop-info button{margin-top:8px;background:transparent;border:1px solid var(--stamp);border-radius:4px;padding:8px 14px;color:var(--stamp)}
+.outcome{display:grid;grid-template-columns:1fr;gap:20px;margin-top:26px}
+.verdict{background:var(--leaf);color:var(--ink);padding:18px 22px;border-left:6px solid var(--stamp)}
+.verdict p{margin-top:6px}
+.proposal{background:var(--leaf);color:var(--ink);padding:18px 22px;border-left:6px solid var(--void)}
+.proposal p{margin-top:6px}
+.proposal .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.proposal .acts button{background:transparent;border:1px solid var(--stamp);border-radius:4px;padding:8px 14px;color:var(--stamp)}
+.live{min-height:24px;color:var(--guilloche);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--leaf);color:var(--ink);padding:22px}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:1px solid rgba(234,240,236,.4)}.reference h2,.reference h3{color:var(--leaf)}.reference p{margin-top:14px;font-size:16px;max-width:72ch}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid rgba(234,240,236,.35)}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}.register ul{margin:8px 0;padding-left:22px}.register li{margin-bottom:5px;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:700}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px;max-width:72ch}
+@media(min-width:1100px){.passport{grid-template-columns:1fr 1.7fr;align-items:start}.leaf.data{border-bottom:0;border-right:2px dashed var(--muted);padding-right:34px;position:sticky;top:20px}.visas{grid-template-columns:1fr 1fr;padding-left:34px}}
+@media(max-width:760px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:34px}.stamp{width:160px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:24pt}h2{font-size:16pt}h3{font-size:13pt}.demo{border-color:#999}.demo strong,.live,a{color:#000}.context{border-color:#777}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.tools,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action]{display:none!important}.passport{display:block;box-shadow:none;background:white}.leaf{padding:10px 0;background-image:none;border:0}.visas{display:block;padding:0}.hop{break-inside:avoid;border:0;border-top:1px solid #999;padding:12px 0;margin-top:10px}.hop.zone{border-left:0}.hop-zone{color:#000}.stamp{width:auto;min-height:0;height:auto;border:2px solid #555;border-radius:0;transform:none;clip-path:none;outline:none;display:block;text-align:left;padding:8px 10px;margin-bottom:8px}.stamp::after{display:none}.stamp .value{display:inline}.pagenr{position:static}.outcome{display:block}.verdict,.proposal{border:1px solid #777;break-inside:avoid;margin-top:12px}.export textarea{min-height:260px}.reference{break-before:page;border-color:#000}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar het paspoort</a>
+<main class="page">
+<div class="demo"><span>FAB / Data Lineage</span><strong>Synthetische demonstratie, geen lineageregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Waar veranderde de einddatum van de indicatie?</h1>
+<p class="intro">Volg één gegeven door de keten. Elke stempel toont welke waarde een systeem laat zien en welke vastgelegde transformatie het gegeven onderweg kreeg. Een verschil is pas verklaard als de waarden echt zijn vergeleken en de transformatie is vastgelegd.</p>
+</div>
+<div class="context">
+<p><strong>Einddatum indicatie</strong></p>
+<p>Aanleiding SIG-DEMO-0912: het BI-overzicht ‘Indicaties die binnen 30 dagen verlopen’ toont bij wijkteam Noord indicaties een dag eerder dan het zorgdossier.</p>
+<p>Lineage demo v1, revisie 2026-10-03. Gegevenseigenaar: gegevenseigenaar zorgadministratie (voorgestelde rol).</p>
+<p>Gebruiksmoment: uitvoering bij een ketenafwijking, of overleg met BI.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Paspoort van het gegeven</h2>
+<div class="tools interactive">
+<label for="sample">
+Steekproef
+<select id="sample">
+<option value="DEMO-IND-01" selected>DEMO-IND-01 (wijkteam Noord)</option>
+<option value="DEMO-IND-02">DEMO-IND-02 (wijkteam Noord)</option>
+<option value="DEMO-IND-03">DEMO-IND-03 (wijkteam Zuid)</option>
+</select>
+</label>
+<button class="plain" data-action="load">Simuleer nachtelijke lading</button>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer lineagespoor</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="passport">
+<div class="leaf data" id="data-leaf">
+<h3>Gegevenspagina</h3>
+<dl class="deflist">
+<dt>Gegeven</dt>
+<dd>
+Einddatum indicatie
+</dd>
+<dt>Betekenis</dt>
+<dd>
+Laatste dag met indicatie, tot en met
+</dd>
+<dt>Bron</dt>
+<dd>
+Zorgdossier (ECD); Registratieafspraak indicaties v2 (demo)
+</dd>
+<dt>Gegevenseigenaar</dt>
+<dd>
+Gegevenseigenaar zorgadministratie (voorgestelde rol)
+</dd>
+</dl>
+<div class="samplebox" id="sample-info"></div>
+</div>
+<div class="visas" id="visas"></div>
+</div>
+<div class="outcome">
+<div class="verdict" aria-labelledby="locus-title">
+<h3 id="locus-title">Plek van de verandering</h3>
+<div id="locus" aria-live="polite"></div>
+</div>
+<div class="proposal" aria-labelledby="proposal-title">
+<h3 id="proposal-title">Correctievoorstel</h3>
+<div id="proposal"></div>
+<div class="acts">
+<button data-action="propose">Leg correctievoorstel vast</button>
+<button data-action="approve">Simuleer akkoord gegevenseigenaar</button>
+</div>
+</div>
+</div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Lineagespoor om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief vergelijkingen, plek en voorstel. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Volledig register, ook zonder interactie</h2>
+<p>Dit register toont de beginstand per steekproef en blijft leesbaar zonder JavaScript. De gesimuleerde statussen bovenaan kunnen ervan afwijken. Peildatum 2026-10-03; alle gegevens zijn synthetisch.</p>
+<div class="register">
+<article id="lin-static-DEMO-IND-01">
+<h3>Steekproef DEMO-IND-01 (wijkteam Noord)</h3>
+<p><strong>Bronwaarde:</strong> 2027-03-31, gewijzigd in het ECD op 2026-09-14 09:20.</p>
+<ul>
+<li>Zorgdossier (ECD): toont 2027-03-31. Bron: vastgelegd 2026-09-14 09:20. Transformatie: bron, einddatum uit het indicatiebesluit (tot en met) — Registratieafspraak indicaties v2 (demo).</li>
+<li>Integratielaag: toont 2027-03-31. Begin: niet vergeleken. Transformatie: geen wijziging — Mappingdocument ECD–ZA v3, 2026-06-12.</li>
+<li>Zorgadministratie: toont 2027-04-01. Begin: klopt met de vastgelegde transformaties vanaf Zorgdossier (ECD). Transformatie: plus 1 dag naar ‘geldig tot’ (exclusief); leeg blijft leeg — Interfacespecificatie ZA v2.1, 2026-04-03.</li>
+<li>Datawarehouse: toont 2027-03-31. Begin: niet vergeleken. Transformatie: min 1 dag terug naar ‘tot en met’; leeg wordt 9999-12-31 — DWH-laadspecificatie v4, 2026-08-20.</li>
+<li>BI-overzicht verloopt binnen 30 dagen: toont 2027-03-30. Begin: onverklaard verschil, verwacht 2027-03-31. Transformatie: geen wijziging; 9999-12-31 verschijnt niet — Rapportdefinitie RD-14 v2, 2026-09-01.</li>
+</ul>
+<p><strong>Beginplek:</strong> het verschil ontstaat ergens tussen Zorgadministratie en BI-overzicht verloopt binnen 30 dagen; Datawarehouse is nog niet vergeleken.</p>
+</article>
+<article id="lin-static-DEMO-IND-02">
+<h3>Steekproef DEMO-IND-02 (wijkteam Noord)</h3>
+<p><strong>Bronwaarde:</strong> geen einddatum, gewijzigd in het ECD op 2026-08-30 11:05.</p>
+<ul>
+<li>Zorgdossier (ECD): toont geen einddatum. Bron: vastgelegd 2026-08-30 11:05. Transformatie: bron — Registratieafspraak indicaties v2 (demo).</li>
+<li>Integratielaag: toont geen einddatum. Begin: niet vergeleken. Transformatie: geen wijziging — Mappingdocument ECD–ZA v3, 2026-06-12.</li>
+<li>Zorgadministratie: toont geen einddatum. Begin: niet vergeleken. Transformatie: plus 1 dag naar ‘geldig tot’; leeg blijft leeg — Interfacespecificatie ZA v2.1, 2026-04-03.</li>
+<li>Datawarehouse: toont 9999-12-31. Begin: niet vergeleken. Transformatie: min 1 dag; leeg wordt 9999-12-31 — DWH-laadspecificatie v4, 2026-08-20.</li>
+<li>BI-overzicht verloopt binnen 30 dagen: niet in het overzicht. Begin: niet vergeleken. Transformatie: geen wijziging; 9999-12-31 verschijnt niet — Rapportdefinitie RD-14 v2, 2026-09-01.</li>
+</ul>
+<p><strong>Beginplek:</strong> geen onverklaard verschil tussen de vergeleken stappen; Integratielaag, Zorgadministratie, Datawarehouse en het BI-overzicht zijn nog niet vergeleken.</p>
+</article>
+<article id="lin-static-DEMO-IND-03">
+<h3>Steekproef DEMO-IND-03 (wijkteam Zuid)</h3>
+<p><strong>Bronwaarde:</strong> 2027-06-30 (verlengd, was 2026-12-31), gewijzigd in het ECD op 2026-10-02 14:10.</p>
+<ul>
+<li>Zorgdossier (ECD): toont 2027-06-30. Bron: vastgelegd 2026-10-02 14:10. Transformatie: bron — Registratieafspraak indicaties v2 (demo).</li>
+<li>Integratielaag: toont 2027-06-30. Begin: niet vergeleken. Transformatie: geen wijziging — Mappingdocument ECD–ZA v3, 2026-06-12.</li>
+<li>Zorgadministratie: toont 2027-07-01. Begin: niet vergeleken. Transformatie: plus 1 dag naar ‘geldig tot’; leeg blijft leeg — Interfacespecificatie ZA v2.1, 2026-04-03.</li>
+<li>Datawarehouse: toont 2026-12-31. Begin: nog niet ververst (geladen 2026-10-02 02:00, bron gewijzigd 2026-10-02 14:10). Transformatie: min 1 dag; leeg wordt 9999-12-31 — DWH-laadspecificatie v4, 2026-08-20.</li>
+<li>BI-overzicht verloopt binnen 30 dagen: toont 2026-12-30. Begin: nog niet ververst (geladen 2026-10-02 03:00, bron gewijzigd 2026-10-02 14:10). Transformatie: geen wijziging; 9999-12-31 verschijnt niet — Rapportdefinitie RD-14 v2, 2026-09-01.</li>
+</ul>
+<p><strong>Beginplek:</strong> geen onverklaard verschil tussen de vergeleken stappen; Datawarehouse en het BI-overzicht zijn nog niet ververst.</p>
+</article>
+<p><strong>Vastgelegde transformaties met document en eigenaar:</strong></p>
+<ul>
+<li>Zorgdossier (ECD): bron; einddatum uit het indicatiebesluit (tot en met) — Registratieafspraak indicaties v2 (demo); eigenaar: gegevenseigenaar zorgadministratie (voorgestelde rol).</li>
+<li>Integratielaag: geen wijziging — Mappingdocument ECD–ZA v3, 2026-06-12; eigenaar: integratiebeheer (voorgestelde rol).</li>
+<li>Zorgadministratie: plus 1 dag naar ‘geldig tot’ (exclusief); lege waarde blijft leeg — Interfacespecificatie ZA v2.1, 2026-04-03; eigenaar: functioneel beheer zorgadministratie (voorgestelde rol).</li>
+<li>Datawarehouse: min 1 dag terug naar ‘tot en met’; lege waarde wordt 9999-12-31 — DWH-laadspecificatie v4, 2026-08-20; eigenaar: BI-team (voorgestelde rol).</li>
+<li>BI-overzicht verloopt binnen 30 dagen: geen wijziging; 9999-12-31 verschijnt niet in het overzicht — Rapportdefinitie RD-14 v2, 2026-09-01; eigenaar: rapportage-eigenaar met BI (voorgestelde rol).</li>
+</ul>
+<p><strong>Afnemersgevolg:</strong> planners van de wijkteams zien een indicatie een dag eerder verlopen: hinder, mogelijk een te vroege herindicatieaanvraag. Geen zorginhoudelijk gevolg vastgesteld. Declaratie gebruikt de Zorgadministratie en is volgens deze lineage niet geraakt; dat is niet getoetst.</p>
+<p><strong>Regels in volgorde:</strong> een stap waarvan het verversingsmoment vóór het wijzigingsmoment in de bron ligt is nog niet ververst en telt niet als basis of afwijking; de verwachte waarde van een geldig vergeleken, ververste stap volgt uit de dichtstbijzijnde eerdere geldig vergeleken, ververste stap met de vastgelegde transformaties ertussen; niet vergeleken is onbekend; het eerste onverklaarde verschil bepaalt de plek, met tussenstappen als versmalbaar gebied; een correctievoorstel kan pas als de plek aangrenzend is gelokaliseerd en vervalt als de onderliggende vergelijking ongeldig wordt; een nachtelijke lading maakt eerdere vergelijkingen van de geladen stappen ongeldig.</p>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij een ketenafwijking, met integratiebeheer, BI en de gegevenseigenaar; de uitkomst is de plek waar het gegeven veranderde en een correctievoorstel ter beoordeling. FAB herverwerkt of corrigeert niets zelf.</p>
+<p><strong>Bron:</strong> synthetische lineage en steekproeven, demo v1, revisie 2026-10-03; de echte lineageregistratie, mappingdocumenten en bronhouder (gegevenseigenaar zorgadministratie met ketenbeheer) zijn niet vastgesteld. Herzie bij een nieuwe documentversie, een gewijzigd laadschema of na herstel.</p>
+<p><strong>Regels:</strong> alleen vergeleken waarden tellen; niet vergeleken is onbekend; een nog niet ververste stap is geen afwijking; vastgelegd is niet hetzelfde als juist; een lading na vergelijking maakt die vergelijking ongeldig; één steekproef bewijst niets over alle cliënten.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige koppeldocumentatie en een handmatige spoorzoektocht op tijd tot de juiste plek, juiste eigenaar en herkenning van verversingsverschillen.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-ketenkaart.html">Ketenkaart</a><a href="fab-data-quality-map.html">Data Quality Map</a><a href="fab-rapportage-lineage.html">Rapportage Lineage</a><a href="../landschap_en_processen/fab-applicatielandschap.html">Applicatielandschap</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een gesimuleerde vergelijking is geen echte ketencontrole.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const HOPS=[
+{id:'h1',name:'Zorgdossier (ECD)',shape:'round',rot:'-2deg',transform:'Bron. Cliëntadministratie legt de einddatum vast uit het indicatiebesluit (tot en met).',doc:'Registratieafspraak indicaties v2 (demo)',refresh:'direct',owner:'Gegevenseigenaar zorgadministratie'},
+{id:'h2',name:'Integratielaag',shape:'rect',rot:'3deg',transform:'Geen wijziging.',doc:'Mappingdocument ECD–ZA v3, 2026-06-12',refresh:'direct bij bericht',owner:'Integratiebeheer'},
+{id:'h3',name:'Zorgadministratie',shape:'oval',rot:'-3deg',transform:"Plus 1 dag: opgeslagen als 'geldig tot' (exclusief). Lege waarde blijft leeg.",doc:'Interfacespecificatie ZA v2.1, 2026-04-03',refresh:'direct bij bericht',owner:'Functioneel beheer zorgadministratie'},
+{id:'h4',name:'Datawarehouse',shape:'oct',rot:'4deg',transform:"Min 1 dag: terug naar 'tot en met'. Lege waarde wordt 9999-12-31.",doc:'DWH-laadspecificatie v4, 2026-08-20',refresh:'nachtelijk',owner:'BI-team'},
+{id:'h5',name:'BI-overzicht verloopt binnen 30 dagen',shape:'clip',rot:'-1deg',transform:'Geen wijziging. 9999-12-31 verschijnt niet in het overzicht.',doc:'Rapportdefinitie RD-14 v2, 2026-09-01',refresh:'nachtelijk',owner:'Rapportage-eigenaar met BI'}];
+const SAMPLES={
+'DEMO-IND-01':{team:'Noord',changed:'2026-09-14 09:20',desc:'Indicatie met einddatum 2027-03-31',shown:{h1:'2027-03-31',h2:'2027-03-31',h3:'2027-04-01',h4:'2027-03-31',h5:'2027-03-30'},after:{h4:'2027-03-31',h5:'2027-03-30'},compared:{h1:{at:'2026-10-02',sim:false},h3:{at:'2026-10-02',sim:false},h5:{at:'2026-10-02',sim:false}}},
+'DEMO-IND-02':{team:'Noord',changed:'2026-08-30 11:05',desc:'Indicatie zonder einddatum',shown:{h1:'none',h2:'none',h3:'none',h4:'inf',h5:'absent'},after:{h4:'inf',h5:'absent'},compared:{h1:{at:'2026-10-02',sim:false}}},
+'DEMO-IND-03':{team:'Zuid',changed:'2026-10-02 14:10',desc:'Indicatie verlengd tot 2027-06-30 (was 2026-12-31)',shown:{h1:'2027-06-30',h2:'2027-06-30',h3:'2027-07-01',h4:'2026-12-31',h5:'2026-12-30'},after:{h4:'2027-06-30',h5:'2027-06-29'},compared:{h1:{at:'2026-10-02',sim:false},h5:{at:'2026-10-02',sim:false}}}};
+const IMPACT='Planners van de wijkteams zien een indicatie een dag eerder verlopen: hinder, mogelijk een te vroege herindicatieaanvraag. Geen zorginhoudelijk gevolg vastgesteld. Declaratie gebruikt de Zorgadministratie en is volgens deze lineage niet geraakt; dat is niet getoetst.';
+let current,loaded,run,compared,invalidated,proposals,loadDone;
+function initialize(){
+ current='DEMO-IND-01';
+ loaded={h4:'2026-10-02 02:00',h5:'2026-10-02 03:00'};
+ run={};
+ compared={};invalidated={};proposals={};
+ for(const id in SAMPLES){
+  run[id]={...SAMPLES[id].shown};
+  compared[id]={};for(const h in SAMPLES[id].compared)compared[id][h]={...SAMPLES[id].compared[h]};
+  invalidated[id]=new Set();proposals[id]=null;
+ }
+ loadDone=false;
+}
+function disp(v){return v==='none'?'Geen einddatum':v==='inf'?'9999-12-31':v==='absent'?'Niet in het overzicht':v;}
+function isDate(v){return /^\d{4}-\d{2}-\d{2}$/.test(v);}
+function addDays(v,n){const d=new Date(v+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+function applyTransform(hid,v){
+ if(hid==='h1'||hid==='h2')return v;
+ if(hid==='h3')return isDate(v)?addDays(v,1):v;
+ if(hid==='h4')return v==='none'?'inf':(isDate(v)?addDays(v,-1):v);
+ return v==='inf'?'absent':v;
+}
+function fresh(sid,hid){
+ if(hid==='h1'||hid==='h2'||hid==='h3')return true;
+ return loaded[hid]>=SAMPLES[sid].changed;
+}
+function validComp(sid,hid){return!!compared[sid][hid]&&fresh(sid,hid);}
+function trace(sid){
+ const steps=[];
+ for(let i=0;i<HOPS.length;i++){
+  const h=HOPS[i],st={hop:h,shown:run[sid][h.id],fresh:fresh(sid,h.id),compared:!!compared[sid][h.id],valid:validComp(sid,h.id),basis:null,expected:null,kind:'',text:''};
+  if(h.id==='h1'){st.kind='bron';st.text=`Bron: ${disp(st.shown)}, vastgelegd ${SAMPLES[sid].changed}`;}
+  else if(!st.fresh)st.kind='stale';
+  else if(!st.compared)st.kind='unknown';
+  else{
+   for(let j=i-1;j>=0;j--){const b=steps[j];if(b.valid||(b.hop.id==='h1'&&b.fresh)){st.basis=b;break;}}
+   if(st.basis){
+    let v=st.basis.shown;
+    for(let j=HOPS.indexOf(st.basis.hop)+1;j<=i;j++)v=applyTransform(HOPS[j].id,v);
+    st.expected=v;st.kind=v===st.shown?'ok':'diff';
+   }else st.kind='unknown';
+  }
+  steps.push(st);
+ }
+ return steps;
+}
+function stateText(st,sid){
+ if(st.kind==='bron')return st.text;
+ if(st.kind==='stale')return`Nog niet ververst: geladen ${loaded[st.hop.id]}, bron gewijzigd ${SAMPLES[sid].changed}. Vergelijk opnieuw na de volgende lading.`;
+ if(st.kind==='unknown')return invalidated[sid].has(st.hop.id)?'Niet vergeleken: opnieuw vergelijken, lading na de vorige vergelijking':'Niet vergeleken: onbekend';
+ if(st.kind==='ok')return st.basis.hop.id===HOPS[HOPS.indexOf(st.hop)-1].id?'Klopt met de vastgelegde transformatie':`Klopt met de vastgelegde transformaties vanaf ${st.basis.hop.name}`;
+ return`Onverklaard verschil: verwacht ${disp(st.expected)}, getoond ${disp(st.shown)}`;
+}
+function locusInfo(sid){
+ const steps=trace(sid);
+ const m=steps.find(s=>s.kind==='diff');
+ const notCompared=steps.filter(s=>s.hop.id!=='h1'&&s.fresh&&!s.valid).length;
+ const notFresh=steps.filter(s=>!s.fresh).length;
+ if(m){
+  const p=m.basis,pi=HOPS.indexOf(p.hop),mi=HOPS.indexOf(m.hop);
+  const between=HOPS.slice(pi+1,mi);
+  const zone=new Set();for(let j=pi;j<=mi;j++)zone.add(HOPS[j].id);
+  if(!between.length)return{kind:'a',p,m,zone,steps,text:`Het gegeven veranderde tussen ${p.hop.name} en ${m.hop.name} zonder vastgelegde transformatie. Verwacht ${disp(m.expected)}, getoond ${disp(m.shown)}.`};
+  const names=between.map(h=>h.name);
+  const list=names.length===1?names[0]:names.slice(0,-1).join(', ')+' en '+names[names.length-1];
+  return{kind:'b',p,m,zone,steps,text:`Het verschil ontstaat ergens tussen ${p.hop.name} en ${m.hop.name}. Vergelijk ${list} om de plek te versmallen.`};
+ }
+ const allOk=steps.every(s=>s.hop.id==='h1'||(s.valid&&s.fresh));
+ if(allOk)return{kind:'c',zone:new Set(),steps,text:`Geen onverklaard verschil in steekproef ${sid}. Dat bewijst niet dat het gegeven voor alle cliënten klopt.`};
+ return{kind:'d',zone:new Set(),steps,text:`Geen onverklaard verschil tussen de vergeleken stappen. Nog niet vergeleken: ${notCompared}. Nog niet ververst: ${notFresh}.`};
+}
+function proposalState(sid,L){
+ const pr=proposals[sid];
+ if(!pr)return{show:`Nog geen correctievoorstel.`,canPropose:L.kind==='a',canApprove:false};
+ const valid=L.kind==='a'&&L.p.hop.id===pr.p&&L.m.hop.id===pr.m;
+ if(!valid)return{show:'Voorstel vervallen: de vergelijking waarop het steunde is niet meer geldig.',canPropose:L.kind==='a',canApprove:false};
+ const lead=`Correctievoorstel ${sid}: ${L.m.hop.name} toont ${disp(pr.shown)} waar de vastgelegde transformatie ${disp(pr.expected)} geeft. Vraag ${L.m.hop.owner} de berekening te herleiden en te herstellen, of de transformatie vast te leggen. Ter beoordeling aan de gegevenseigenaar zorgadministratie. Geen herverwerking of handmatige correctie zonder akkoord.`;
+ if(pr.approved)return{show:lead+' Vastgelegd door FAB (demo), 2026-10-03. Akkoord gegevenseigenaar (simulatie), 2026-10-03. Uitvoering en controle volgen via de bronregistratie; herstel is nog niet aangetoond.',canPropose:false,canApprove:false};
+ return{show:lead+' Vastgelegd door FAB (demo), 2026-10-03; nog niet beoordeeld.',canPropose:false,canApprove:true};
+}
+function draw(){
+ const sid=current,L=locusInfo(sid);
+ const sm=SAMPLES[sid];
+ document.querySelector('#sample-info').innerHTML=`
+ <p><strong>Steekproef ${sid}</strong> (wijkteam ${sm.team}, synthetische referentie): ${sm.desc}.</p>
+ <p>Gewijzigd in de bron: ${sm.changed}. Waarde in het ECD: ${disp(sm.shown.h1)}.</p>`;
+ const visas=document.querySelector('#visas');
+ visas.innerHTML=HOPS.map((h,i)=>{
+  const st=L.steps[i],kind=st.kind,txt=stateText(st,sid);
+  const cls=kind==='ok'||kind==='bron'?'st-ok':kind==='diff'?'st-diff':kind==='stale'?'st-stale':'st-none';
+  const shown=(kind==='unknown')?'?':disp(st.shown);
+  let sword='';
+  if(kind==='diff')sword='<p class="sword">Onverklaard verschil</p>';
+  if(kind==='stale')sword='<p class="sword">Nog niet ververst</p>';
+  if(kind==='unknown')sword='<p class="sword">Niet vergeleken</p>';
+  const sdate=compared[sid][h.id]?`Vergeleken ${compared[sid][h.id].at}${compared[sid][h.id].sim?' (simulatie)':''}`:'';
+  const info=compared[sid][h.id]?`Vergeleken ${compared[sid][h.id].at}${compared[sid][h.id].sim?' (simulatie)':''} door FAB (demo), referentie ${sid}`:'Nog geen geldige vergelijking vastgelegd.';
+  const canCompare=h.id!=='h1'&&st.fresh&&!st.valid;
+  return`<section class="hop${L.zone.has(h.id)?' zone':''}" data-hop="${h.id}">
+  ${L.zone.has(h.id)?'<p class="hop-zone">In het verschilgebied</p>':''}
+  <div class="stamp s-${h.shape} ${cls}" style="--rot:${h.rot}">
+   <p class="stamp-sys">${h.name}</p>
+   <p class="value">${shown}</p>
+   <p class="sdate">${sdate}</p>
+   ${sword}
+  </div>
+  <div class="hop-info">
+   <p class="transform"><strong>Transformatie naar deze stap:</strong> ${h.transform} <span class="doc">${h.doc}. Eigenaar: ${h.owner} (voorgestelde rol).</span></p>
+   <p class="refresh">Verversing: ${h.refresh==='nachtelijk'?`nachtelijk, ${loaded[h.id]}`:h.refresh}</p>
+   <p class="pagenr">Blz. ${i+1} van 5</p>
+   <p class="state${kind==='diff'?' diff':''}">${txt}</p>
+   <p class="compare-info">${info}</p>
+   ${h.id!=='h1'?`<button data-action="compare" data-hop="${h.id}" ${canCompare?'':'disabled'}>Simuleer vergelijking</button>`:''}
+   ${h.id==='h5'?`<p class="transform"><strong>Afnemersgevolg:</strong> ${IMPACT}</p>`:''}
+  </div>
+  </section>`;
+ }).join('');
+ document.querySelector('#locus').innerHTML=`<p>${L.text}</p><p>Een vastgelegde transformatie verklaart een verschil, maar zegt niet dat de betekenis klopt. De gegevenseigenaar beoordeelt dat.</p>`;
+ const pr=proposalState(sid,L);
+ document.querySelector('#proposal').innerHTML=`<p>${pr.show}</p>`;
+ document.querySelector('[data-action="propose"]').disabled=!pr.canPropose;
+ document.querySelector('[data-action="approve"]').disabled=!pr.canApprove;
+ document.querySelector('[data-action="load"]').disabled=loadDone;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const lines=[
+ 'Data Lineage / SIG-DEMO-0912 / demo v1 / revisie 2026-10-03',
+ 'Exportmoment: '+new Date().toISOString(),
+ 'Uitsluitend simulatie; geen echte lineage-vergelijking, lading of herstelactie.',
+ `Gegeven: einddatum indicatie ("laatste dag met indicatie, tot en met"). Nachtelijke lading ${loadDone?'uitgevoerd op 2026-10-03 (simulatie)':'nog niet uitgevoerd in deze simulatie'}.`];
+ for(const sid in SAMPLES){
+  const L=locusInfo(sid);
+  lines.push(`Steekproef ${sid} (wijkteam ${SAMPLES[sid].team}, gewijzigd ${SAMPLES[sid].changed}):`);
+  for(const st of L.steps){
+   lines.push(`- ${st.hop.name}: toont ${disp(st.shown)}. Status: ${stateText(st,sid)}. Transformatie: ${st.hop.transform} (${st.hop.doc})`);
+  }
+  lines.push(`Plek: ${L.text}`);
+  lines.push(`Voorstel: ${proposalState(sid,L).show}`);
+ }
+ lines.push(`Afnemersgevolg: ${IMPACT}`);
+ lines.push('FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.');
+ return lines.join('\n');
+}
+document.querySelector('#sample').addEventListener('change',e=>{current=e.target.value;draw();});
+document.querySelector('.tools').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b)return;
+ if(b.dataset.action==='load'&&!loadDone){
+  loadDone=true;loaded={h4:'2026-10-03 02:00',h5:'2026-10-03 03:00'};
+  for(const sid in SAMPLES){
+   for(const h of['h4','h5']){if(compared[sid][h]){delete compared[sid][h];invalidated[sid].add(h);}}
+   run[sid].h4=SAMPLES[sid].after.h4;run[sid].h5=SAMPLES[sid].after.h5;
+  }
+  document.querySelector('#message').textContent='Nachtelijke lading gesimuleerd: Datawarehouse 2026-10-03 02:00, BI-overzicht 03:00. Eerdere vergelijkingen van die stappen zijn ongeldig.';
+  draw();
+ }
+});
+document.querySelector('#visas').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action="compare"]');if(!b||b.disabled)return;
+ const h=b.dataset.hop;
+ compared[current][h]={at:PEIL,sim:true};invalidated[current].delete(h);
+ draw();
+ const stamp=document.querySelector(`.hop[data-hop="${h}"] .stamp`);
+ if(stamp)stamp.classList.add('landed');
+ document.querySelector('#message').textContent=`Vergeleken ${PEIL} (simulatie) door FAB (demo), referentie ${current}: ${HOPS.find(x=>x.id===h).name}.`;
+});
+document.querySelector('.proposal .acts').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b||b.disabled)return;
+ const L=locusInfo(current);
+ if(b.dataset.action==='propose'&&L.kind==='a'){
+  proposals[current]={p:L.p.hop.id,m:L.m.hop.id,expected:L.m.expected,shown:L.m.shown,approved:false};
+  document.querySelector('#message').textContent=`Correctievoorstel voor ${current} vastgelegd; ter beoordeling aan de gegevenseigenaar zorgadministratie.`;
+ }
+ if(b.dataset.action==='approve'&&proposals[current]){
+  proposals[current].approved=true;
+  document.querySelector('#message').textContent='Akkoord van de gegevenseigenaar gesimuleerd; uitvoering en controle volgen via de bronregistratie.';
+ }
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();document.querySelector('#sample').value=current;draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; vergelijkingen, lading en voorstellen zijn gewist.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Lineagespoor gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische adoptiekaart: vier muren van vijf lagen — bekend, getraind, gebruikt, beheerst, geborgd — met maatlijnen, signalen en advies per afdeling.">
+    <title>FAB Adoptiekaart — wordt de nieuwe werkwijze echt beheerst?</title>
+    <style>
+:root{--site:#D9DEE0;--block:#ECE8DC;--mortar:#A7A69C;--ink:#1C2630;--blueprint:#2A5C8F;--tape:#E8C547;--muted:#55606A;--display:"Skia","Tw Cen MT","Century Gothic",sans-serif;--body:"Hoefler Text","Constantia","Cambria",Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--site);color:var(--ink);font:16.5px/1.65 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--blueprint);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(32px,4.4vw,52px);font-weight:700;line-height:1.12;max-width:20ch}h2{font-family:var(--display);font-size:25px}h3{font-family:var(--display);font-size:20px}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--blueprint);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:var(--block);padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1440px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--mortar);padding-bottom:14px;font-size:15px}.demo strong{color:var(--blueprint)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 26px}.intro{margin-top:18px;max-width:54ch}.context{background:var(--block);border-left:6px solid var(--blueprint);padding:16px 20px;font-size:15px}.context p+p{margin-top:8px}
+.layers-key{background:var(--block);border:1px solid var(--mortar);padding:14px 18px;max-width:100ch}
+.layers-key h3{margin-bottom:6px}
+.layers-key ul{list-style:none;padding:0;margin:6px 0}.layers-key li{margin-bottom:6px;font-size:14.5px}.layers-key .ln{font-family:var(--display);font-weight:700}
+.tools{display:flex;gap:12px 20px;align-items:flex-start;flex-wrap:wrap;margin:18px 0}.plain{background:var(--block);border:1px solid var(--blueprint);border-radius:4px;padding:9px 16px}
+.interactive{display:none}body.ready .interactive{display:flex}
+.tally{background:var(--block);border:1px solid var(--mortar);padding:12px 16px;font-size:15.5px;max-width:100ch}
+.walls{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:24px}
+.wallsect{display:flex;flex-direction:column}
+.wallname{font-family:var(--display);font-weight:700;font-size:21px;margin-bottom:10px}
+.wall{display:flex;flex-direction:column-reverse;gap:3px}
+.course{position:relative;min-height:58px;display:flex;align-items:center;padding:8px 12px;background-color:var(--block);background-image:repeating-linear-gradient(to right,transparent 0 46px,var(--mortar) 46px 48px),repeating-linear-gradient(to bottom,transparent 0 17px,var(--mortar) 17px 19px);background-size:48px 19px;border:1px solid var(--mortar)}
+.course .plate{display:inline-flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;background:var(--block);padding:4px 9px;max-width:100%;position:relative}
+.course .lname{font-family:var(--display);font-weight:700;flex:none}
+.course .state{font-size:12.8px;line-height:1.4}
+.course.unmeasured{background-image:none;background-color:transparent;border:1.5px dashed var(--muted);color:var(--muted)}
+.course.part{background-image:none;background-color:transparent;border:1px solid var(--mortar);padding:0;position:relative}
+.course.part .fill{position:absolute;left:0;top:0;bottom:0;background-color:var(--block);background-image:repeating-linear-gradient(to right,transparent 0 46px,var(--mortar) 46px 48px);background-size:48px 19px;border-right:1px solid var(--mortar)}
+.course.part .inside{position:relative;padding:8px 12px;display:flex;align-items:center;width:100%}
+.ruler{position:relative;height:15px;margin:1px 0}
+.ruler .dim{position:absolute;top:0;bottom:0;border-left:2px solid var(--blueprint)}
+.ruler .dim::before,.ruler .dim::after{content:"";position:absolute;left:-5px;width:9px;height:2px;background:var(--blueprint)}
+.ruler .dim::before{top:0;transform:rotate(35deg);transform-origin:left top}
+.ruler .dim::after{bottom:0;transform:rotate(-35deg);transform-origin:left bottom}
+.ruler .dimtxt{position:absolute;left:5px;top:1px;font-size:11px;line-height:12px;color:var(--blueprint);white-space:nowrap}
+.ruler .dimtxt.flip{left:auto;right:5px}
+.gap{height:16px;background:repeating-linear-gradient(45deg,var(--tape) 0 10px,var(--ink) 10px 20px)}
+.course.settle{animation:settle .3s}
+@keyframes settle{from{transform:translateY(-8px)}to{transform:translateY(0)}}
+.walldown{margin-top:14px;font-size:14.5px}
+.walldown p+p{margin-top:6px}
+.stand{font-weight:700}
+.signals{color:var(--ink)}
+.advice{border-top:1px solid var(--mortar);padding-top:8px}
+.walldown .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.walldown .acts button{background:transparent;border:1px solid var(--blueprint);border-radius:4px;padding:8px 12px;color:var(--blueprint);font-size:14px}
+.live{min-height:24px;color:var(--blueprint);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--block);padding:22px;border:1px solid var(--mortar)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid var(--mortar)}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}.register table{border-collapse:collapse;font-size:14px;margin:8px 0}.register th,.register td{border:1px solid var(--mortar);padding:5px 10px;text-align:left;vertical-align:top}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:700}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(max-width:1000px){.walls{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.walls{grid-template-columns:1fr}}
+@media(max-width:760px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:32px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:24pt}.demo strong,.live,a{color:#000}.context,.layers-key,.tally{border:1px solid #777;background:white}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.tools,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action]{display:none!important}.walls{display:block}.wallsect{break-inside:avoid;margin-top:12px}.course{background-image:none;background-color:white;border:1px solid #999;min-height:0}.course.unmeasured{border-style:dashed;color:#000}.course.part .fill{display:none}.course.part .inside{padding:4px 8px}.ruler{display:none}.gap{display:none}.export textarea{min-height:260px}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de muren</a>
+<main class="page">
+<div class="demo"><span>FAB / Adoptiekaart</span><strong>Synthetische demonstratie, geen adoptiemeting</strong></div>
+<header class="mast">
+<div>
+<h1>Wordt de nieuwe werkwijze goed en veilig gebruikt?</h1>
+<p class="intro">Elke afdeling bouwt een muur van vijf lagen: bekend, getraind, gebruikt, beheerst en geborgd. Een laag ligt pas als het eigen signaal is gemeten en de grens haalt. Een laag boven een gat draagt niet: veel gebruik zonder aangetoonde beheersing is een risico, geen succes.</p>
+</div>
+<div class="context">
+<p><strong>Gestructureerde nachtoverdracht op de tablet, brede invoering na de pilot</strong></p>
+<p>ADOPT-DEMO-04, woonzorglocatie De Linde (fictief), vier afdelingen, live sinds 2026-09-07. Peilmoment 2026-10-03. Adoptieplan demo v1.</p>
+<p>Eigenaar: proceseigenaar zorg met opleidingsverantwoordelijke (voorgestelde rollen). FAB levert gebruiksgegevens en beheert de inrichting.</p>
+<p>Gebruiksmoment: nazorgoverleg.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Muren per afdeling</h2>
+<div class="layers-key" aria-labelledby="layers-title">
+<h3 id="layers-title">Lagen en signalen (van onder naar boven)</h3>
+<ul>
+<li><span class="ln">Bekend:</span> de teamleider bevestigt dat de werkwijze in het werkoverleg is uitgelegd. Bron: verslag werkoverleg.</li>
+<li><span class="ln">Getraind:</span> vaste medewerkers met afgeronde e-learning én praktijkinstructie, grens 90 %. Bron: leerregistratie.</li>
+<li><span class="ln">Gebruikt:</span> nachtdiensten van de laatste twee weken met de overdracht in het formulier, grens 85 %. Bron: gebruiksmeting in het ECD door FAB.</li>
+<li><span class="ln">Beheerst:</span> ochtendoverdrachten in een steekproef zonder ontbrekend verplicht onderdeel, grens 90 %, steekproef minimaal 20. Bron: steekproef door de kwaliteitsmedewerker.</li>
+<li><span class="ln">Geborgd:</span> werkinstructie vastgesteld én opgenomen in het inwerkprogramma van de afdeling. Bron: kwaliteitshandboek en inwerkprogramma.</li>
+</ul>
+<p id="instr">Werkinstructie nachtoverdracht v1, vastgesteld 2026-09-01 door proceseigenaar zorg (demo).</p>
+</div>
+<div class="tools interactive">
+<button class="plain" data-action="instr-change">Simuleer gewijzigde werkinstructie</button>
+<button class="plain" data-action="instr-adopt">Simuleer vaststelling v2</button>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer adoptieoverzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="tally">
+<p id="tally" aria-live="polite"></p>
+</div>
+<div class="walls" id="walls"></div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Adoptieoverzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief lagen, stand, signalen en advies per afdeling. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Beginstand per afdeling, ook zonder interactie</h2>
+<p>Dit register toont de beginstand en blijft leesbaar zonder JavaScript. De gesimuleerde muren bovenaan kunnen ervan afwijken. Peilmoment 2026-10-03; alle gegevens zijn synthetisch.</p>
+<div class="register">
+<article id="adopt-static-esdoorn">
+<h3>Esdoorn</h3>
+<table>
+<tr>
+<th>Laag</th>
+<th>Beginstatus</th>
+</tr>
+<tr>
+<td>Bekend</td>
+<td>Bevestigd door teamleider, 2026-09-10 (ligt)</td>
+</tr>
+<tr>
+<td>Getraind</td>
+<td>Gemeten, haalt de grens: 27 van 29 (93,1 %), grens 90 % (ligt)</td>
+</tr>
+<tr>
+<td>Gebruikt</td>
+<td>Gemeten, haalt de grens: 52 van 56 (92,9 %), grens 85 % (ligt)</td>
+</tr>
+<tr>
+<td>Beheerst</td>
+<td>Gemeten, haalt de grens: 23 van 25 (92,0 %), grens 90 % (ligt)</td>
+</tr>
+<tr>
+<td>Geborgd</td>
+<td>Niet aangetoond: nog niet in het inwerkprogramma</td>
+</tr>
+</table>
+<p><strong>Stand:</strong> beheerst. <strong>Signalen:</strong> geen aandachtssignaal. <strong>Advies:</strong> neem de werkinstructie op in het inwerkprogramma van de afdeling.</p>
+</article>
+<article id="adopt-static-hazelaar">
+<h3>Hazelaar</h3>
+<table>
+<tr>
+<th>Laag</th>
+<th>Beginstatus</th>
+</tr>
+<tr>
+<td>Bekend</td>
+<td>Bevestigd door teamleider, 2026-09-10 (ligt)</td>
+</tr>
+<tr>
+<td>Getraind</td>
+<td>Gemeten, onder de grens: 25 van 28 (89,3 %), grens 90 % (ligt niet)</td>
+</tr>
+<tr>
+<td>Gebruikt</td>
+<td>Gemeten, haalt de grens: 50 van 56 (89,3 %), grens 85 % (ligt, maar draagt niet: Getraind ontbreekt)</td>
+</tr>
+<tr>
+<td>Beheerst</td>
+<td>Gemeten, haalt de grens: 18 van 20 (90,0 %), grens 90 % (ligt, maar draagt niet: Getraind ontbreekt)</td>
+</tr>
+<tr>
+<td>Geborgd</td>
+<td>Niet aangetoond: nog niet in het inwerkprogramma</td>
+</tr>
+</table>
+<p><strong>Stand:</strong> bekend. <strong>Signalen:</strong> gebruik zonder aangetoonde training. <strong>Advies:</strong> plan praktijkinstructie voor de nog niet getrainde medewerkers en controleer de overdrachten van deze afdeling extra.</p>
+</article>
+<article id="adopt-static-beuk">
+<h3>Beuk</h3>
+<table>
+<tr>
+<th>Laag</th>
+<th>Beginstatus</th>
+</tr>
+<tr>
+<td>Bekend</td>
+<td>Bevestigd door teamleider, 2026-09-14 (ligt)</td>
+</tr>
+<tr>
+<td>Getraind</td>
+<td>Gemeten, haalt de grens: 30 van 31 (96,8 %), grens 90 % (ligt)</td>
+</tr>
+<tr>
+<td>Gebruikt</td>
+<td>Gemeten, haalt de grens: 49 van 56 (87,5 %), grens 85 % (ligt)</td>
+</tr>
+<tr>
+<td>Beheerst</td>
+<td>Niet gemeten</td>
+</tr>
+<tr>
+<td>Geborgd</td>
+<td>Niet aangetoond: nog niet in het inwerkprogramma</td>
+</tr>
+</table>
+<p><strong>Stand:</strong> gebruikt. <strong>Signalen:</strong> gebruik zonder aangetoonde beheersing. <strong>Advies:</strong> laat de kwaliteitsmedewerker een steekproef doen: gebruik bewijst geen goede registratie.</p>
+</article>
+<article id="adopt-static-wilg">
+<h3>Wilg</h3>
+<table>
+<tr>
+<th>Laag</th>
+<th>Beginstatus</th>
+</tr>
+<tr>
+<td>Bekend</td>
+<td>Niet gemeten</td>
+</tr>
+<tr>
+<td>Getraind</td>
+<td>Gemeten, onder de grens: 22 van 30 (73,3 %), grens 90 % (ligt niet)</td>
+</tr>
+<tr>
+<td>Gebruikt</td>
+<td>Gemeten, onder de grens: 31 van 56 (55,4 %), grens 85 % (ligt niet)</td>
+</tr>
+<tr>
+<td>Beheerst</td>
+<td>Niet gemeten</td>
+</tr>
+<tr>
+<td>Geborgd</td>
+<td>Niet aangetoond: nog niet in het inwerkprogramma</td>
+</tr>
+</table>
+<p><strong>Stand:</strong> nog niets aangetoond. <strong>Signalen:</strong> geen aandachtssignaal. <strong>Advies:</strong> vraag de teamleider de uitleg in het werkoverleg te bevestigen.</p>
+</article>
+<p><strong>Regels in volgorde:</strong> elke laag heeft een eigen signaal; niet gemeten is onbekend, niet groen; een laag ligt pas als het eigen signaal is gemeten en de grens haalt; een steekproef onder 20 telt niet voor Beheerst; een laag die ligt terwijl een lagere laag ontbreekt draagt niet; de stand is de hoogste ononderbroken laag vanaf Bekend; gebruik zonder aangetoonde training of beheersing is een aandachtssignaal; een gewijzigde werkinstructie vraagt opnieuw bekendmaking en vaststelling; er is geen totaalscore.</p>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij het nazorgoverleg met de proceseigenaar, opleidingsverantwoordelijke, kwaliteitsmedewerker en kerngebruikers; de uitkomst is per afdeling een ondersteuningsactie en zicht op borging. De proceseigenaar besluit.</p>
+<p><strong>Bron:</strong> synthetische adoptiesignalen, demo v1, revisie 2026-10-03; de echte leerregistratie, gebruiksmeting, steekproefmethode en bronhouder (proceseigenaar met opleidings-/adoptieverantwoordelijke) zijn niet vastgesteld. Herzie na iedere meetperiode en bij een gewijzigde werkinstructie.</p>
+<p><strong>Regels:</strong> elke laag heeft een eigen signaal; niet gemeten is onbekend, niet groen; trainingsdeelname bewijst geen vaardigheid en gebruik geen goede registratie; een laag boven een gat draagt niet; een gewijzigde werkinstructie vraagt opnieuw bekendmaking en vaststelling; geen totaalscore.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met het huidige nazorgverslag en de trainingslijst op herkenning van gebruik zonder beheersing, juiste ondersteuningsactie en eigenaar.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-pilot-cockpit.html">Pilot Cockpit</a><a href="fab-releaseatelier.html">Releaseatelier</a><a href="fab-test-coverage-map.html">Testsporen en bewijs</a><a href="../incident_en_continuiteit/fab-known-error-map.html">Bekende fouten</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een gesimuleerde meting is geen echte steekproef of vaststelling.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const LAYERS=[
+{id:'l1',name:'Bekend',low:'bekend'},
+{id:'l2',name:'Getraind',low:'getraind',grens:90},
+{id:'l3',name:'Gebruikt',low:'gebruikt',grens:85},
+{id:'l4',name:'Beheerst',low:'beheerst',grens:90,min:20},
+{id:'l5',name:'Geborgd',low:'geborgd'}];
+const DEPTS=[
+{id:'esdoorn',name:'Esdoorn',l1:{m:true,date:'2026-09-10'},l2:{n:27,d:29},l3:{n:52,d:56},l4:{n:23,d:25},prog:false,sample:null},
+{id:'hazelaar',name:'Hazelaar',l1:{m:true,date:'2026-09-10'},l2:{n:25,d:28},l3:{n:50,d:56},l4:{n:18,d:20},prog:false,sample:null},
+{id:'beuk',name:'Beuk',l1:{m:true,date:'2026-09-14'},l2:{n:30,d:31},l3:{n:49,d:56},l4:null,prog:false,sample:{n:17,d:22}},
+{id:'wilg',name:'Wilg',l1:null,l2:{n:22,d:30},l3:{n:31,d:56},l4:null,prog:false,sample:{n:9,d:12}}];
+const INSTR_V1='Werkinstructie nachtoverdracht v1, vastgesteld 2026-09-01 door proceseigenaar zorg (demo)';
+const INSTR_V2_OPEN='Werkinstructie nachtoverdracht v2, gewijzigd, nog niet vastgesteld';
+const INSTR_V2='Werkinstructie nachtoverdracht v2, vastgesteld 2026-10-03 (simulatie) door proceseigenaar zorg';
+const ADVICE_TAIL=' Advies, geen besluit. De proceseigenaar besluit over extra ondersteuning; trainingsdeelname bewijst geen vaardigheid.';
+let depts,instr,changed;
+function initialize(){
+ depts=DEPTS.map(d=>({...d,l1:d.l1?{...d.l1}:null,l2:{...d.l2},l3:{...d.l3},l4:d.l4?{...d.l4}:null}));
+ instr={text:INSTR_V1,established:true};changed=false;
+}
+function pct(n,d){return n/d*100;}
+function pctText(n,d){return (n/d*100).toFixed(1).replace('.',',');}
+function layerLies(d,i){
+ if(i===0)return!!(d.l1&&d.l1.m);
+ if(i===1)return d.l2.n/d.l2.d>=.9;
+ if(i===2)return d.l3.n/d.l3.d>=.85;
+ if(i===3)return!!d.l4&&d.l4.d>=20&&d.l4.n/d.l4.d>=.9;
+ return instr.established&&d.prog;
+}
+function lowestGap(d){for(let i=0;i<5;i++)if(!layerLies(d,i))return i;return -1;}
+function layerState(d,i){
+ const lies=layerLies(d,i),gap=lowestGap(d);
+ let t;
+ if(i===0)t=d.l1&&d.l1.m?`Bevestigd door teamleider, ${d.l1.date}`:`Niet gemeten${d.l1&&d.l1.note?`. ${d.l1.note}`:''}`;
+ else if(i===3&&!d.l4)t='Niet gemeten';
+ else if(i===3&&d.l4.d<20)t=`Gemeten, steekproef te klein: ${d.l4.d} van minimaal 20`;
+ else if(i===1||i===2||i===3){
+  const L=LAYERS[i],v=i===1?d.l2:i===2?d.l3:d.l4,ok=lies;
+  t=`Gemeten, ${ok?'haalt':'onder'} de grens: ${v.n} van ${v.d} (${pctText(v.n,v.d)} %), grens ${L.grens} %`;
+ }
+ else t=lies?'Werkinstructie vastgesteld en opgenomen in het inwerkprogramma':(!instr.established?'Niet aangetoond: werkinstructie gewijzigd, nog niet vastgesteld':'Niet aangetoond: nog niet in het inwerkprogramma');
+ if(lies&&gap>-1&&gap<i)t+=`. Ligt, maar draagt niet: ${LAYERS[gap].name} ontbreekt`;
+ return t;
+}
+function assess(d){
+ const lies=[0,1,2,3,4].map(i=>layerLies(d,i)),gap=lowestGap(d);
+ let high=-1;for(let i=0;i<5;i++){if(lies[i])high=i;else break;}
+ const stand=high<0?'Stand: nog niets aangetoond':`Stand: ${LAYERS[high].low}`;
+ const signals=[];
+ if(lies[2]&&!lies[1])signals.push('Gebruik zonder aangetoonde training');
+ if(lies[2]&&!lies[3])signals.push('Gebruik zonder aangetoonde beheersing');
+ let advice;
+ if(lies[2]&&!lies[1])advice='Plan praktijkinstructie voor de nog niet getrainde medewerkers en controleer de overdrachten van deze afdeling extra.';
+ else if(lies[2]&&!d.l4)advice='Laat de kwaliteitsmedewerker een steekproef doen: gebruik bewijst geen goede registratie.';
+ else if(lies[2]&&d.l4.d<20)advice='Vergroot de steekproef tot minimaal 20 overdrachten.';
+ else if(lies[2]&&!lies[3])advice='Bespreek de ontbrekende onderdelen met het team en de kerngebruiker; pas zo nodig de instructie aan.';
+ else if(gap===0)advice='Vraag de teamleider de uitleg in het werkoverleg te bevestigen.';
+ else if(gap===1)advice='Plan training en praktijkinstructie voor de nog niet getrainde medewerkers.';
+ else if(gap===2)advice='Zoek met de kerngebruiker uit waarom het formulier niet wordt gebruikt.';
+ else if(!lies[4])advice=!instr.established?'Laat de gewijzigde werkinstructie vaststellen door de proceseigenaar.':'Neem de werkinstructie op in het inwerkprogramma van de afdeling.';
+ else advice='Borging aangetoond; plan een herbeoordeling over drie maanden (demo-afspraak).';
+ return{lies,gap,stand,signals:signals.length?signals.join('. '):'Geen aandachtssignaal',signalCount:signals.length,advice:advice+ADVICE_TAIL};
+}
+function courseHtml(d,i,a){
+ const L=LAYERS[i],lies=a.lies[i],gap=a.gap;
+ const floating=lies&&gap>-1&&gap<i;
+ const under=lies&&(i===1||i===2||(i===3&&d.l4));
+ let inner;
+ const name=`<span class="lname">${L.name}</span>`,st=`<span class="state">${layerState(d,i)}</span>`;
+ if(!lies&&((i===1||i===2)||(i===3&&d.l4))){
+  const v=i===1?d.l2:i===2?d.l3:d.l4;
+  const w=Math.min(100,pct(v.n,v.d));
+  const gw=LAYERS[i].grens;
+  inner=`<div class="ruler" aria-hidden="true">
+   <div class="dim" style="left:${gw}%"><span class="dimtxt${gw > 55 ? " flip" : ""}">grens ${gw} %</span></div>
+  </div><div class="course part" data-layer="${L.id}">
+   <div class="fill" style="width:${w}%"></div>
+   <div class="inside"><span class="plate">${name}${st}</span></div>
+  </div>`;
+ }else if(!lies&&((i===0&&!d.l1)||(i===0&&d.l1&&!d.l1.m)||(i===3&&!d.l4)||(i===4))){
+  inner=`<div class="course unmeasured" data-layer="${L.id}"><span class="plate">${name}${st}</span></div>`;
+ }else{
+  inner=`<div class="course" data-layer="${L.id}"><span class="plate">${name}${st}</span></div>`;
+ }
+ const gapHtml=floating&&i>0&&!a.lies[i-1]?'<div class="gap" aria-hidden="true"></div>':'';
+ return gapHtml+inner;
+}
+function draw(){
+ const walls=document.querySelector('#walls');
+ walls.innerHTML=depts.map(d=>{
+  const a=assess(d);
+  return`<section class="wallsect" data-dept="${d.id}">
+  <h3 class="wallname">${d.name}</h3>
+  <div class="wall">${[0,1,2,3,4].map(i=>courseHtml(d,i,a)).join('')}</div>
+  <div class="walldown">
+   <p class="stand">${a.stand}</p>
+   <p class="signals">${a.signals}</p>
+   <p class="advice">${a.advice}</p>
+   <div class="acts">
+    <button data-action="confirm" ${d.l1&&d.l1.m?'disabled':''}>Simuleer bevestiging door teamleider</button>
+    <button data-action="train" ${a.lies[1]?'disabled':''}>Simuleer extra praktijkinstructie (3 medewerkers)</button>
+    <button data-action="sample" ${!d.l4&&d.sample?'':'disabled'}>Simuleer steekproef kwaliteitsmedewerker</button>
+    <button data-action="embed" ${d.prog?'disabled':''}>Simuleer opname in het inwerkprogramma</button>
+   </div>
+  </div>
+  </section>`;
+ }).join('');
+ const parts=depts.map(d=>`${d.name}: ${assess(d).stand.replace('Stand: ','')}`);
+ const k=depts.filter(d=>assess(d).signalCount>0).length;
+ document.querySelector('#tally').textContent=`${parts.join('. ')}. ${k} ${k===1?'afdeling':'afdelingen'} met gebruik zonder aangetoonde training of beheersing.`;
+ document.querySelector('#instr').textContent=instr.text;
+ document.querySelector('[data-action="instr-change"]').disabled=changed;
+ document.querySelector('[data-action="instr-adopt"]').disabled=!changed||instr.established;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const lines=[
+ 'Adoptiekaart / ADOPT-DEMO-04 / demo v1 / revisie 2026-10-03',
+ 'Exportmoment: '+new Date().toISOString(),
+ 'Uitsluitend simulatie; geen echte meting, training, steekproef of vaststelling.',
+ 'Lagen en signalen (demo-afspraken, geen lokale normen):',
+ '- Bekend: teamleider bevestigt uitleg in het werkoverleg. Bron: verslag werkoverleg.',
+ '- Getraind: afgeronde e-learning én praktijkinstructie, grens 90 %. Bron: leerregistratie.',
+ '- Gebruikt: nachtdiensten met de overdracht in het formulier, grens 85 %. Bron: gebruiksmeting door FAB.',
+ '- Beheerst: steekproef zonder ontbrekend verplicht onderdeel, grens 90 %, minimaal 20. Bron: kwaliteitsmedewerker.',
+ '- Geborgd: werkinstructie vastgesteld én in het inwerkprogramma. Bron: kwaliteitshandboek en inwerkprogramma.',
+ 'Werkinstructie: '+instr.text];
+ for(const d of depts){
+  const a=assess(d);
+  lines.push(`${d.name}:\n`+[0,1,2,3,4].map(i=>`- ${LAYERS[i].name}: ${layerState(d,i)}`).join('\n')+`\n${a.stand}. Signalen: ${a.signals}.\nAdvies: ${a.advice}`);
+ }
+ lines.push(document.querySelector('#tally').textContent);
+ lines.push('FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.');
+ return lines.join('\n');
+}
+document.querySelector('#walls').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b||b.disabled)return;
+ const d=depts.find(x=>x.id===b.closest('[data-dept]').dataset.dept);
+ if(b.dataset.action==='confirm'&&(!d.l1||!d.l1.m)){
+  d.l1={m:true,date:`${PEIL} (simulatie)`};
+  document.querySelector('#message').textContent=`${d.name}: teamleider heeft de uitleg in het werkoverleg bevestigd (simulatie).`;
+ }
+ if(b.dataset.action==='train'&&!(d.l2.n/d.l2.d>=.9)){
+  d.l2.n=Math.min(d.l2.d,d.l2.n+3);
+  document.querySelector('#message').textContent=`${d.name}: extra praktijkinstructie gesimuleerd; nu ${d.l2.n} van ${d.l2.d} getraind.`;
+ }
+ if(b.dataset.action==='sample'&&!d.l4&&d.sample){
+  d.l4={...d.sample};
+  document.querySelector('#message').textContent=`${d.name}: steekproef door kwaliteitsmedewerker (demo), ${PEIL}.`;
+ }
+ if(b.dataset.action==='embed'&&!d.prog){
+  d.prog=true;
+  document.querySelector('#message').textContent=`${d.name}: werkinstructie opgenomen in het inwerkprogramma, ${PEIL} (simulatie).`;
+ }
+ draw();
+});
+document.querySelector('.tools').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b||b.disabled)return;
+ if(b.dataset.action==='instr-change'&&!changed){
+  changed=true;instr={text:INSTR_V2_OPEN,established:false};
+  for(const d of depts)d.l1={m:false,note:'Werkinstructie gewijzigd: teamleider bevestigt opnieuw'};
+  document.querySelector('#message').textContent='Werkinstructie gewijzigd naar v2 (nog niet vastgesteld): iedere afdeling bevestigt Bekend opnieuw.';
+ }
+ if(b.dataset.action==='instr-adopt'&&changed&&!instr.established){
+  instr={text:INSTR_V2,established:true};
+  document.querySelector('#message').textContent='Werkinstructie v2 vastgesteld door de proceseigenaar (simulatie).';
+ }
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; metingen, steekproeven, borging en instructiewijziging zijn teruggedraaid.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Adoptieoverzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>
