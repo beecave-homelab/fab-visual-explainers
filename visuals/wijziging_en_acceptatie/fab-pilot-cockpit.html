@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische pilot cockpit: gecontroleerde meetweken op millimeterpapier, stopcriteria en een advies over doorgaan, aanpassen of stoppen.">
+    <title>FAB Pilot Cockpit — helpt de proef echt?</title>
+    <style>
+:root{--desk:#DDE5E0;--paper:#F7FAF6;--grid:#B9D8C2;--grid-major:#7FB394;--graphite:#3B4045;--ballpoint:#1D4E9E;--stop:#B8360F;--display:"Baskerville","Baskerville Old Face","Libre Baskerville",Georgia,serif;--body:"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Verdana,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--desk);color:var(--graphite);font:15.5px/1.6 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--ballpoint);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(34px,4.4vw,56px);font-weight:700;line-height:1.12;max-width:20ch}h2{font-family:var(--display);font-size:26px;font-weight:700}h3{font-family:var(--display);font-size:20px;font-weight:700}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--ballpoint);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #9db3a7;padding-bottom:14px;font-size:15px}.demo strong{color:var(--stop)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 30px}.intro{margin-top:18px;max-width:54ch}.context{background:var(--paper);border-left:6px solid var(--ballpoint);padding:18px 20px;font-size:15px}.context p+p{margin-top:8px}
+.facts{background:var(--paper);border:1px solid var(--grid-major);padding:16px 20px;margin-bottom:20px;font-size:15px}.facts h2{font-size:20px;margin-bottom:6px}.facts p+p,.facts ul{margin-top:8px}.facts ul{padding-left:22px}
+.tools{display:flex;gap:12px 20px;align-items:center;flex-wrap:wrap;margin:18px 0}.tools>label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}input[type=range]{min-height:44px;min-width:0;width:220px;max-width:100%;accent-color:var(--ballpoint)}.plain{background:var(--paper);border:1px solid var(--ballpoint);border-radius:4px;padding:9px 16px}
+.interactive{display:none}body.ready .interactive{display:flex}
+.stage{display:grid;grid-template-columns:1fr;gap:26px;align-items:start}
+.chartwrap{background:var(--paper);border:1px solid var(--grid-major);padding:10px}.chart{display:block;width:100%;height:auto}
+.legend{display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px;margin-top:8px}.legend span{display:inline-flex;align-items:center;gap:6px}.sw{display:inline-block;width:16px;height:16px;vertical-align:middle}
+.weeks{list-style:none;padding:0;margin:18px 0 0;border-top:2px solid var(--grid-major)}
+.week{padding:10px 4px;border-bottom:1px solid var(--grid);font-size:14px}
+.week .wname{font-size:15px}
+.week .gline{margin-top:2px}.week .wstate{color:var(--graphite)}.week .meta{color:#5a6066;font-size:13px;margin-top:4px}
+.week .wacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.wacts button{background:transparent;border:1px solid var(--ballpoint);border-radius:4px;padding:7px 12px;font-size:14px;min-height:44px}
+.panel{background:var(--paper);border:1px solid var(--grid-major);padding:16px 18px}
+.panel h3{margin-bottom:8px}
+.brakes{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.brakes li{border-left:4px solid var(--grid-major);padding:4px 0 4px 12px;font-size:14px}
+.brakes .state{font-weight:700}.brakes .hit{color:var(--stop)}.brakes .unmeasured{color:var(--graphite)}
+.brakes .bacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.bacts button{background:transparent;border:1px solid var(--graphite);border-radius:4px;padding:7px 12px;font-size:14px;min-height:44px}
+.advice{background:var(--paper);border:2px solid var(--graphite);padding:16px 18px}.advice p{margin-top:6px}
+.live{min-height:24px;color:var(--stop);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--paper);padding:22px;border:1px solid var(--grid-major)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--graphite)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register p{margin:6px 0;font-size:15px}
+.tablewrap{overflow-x:auto;margin-top:12px}.register table{border-collapse:collapse;font-size:14px;background:var(--paper)}.register caption{text-align:left;font-weight:700;padding-bottom:6px}.register th,.register td{border:1px solid var(--grid-major);padding:6px 10px;text-align:left;white-space:nowrap}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(min-width:1000px){.stage{grid-template-columns:2fr 1fr}.side{position:sticky;top:20px;display:grid;gap:16px}.week{display:grid;grid-template-columns:160px 1fr 1fr auto;gap:2px 24px;align-items:baseline}.week .meta{grid-column:1/4}.week .wacts{grid-column:4;grid-row:1/3;justify-self:end;margin-top:0}}
+@media(max-width:900px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:34px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context,.facts{font-size:10pt}.tools,.wacts,.bacts,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action]{display:none!important}.stage,.side{display:block}.week,.panel,.advice,.facts{border:1px solid #777;break-inside:avoid;margin-bottom:10px}.reference{break-before:page}details>:not(summary){display:block!important}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de meetweken</a>
+<main class="page">
+<div class="demo"><span>FAB / Pilot Cockpit</span><strong>Synthetische demonstratie, geen meetregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Vermindert de proef het probleem echt?</h1>
+<p class="intro">De proef is vooraf vastgelegd: hypothese, meting, nulmeting en stopcriteria. Alleen gecontroleerde meetweken tellen mee. Een stopcriterium dat niet is gemeten, is niet groen maar onbekend.</p>
+</div>
+<div class="context">
+<p><strong>Gestructureerde nachtoverdracht op de tablet</strong></p>
+<p>PILOT-DEMO-04, teams Esdoorn en Hazelaar, woonzorglocatie De Linde (fictief)</p>
+<p>Looptijd 8 weken vanaf 2026-08-10, peilmoment na week 7. Plan demo v1, revisie 2026-10-03.</p>
+<p>Pilot-eigenaar: proceseigenaar zorg (voorgestelde rol). FAB beheert de inrichting en levert de meetgegevens aan. Gebruiksmoment: pilotoverleg.</p>
+</div>
+</header>
+<section class="facts" aria-labelledby="facts-title">
+<h2 id="facts-title">Vooraf vastgelegd</h2>
+<p><strong>Hypothese:</strong> als de nachtdienst de overdracht invult in het gestructureerde formulier, ontbreekt bij de ochtendoverdracht minder vaak een verplicht onderdeel.</p>
+<p><strong>Meting:</strong> teller = ochtendoverdrachten met minstens één ontbrekend verplicht onderdeel (medicatie, valrisico, bijzonderheden); noemer = alle ochtendoverdrachten van de teams in die kalenderweek; populatie = cliënten van de genoemde teams; uitsluiting = overdrachten tijdens ECD-uitval volgens noodwerkwijze; bron = steekproefcontrole door de kwaliteitsmedewerker (demo) op het overdrachtsverslag in het ECD.</p>
+<p><strong>Nulmeting</strong> (2026-07-13 t/m 2026-08-09): pilotteams 46 van 212 (21,7 %); vergelijkingsteams Beuk en Wilg 41 van 198 (20,7 %).</p>
+<p><strong>Succesgrens:</strong> over minstens 4 meegetelde weken samen is het aandeel bij de pilotteams ten hoogste 12,0 %, én minstens 5,0 procentpunt lager dan bij de vergelijkingsteams over dezelfde weken.</p>
+<p><strong>Meetellen:</strong> alleen gecontroleerde weken met een noemer van minstens 40 bij de pilotteams; weken 1 en 2 zijn inwerkperiode en tellen niet mee voor de succesgrens. Stopcriteria gelden voor alle weken.</p>
+</section>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Meetweken op millimeterpapier</h2>
+<div class="tools interactive">
+<label for="week">
+Bekijk tot week <span id="week-label">week 7</span>
+<input type="range" id="week" min="2" max="7" step="1" value="7">
+</label>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer pilotoverzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="stage">
+<div class="chartcol">
+<div class="chartwrap">
+<svg class="chart" id="chart" viewBox="0 0 720 360" role="img" aria-label="Grafiek van het aandeel onvolledige ochtendoverdrachten per week voor pilot- en vergelijkingsteams" focusable="false">
+</svg>
+</div>
+<div class="legend" id="legend" aria-label="Legenda"></div>
+</div>
+<div class="side">
+<div class="advice" aria-labelledby="advice-title">
+<h3 id="advice-title">Advies</h3>
+<div id="advice" aria-live="polite"></div>
+</div>
+<section class="panel" aria-labelledby="brakes-title">
+<h3 id="brakes-title">Noodrem: stopcriteria</h3>
+<ul class="brakes" id="brakes">
+</ul>
+</section>
+</div>
+</div>
+<ol class="weeks" id="weeks">
+</ol>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Pilotoverzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief controles, correcties en stopcriteria. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle meetweken en stopcriteria, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde statussen bovenaan kunnen ervan afwijken en gelden nooit als werkelijke controle. Peildatum 2026-10-03, peilmoment na week 7.</p>
+<div class="register">
+<div class="tablewrap">
+<table>
+<caption>Meetweken PILOT-DEMO-04: ontbrekende verplichte onderdelen in de ochtendoverdracht</caption>
+<thead>
+<tr>
+<th>Week</th>
+<th>Pilot teller en noemer</th>
+<th>Status</th>
+<th>Vergelijking teller en noemer</th>
+<th>Status</th>
+<th>Overdrachtstijd</th>
+<th>Meldingen</th>
+</tr>
+</thead>
+<tbody>
+<tr data-static-week>
+<td>1 (inwerkperiode)</td>
+<td>15 van 54</td>
+<td>Gecontroleerd, telt niet mee</td>
+<td>11 van 50</td>
+<td>Gecontroleerd</td>
+<td>24 min</td>
+<td>6</td>
+</tr>
+<tr data-static-week>
+<td>2 (inwerkperiode)</td>
+<td>11 van 52</td>
+<td>Gecontroleerd, telt niet mee</td>
+<td>10 van 49</td>
+<td>Gecontroleerd</td>
+<td>22 min</td>
+<td>4</td>
+</tr>
+<tr data-static-week>
+<td>3</td>
+<td>8 van 55</td>
+<td>Gecontroleerd, telt mee</td>
+<td>10 van 51</td>
+<td>Gecontroleerd</td>
+<td>21 min</td>
+<td>2</td>
+</tr>
+<tr data-static-week>
+<td>4</td>
+<td>6 van 53</td>
+<td>Gecontroleerd, telt mee</td>
+<td>9 van 48</td>
+<td>Gecontroleerd</td>
+<td>20 min</td>
+<td>1</td>
+</tr>
+<tr data-static-week>
+<td>5</td>
+<td>5 van 51</td>
+<td>Gecontroleerd, telt mee</td>
+<td>10 van 50</td>
+<td>Gecontroleerd</td>
+<td>20 min</td>
+<td>1</td>
+</tr>
+<tr data-static-week>
+<td>6</td>
+<td>4 van 38</td>
+<td>Aangeleverd, niet gecontroleerd; noemer onder 40 door vakantiesluiting (demo)</td>
+<td>9 van 47</td>
+<td>Aangeleverd</td>
+<td>19 min</td>
+<td>0</td>
+</tr>
+<tr data-static-week>
+<td>7</td>
+<td>5 van 52</td>
+<td>Aangeleverd, niet gecontroleerd</td>
+<td>10 van 50</td>
+<td>Aangeleverd</td>
+<td>19 min</td>
+<td>1</td>
+</tr>
+<tr data-static-week>
+<td>8</td>
+<td>—</td>
+<td>Nog niet gemeten</td>
+<td>—</td>
+<td>Nog niet gemeten</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Stopcriteria bij start:</strong> S1 privacy-incident door het formulier (gevolg: stoppen) — gemeten via de meldingsregistratie t/m week 7, geen incident, niet geraakt. S2 overdracht niet beschikbaar bij storing zonder werkende terugval (gevolg: stoppen) — niet gemeten: terugvaltest niet uitgevoerd. S3 overdrachtstijd stijgt meer dan 10 minuten ten opzichte van de nulmeting van 18 minuten (gevolg: aanpassen) — berekend over de meegetelde weken 3–5: gemiddeld 20,3 min, niet geraakt. S4 meer dan 6 servicedeskmeldingen over het formulier in één week (gevolg: aanpassen) — hoogste week 6 meldingen, niet geraakt.</p>
+<p><strong>Beginadvies:</strong> nog niet te beoordelen: 3 van minimaal 4 meetweken meegeteld. <strong>Rekenregels:</strong> alleen gecontroleerde weken 3 t/m het gekozen peilmoment met een pilotnoemer van minstens 40 tellen mee, en alleen als de vergelijkingsweek ook gecontroleerd is; percentages worden met onafgeronde waarden berekend en altijd met teller en noemer getoond; niet gemeten is onbekend, niet groen.</p>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij het pilotoverleg met de pilot-eigenaar en de kwaliteitsmedewerker; de uitkomst is een onderbouwd advies om door te gaan, aan te passen of te stoppen. De pilot-eigenaar besluit.</p>
+<p><strong>Bron:</strong> synthetische meetweken, demo v1, revisie 2026-10-03; de echte meetregistratie, steekproefmethode en bronhouder zijn niet vastgesteld. Herzie bij iedere meetweek; een gewijzigde meetdefinitie vraagt een nieuwe nulmeting.</p>
+<p><strong>Regels:</strong> alleen gecontroleerde weken tellen; percentages altijd met teller en noemer; vergelijking met teams zonder proef; niet gemeten is onbekend, niet groen; gebruik of trainingsdeelname bewijst geen effect.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met het huidige pilotverslag op herkenning van ongecontroleerde weken, gemiste stopcriteria en de kwaliteit van het advies.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-releaseatelier.html">Releaseatelier</a><a href="fab-test-coverage-map.html">Testsporen en bewijs</a><a href="../gegevens_en_ketens/fab-rapportage-lineage.html">Rapportage Lineage</a><a href="../incident_en_continuiteit/fab-continuiteitskaart.html">Continuïteit en noodwerkwijze</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een aanwijzing voor effect is geen bewezen effect.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const INITIAL_WEEKS=[
+{w:1,pt:15,pn:54,ps:'gecontroleerd',ct:11,cn:50,cs:'gecontroleerd',time:24,mel:6},
+{w:2,pt:11,pn:52,ps:'gecontroleerd',ct:10,cn:49,cs:'gecontroleerd',time:22,mel:4},
+{w:3,pt:8,pn:55,ps:'gecontroleerd',ct:10,cn:51,cs:'gecontroleerd',time:21,mel:2},
+{w:4,pt:6,pn:53,ps:'gecontroleerd',ct:9,cn:48,cs:'gecontroleerd',time:20,mel:1},
+{w:5,pt:5,pn:51,ps:'gecontroleerd',ct:10,cn:50,cs:'gecontroleerd',time:20,mel:1},
+{w:6,pt:4,pn:38,ps:'aangeleverd',ct:9,cn:47,cs:'aangeleverd',time:19,mel:0},
+{w:7,pt:5,pn:52,ps:'aangeleverd',ct:10,cn:50,cs:'aangeleverd',time:19,mel:1},
+{w:8,pt:null,pn:null,ps:'geen',ct:null,cn:null,cs:'geen',time:null,mel:null}];
+const BRAKES=[
+{id:'S1',text:'Privacy-incident door het formulier',consequence:'stoppen'},
+{id:'S2',text:'Overdracht niet beschikbaar bij storing, zonder werkende terugval',consequence:'stoppen'},
+{id:'S3',text:'Overdrachtstijd stijgt meer dan 10 minuten ten opzichte van de nulmeting',consequence:'aanpassen'},
+{id:'S4',text:'Meer dan 6 servicedeskmeldingen over het formulier in één week',consequence:'aanpassen'}];
+let weeks,week,brakeState;
+function initialize(){
+ weeks=INITIAL_WEEKS.map(w=>({...w}));
+ week=7;
+ brakeState={S1:{state:'ok'},S2:{state:'unmeasured'},S3:{},S4:{}};
+}
+function fmt(v){return v.toFixed(1).replace('.',',');}
+function counted(){
+ return weeks.filter(w=>w.w>=3&&w.w<=week&&w.ps==='gecontroleerd'&&w.pn>=40&&w.cs==='gecontroleerd');
+}
+function weekStatus(w){
+ if(w.ps==='geen')return'Nog niet gemeten';
+ if(w.ps==='corrected')return'Gecorrigeerd, opnieuw controleren';
+ if(w.ps==='aangeleverd')return'Aangeleverd, niet gecontroleerd';
+ if(w.w<=2)return'Gecontroleerd, inwerkperiode, telt niet mee';
+ if(w.pn<40)return`Gecontroleerd, telt niet mee: noemer ${w.pn}, minder dan 40`;
+ if(w.w>week)return`Gecontroleerd, telt niet mee: boven het gekozen peilmoment week ${week}`;
+ return'Gecontroleerd, telt mee';
+}
+function groupStatus(s){
+ if(s==='geen')return'Nog niet gemeten';
+ if(s==='corrected')return'Gecorrigeerd, opnieuw controleren';
+ if(s==='aangeleverd')return'Aangeleverd, niet gecontroleerd';
+ return'Gecontroleerd';
+}
+function outcome(){
+ const c=counted();
+ if(c.length<4)return{kind:'unknown',text:`Nog niet te beoordelen: ${c.length} van minimaal 4 meetweken meegeteld.`};
+ const pt=c.reduce((a,w)=>a+w.pt,0),pn=c.reduce((a,w)=>a+w.pn,0);
+ const ct=c.reduce((a,w)=>a+w.ct,0),cn=c.reduce((a,w)=>a+w.cn,0);
+ const p=100*pt/pn,q=100*ct/cn,d=q-p;
+ if(p<=12&&d>=5)return{kind:'yes',text:`Aanwijzing voor effect: pilot ${fmt(p)} % (${pt} van ${pn}), vergelijking ${fmt(q)} % (${ct} van ${cn}), verschil ${fmt(d)} procentpunt.`};
+ return{kind:'no',text:`Geen aanwijzing voor effect: pilot ${fmt(p)} % (${pt} van ${pn}), vergelijking ${fmt(q)} % (${ct} van ${cn}).`};
+}
+function brakeStates(){
+ const c=counted();
+ const out={};
+ out.S1=brakeState.S1.state==='hit'?{cls:'hit',text:'Geraakt'}:{cls:'',text:'Niet geraakt (geen incident gemeld via de meldingsregistratie t/m week 7)'};
+ if(brakeState.S2.state==='unmeasured')out.S2={cls:'unmeasured',text:'Niet gemeten'};
+ else if(brakeState.S2.state==='hit')out.S2={cls:'hit',text:'Geraakt'};
+ else out.S2={cls:'',text:'Niet geraakt (terugvaltest geslaagd 2026-10-03, simulatie)'};
+ if(!c.length)out.S3={cls:'unmeasured',text:'Niet gemeten'};
+ else{
+  const mean=c.reduce((a,w)=>a+w.time,0)/c.length,diff=mean-18;
+  out.S3=diff>10?{cls:'hit',text:'Geraakt'}:{cls:'',text:`Niet geraakt (gemiddeld ${fmt(mean)} min, +${fmt(diff)} t.o.v. nulmeting 18 min)`};
+ }
+ const vis=weeks.filter(w=>w.w<=week&&w.mel!==null);
+ const max=vis.length?Math.max(...vis.map(w=>w.mel)):0;
+ out.S4=max>6?{cls:'hit',text:'Geraakt'}:{cls:'',text:`Niet geraakt (hoogste week: ${max} meldingen)`};
+ return out;
+}
+function advice(){
+ const bs=brakeStates(),o=outcome();
+ const hitStop=BRAKES.some(b=>b.consequence==='stoppen'&&bs[b.id].cls==='hit');
+ const hitAdjust=BRAKES.some(b=>b.consequence==='aanpassen'&&bs[b.id].cls==='hit');
+ const unmeasured=BRAKES.filter(b=>bs[b.id].cls==='unmeasured').map(b=>b.text);
+ let a;
+ if(hitStop)a='Stoppen en voorleggen aan de pilot-eigenaar.';
+ else if(hitAdjust)a='Aanpassen en voorleggen aan de pilot-eigenaar.';
+ else if(o.kind==='unknown')a='Nog niet te beoordelen.';
+ else if(o.kind==='no')a='Geen aanwijzing voor effect: bespreek aanpassen of stoppen.';
+ else if(unmeasured.length)a=`Aanwijzing voor effect; doorgaan pas na meting van: ${unmeasured.join('; ')}.`;
+ else a='Aanwijzing voor effect; voorleggen voor een besluit over doorgaan.';
+ return a+' Advies, geen besluit. De pilot-eigenaar besluit; een aanwijzing is geen bewezen effect.';
+}
+const X0=70,XN=120,X1=700,Y0=20,Y1=320;
+function xWeek(w){return XN+(w-0.5)*((X1-XN)/8);}
+function yPct(v){return Y1-v*10;}
+function drawChart(){
+ const p=[];
+ p.push(`<rect x="0" y="0" width="720" height="360" fill="var(--paper)"/>`);
+ p.push('<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse"><line x1="0" y1="3.5" x2="7" y2="3.5" stroke="var(--grid-major)" stroke-width="1"/></pattern></defs>');
+ for(let y=Y0;y<=Y1;y+=10)p.push(`<line x1="${X0}" y1="${y}" x2="${X1}" y2="${y}" stroke="${(y-Y0)%50===0?'var(--grid-major)':'var(--grid)'}" stroke-width="1"/>`);
+ for(let x=X0;x<=X1;x+=10)p.push(`<line x1="${x}" y1="${Y0}" x2="${x}" y2="${Y1}" stroke="${(x-X0)%50===0?'var(--grid-major)':'var(--grid)'}" stroke-width="1"/>`);
+ for(let w=1;w<=2;w++){
+  const cx=xWeek(w),hw=(X1-XN)/8;
+  p.push(`<rect x="${cx-hw/2}" y="${Y0}" width="${hw}" height="${Y1-Y0}" fill="url(#hatch)" opacity=".45"/>`);
+ }
+ p.push(`<rect x="${X0}" y="${yPct(21.7)-12}" width="${XN-X0-14}" height="24" fill="url(#hatch)"/>`);
+ p.push(`<line x1="${X0}" y1="${yPct(12)}" x2="${X1}" y2="${yPct(12)}" stroke="var(--graphite)" stroke-width="2" stroke-dasharray="7 5"/>`);
+ for(const v of[0,10,20,30])p.push(`<text x="${X0-8}" y="${yPct(v)+4}" text-anchor="end" font-size="13" fill="var(--graphite)">${v} %</text>`);
+ p.push(`<text x="${(X0+XN-14)/2}" y="${Y1+20}" text-anchor="middle" font-size="13" fill="var(--graphite)">N</text>`);
+ for(let w=1;w<=8;w++)p.push(`<text x="${xWeek(w)}" y="${Y1+20}" text-anchor="middle" font-size="13" fill="var(--graphite)">${w}</text>`);
+ const ppts=[],cpts=[];
+ for(const w of weeks){
+  if(w.w>week||w.pt===null)continue;
+  const x=xWeek(w.w),yp=yPct(100*w.pt/w.pn),yc=yPct(100*w.ct/w.cn);
+  ppts.push([x,yp,w]);cpts.push([x,yc,w]);
+ }
+ if(ppts.length)p.push(`<polyline points="${ppts.map(q=>`${q[0]},${q[1]}`).join(' ')}" fill="none" stroke="var(--ballpoint)" stroke-width="1.5"/>`);
+ if(cpts.length)p.push(`<polyline points="${cpts.map(q=>`${q[0]},${q[1]}`).join(' ')}" fill="none" stroke="var(--graphite)" stroke-width="1.5" stroke-dasharray="3 4"/>`);
+ for(const[x,y,w]of cpts){
+  if(w.cs==='gecontroleerd')p.push(`<rect x="${x-4.5}" y="${y-4.5}" width="9" height="9" fill="var(--graphite)"/>`);
+  else p.push(`<rect x="${x-4.5}" y="${y-4.5}" width="9" height="9" fill="var(--paper)" stroke="var(--graphite)" stroke-width="1.5"/>`);
+ }
+ for(const[x,y,w]of ppts){
+  if(w.ps==='gecontroleerd'&&w.pn<40){
+   p.push(`<circle cx="${x}" cy="${y}" r="6" fill="var(--paper)" stroke="var(--ballpoint)" stroke-width="2"/><line x1="${x-5}" y1="${y+5}" x2="${x+5}" y2="${y-5}" stroke="var(--ballpoint)" stroke-width="2"/>`);
+  }else if(w.ps==='gecontroleerd'){
+   p.push(`<line x1="${x-5}" y1="${y-5}" x2="${x+5}" y2="${y+5}" stroke="var(--ballpoint)" stroke-width="2.5"/><line x1="${x-5}" y1="${y+5}" x2="${x+5}" y2="${y-5}" stroke="var(--ballpoint)" stroke-width="2.5"/>`);
+  }else{
+   p.push(`<circle cx="${x}" cy="${y}" r="6" fill="var(--paper)" stroke="var(--ballpoint)" stroke-width="2"/>`);
+  }
+ }
+ document.querySelector('#chart').innerHTML=p.join('');
+ document.querySelector('#legend').innerHTML=[
+  '<span><svg class="sw" viewBox="0 0 16 16"><line x1="3" y1="3" x2="13" y2="13" stroke="var(--ballpoint)" stroke-width="2.5"/><line x1="3" y1="13" x2="13" y2="3" stroke="var(--ballpoint)" stroke-width="2.5"/></svg> Pilotteams, gecontroleerd en meegeteld</span>',
+  '<span><svg class="sw" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" fill="var(--paper)" stroke="var(--ballpoint)" stroke-width="2"/></svg> Aangeleverd, niet gecontroleerd</span>',
+  '<span><svg class="sw" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" fill="var(--paper)" stroke="var(--ballpoint)" stroke-width="2"/><line x1="4" y1="12" x2="12" y2="4" stroke="var(--ballpoint)" stroke-width="2"/></svg> Gecontroleerd, noemer onder 40</span>',
+  '<span><svg class="sw" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" fill="var(--graphite)"/></svg> Vergelijkingsteams (open = niet gecontroleerd)</span>',
+  '<span><svg class="sw" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" fill="url(#hatch)"/></svg> Inwerkperiode, telt niet mee</span>',
+  '<span><svg class="sw" viewBox="0 0 16 16"><line x1="0" y1="8" x2="16" y2="8" stroke="var(--graphite)" stroke-width="2" stroke-dasharray="4 3"/></svg> Succesgrens 12,0 %</span>'
+ ].join('');
+}
+function draw(){
+ drawChart();
+ document.querySelector('#weeks').innerHTML=weeks.map(w=>{
+  const hasData=w.pt!==null,seen=w.w<=week;
+  const acts=[];
+  if(hasData&&seen){
+   if(w.ps==='aangeleverd'||w.ps==='corrected')acts.push(`<button data-action="control" data-week="${w.w}">Simuleer controle door kwaliteitsmedewerker</button>`);
+   if(w.ps==='gecontroleerd')acts.push(`<button data-action="correct" data-week="${w.w}">Simuleer correctie van de cijfers</button>`);
+  }
+  return`<li class="week" data-week="${w.w}">
+  <strong class="wname">Week ${w.w}${w.w<=2?' (inwerkperiode)':''}</strong>
+  <p class="gline">Pilotteams: <strong>${hasData?`${w.pt} van ${w.pn}`:'—'}</strong> — <span class="wstate">${weekStatus(w)}</span>${w.w===6&&hasData?' <span class="meta">(noemer laag door vakantiesluiting van een afdeling, demo)</span>':''}</p>
+  <p class="gline">Vergelijkingsteams: <strong>${hasData?`${w.ct} van ${w.cn}`:'—'}</strong> — <span class="wstate">${groupStatus(w.cs)}</span></p>
+  <p class="meta">Overdrachtstijd pilot gemiddeld: ${w.time!==null?w.time+' min':'—'} (nulmeting 18 min); servicedeskmeldingen formulier: ${w.mel!==null?w.mel:'—'}${!seen?'; boven het gekozen peilmoment':''}</p>
+  ${acts.length?`<div class="wacts">${acts.join('')}</div>`:''}
+  </li>`;
+ }).join('');
+ const bs=brakeStates();
+ document.querySelector('#brakes').innerHTML=BRAKES.map(b=>{
+  const st=bs[b.id];
+  let acts='';
+  if(b.id==='S2')acts=`<div class="bacts"><button data-action="fallback-pass" ${brakeState.S2.state==='unmeasured'?'':'disabled'}>Simuleer terugvaltest: geslaagd</button><button data-action="fallback-fail" ${brakeState.S2.state==='unmeasured'?'':'disabled'}>Simuleer terugvaltest: mislukt</button></div>`;
+  if(b.id==='S1')acts=`<div class="bacts"><button data-action="incident" ${brakeState.S1.state==='hit'?'disabled':''}>Simuleer privacy-incident in week 7</button></div>`;
+  return`<li data-brake="${b.id}"><strong>${b.id}</strong> ${b.text}<br><span class="meta">Bij geraakt: ${b.consequence}.</span><br><span class="state ${st.cls}">${st.text}</span>${acts}</li>`;
+ }).join('');
+ const o=outcome();
+ document.querySelector('#advice').innerHTML=`<p><strong>${o.text}</strong></p><p>${advice()}</p>`;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const bs=brakeStates(),o=outcome();
+ const lines=weeks.map(w=>`Week ${w.w}: pilot ${w.pt!==null?`${w.pt} van ${w.pn}`:'—'} (${weekStatus(w)}); vergelijking ${w.ct!==null?`${w.ct} van ${w.cn}`:'—'} (${groupStatus(w.cs)}); overdrachtstijd ${w.time!==null?w.time+' min':'—'}; meldingen ${w.mel!==null?w.mel:'—'}.`);
+ const c=counted();
+ return[
+  'Pilot Cockpit / PILOT-DEMO-04 / demo v1 / revisie 2026-10-03',
+  'Exportmoment: '+new Date().toISOString(),
+  'Uitsluitend simulatie; geen echte controle, correctie, terugvaltest of pilotbeslissing.',
+  'Hypothese: als de nachtdienst de overdracht invult in het gestructureerde formulier, ontbreekt bij de ochtendoverdracht minder vaak een verplicht onderdeel.',
+  'Meetdefinitie: teller = ochtendoverdrachten met minstens één ontbrekend verplicht onderdeel (medicatie, valrisico, bijzonderheden); noemer = alle ochtendoverdrachten van de teams in die kalenderweek; populatie = cliënten van teams Esdoorn en Hazelaar; uitsluiting = overdrachten tijdens ECD-uitval volgens noodwerkwijze; bron = steekproefcontrole door de kwaliteitsmedewerker (demo).',
+  'Nulmeting 2026-07-13 t/m 2026-08-09: pilotteams 46 van 212 (21,7 %); vergelijkingsteams 41 van 198 (20,7 %). Succesgrens: hoogstens 12,0 % én minstens 5,0 procentpunt lager dan de vergelijking over minstens 4 meegetelde weken.',
+  `Peilmoment: week ${week}. Meegetelde weken: ${c.map(w=>w.w).join(', ')||'geen'}.`,
+  ...lines,
+  'Primaire uitkomst: '+o.text,
+  ...BRAKES.map(b=>`Stopcriterium ${b.id} (${b.text}; gevolg ${b.consequence}): ${bs[b.id].text}`),
+  'Advies: '+advice(),
+  'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'
+ ].join('\n\n');
+}
+document.querySelector('#week').addEventListener('input',e=>{
+ week=+e.target.value;
+ document.querySelector('#week-label').textContent=`week ${week}`;
+ draw();
+});
+document.querySelector('#work').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b)return;
+ const msg=document.querySelector('#message');
+ if(b.dataset.action==='control'){
+  const w=weeks.find(x=>x.w===+b.dataset.week);
+  w.ps='gecontroleerd';w.cs='gecontroleerd';
+  msg.textContent=`Week ${w.w}: gecontroleerd door kwaliteitsmedewerker (demo), ${PEIL}.`;
+ }
+ if(b.dataset.action==='correct'){
+  const w=weeks.find(x=>x.w===+b.dataset.week);
+  w.pt+=2;w.ps='corrected';w.cs='corrected';
+  msg.textContent=`Week ${w.w}: pilotteller gecorrigeerd naar ${w.pt}; beide groepen opnieuw controleren (simulatie).`;
+ }
+ if(b.dataset.action==='fallback-pass'&&brakeState.S2.state==='unmeasured'){
+  brakeState.S2.state='pass';
+  msg.textContent='Terugvaltest geslaagd (simulatie): stopcriterium S2 niet geraakt.';
+ }
+ if(b.dataset.action==='fallback-fail'&&brakeState.S2.state==='unmeasured'){
+  brakeState.S2.state='hit';
+  msg.textContent='Terugvaltest mislukt (simulatie): stopcriterium S2 geraakt.';
+ }
+ if(b.dataset.action==='incident'&&brakeState.S1.state!=='hit'){
+  brakeState.S1.state='hit';
+  msg.textContent='Privacy-incident in week 7 gesimuleerd: stopcriterium S1 geraakt.';
+ }
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();
+ document.querySelector('#week').value='7';
+ document.querySelector('#week-label').textContent='week 7';
+ draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; alle controles, correcties en simulaties zijn gewist.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Pilotoverzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

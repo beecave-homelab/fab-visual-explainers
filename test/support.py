@@ -39,6 +39,9 @@ TASK_FILES = (
     "fab-omgevingsvergelijker.html",
     "fab-known-error-map.html",
     "fab-life-cycle-map.html",
+    "fab-escalatiekaart.html",
+    "fab-risk-control-map.html",
+    "fab-pilot-cockpit.html",
 )
 
 

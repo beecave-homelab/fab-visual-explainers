@@ -123,6 +123,12 @@ def test_task_views__print_and_nojs(
         elif filename == "fab-life-cycle-map.html":
             expect(page.locator(".register article")).to_have_count(5)
             expect(page.locator(".register")).to_contain_text("Einddatum onbekend")
+        elif filename == "fab-escalatiekaart.html":
+            expect(page.locator(".register article")).to_have_count(5)
+        elif filename == "fab-risk-control-map.html":
+            expect(page.locator(".register article")).to_have_count(3)
+        elif filename == "fab-pilot-cockpit.html":
+            expect(page.locator(".register tr[data-static-week]")).to_have_count(8)
         page.emulate_media(media="print")
         expect(page.locator("#copy")).to_be_hidden()
         expect(page.locator("[data-action]:visible")).to_have_count(0)
