@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische omgevingsvergelijking: welke onderdelen van een test gelden ook in de productiedoelstand.">
+    <title>FAB Omgevingsvergelijker — geldt deze test ook in productie?</title>
+    <style>
+:root{--lightbox:#A9AFB3;--sheet:#F4F6F7;--cyan:#0093C4;--magenta:#C8197A;--ink:#231F20;--muted:#4E5559;--display:"Futura","Futura PT","Century Gothic",sans-serif;--body:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--sheet);color:var(--ink);font:17px/1.6 var(--body)}button,select,textarea{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--magenta);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,p,dl,dd{margin:0}h1{font-family:var(--display);font-size:clamp(36px,5vw,68px);font-weight:500;line-height:1.05;letter-spacing:-.02em;max-width:16ch}h2{font-family:var(--display);font-size:26px;font-weight:500;letter-spacing:-.01em}h3{font-family:var(--display);font-size:19px;font-weight:500}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--magenta);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--lightbox);padding-bottom:14px;font-size:15px}.demo strong{color:var(--magenta)}
+.mast{display:grid;grid-template-columns:1fr minmax(260px,.65fr);gap:50px;align-items:end;padding:25px 0 34px}.intro{margin-top:18px;max-width:52ch}.context{border-left:5px solid var(--magenta);padding-left:24px;font-size:16px}.context p+p{margin-top:10px}
+.tools{display:flex;gap:16px 22px;align-items:center;flex-wrap:wrap;margin:24px 0}select{max-width:100%;min-height:44px;background:white;border:1px solid var(--lightbox);padding:8px 12px}.tools>label{display:flex;align-items:center;gap:10px}.plain{background:white;border:1px solid var(--lightbox);border-radius:4px;padding:9px 16px}.tracks{display:flex;gap:8px;flex-wrap:wrap}.track-btn{background:white;border:1px solid var(--lightbox);border-radius:4px;padding:9px 14px;font-family:var(--display);letter-spacing:.02em}.track-btn[aria-pressed="true"]{background:var(--ink);color:white;border-color:var(--ink)}.tools .plain{margin-left:auto}
+.interactive{display:none}body.ready .interactive{display:flex}
+.work-grid{display:grid;grid-template-columns:2fr 1fr;gap:26px;align-items:start}
+.lightbox{position:relative;background:var(--lightbox);padding:30px 26px 26px;border:2px solid var(--ink)}.regmark{position:absolute;width:26px;height:26px;color:var(--ink);opacity:.8}.regmark.tl{top:6px;left:6px}.regmark.tr{top:6px;right:6px}.regmark.bl{bottom:6px;left:6px}.regmark.br{bottom:6px;right:6px}
+.envlabel{font-size:13px;color:var(--ink);display:flex;gap:6px 26px;flex-wrap:wrap;margin-bottom:12px}.envlabel b{font-weight:700}
+.row{display:grid;grid-template-columns:minmax(150px,.8fr) 1.5fr .9fr;gap:10px 20px;align-items:start;padding:16px 4px;border-bottom:1px solid rgba(35,31,32,.45)}.row:last-child{border-bottom:0}.row h3{font-size:19px}.untouched{font-size:14px;color:var(--muted)}
+.plates{position:relative;height:30px}.plate{position:absolute;left:0;top:2px;width:min(78%,520px);height:24px;border:1.5px solid var(--cyan)}.plate-env{background:rgba(0,147,196,.5)}.plate-prod{background:rgba(200,25,122,.5);border-color:var(--magenta);mix-blend-mode:multiply;transition:transform .25s ease}
+.row.k-diff .plate-prod,.row.k-stale .plate-prod,.row.k-unknown .plate-prod{transform:translateX(20px)}
+.row.k-unknown .plate-prod,.row.k-stale .plate-prod{background:transparent;border-style:dashed;mix-blend-mode:normal}
+.values{font-size:14px;margin-top:8px}.values p+p{margin-top:2px}.state{font-weight:700;font-size:16px}.state small{display:block;font-weight:400;font-size:14px;color:var(--muted)}.row-note{font-size:14px;color:var(--muted);max-width:60ch;margin-top:6px}
+.row.off{padding:8px 4px;grid-template-columns:1.2fr 1fr 1fr;align-items:center}.row.off h3{font-size:15px;opacity:.6}.row.off .state{font-size:14px;font-weight:400;opacity:.75}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.row-actions button{background:transparent;border:1px solid var(--muted);border-radius:4px;padding:6px 10px;font-size:13px;min-height:36px}
+.panel{position:sticky;top:20px;background:white;border:2px solid var(--ink);padding:20px 22px}.panel h2{margin-bottom:10px}.panel ul{margin:8px 0;padding-left:22px}.panel li{margin-bottom:8px;max-width:60ch}.tally{margin-top:14px;padding-top:12px;border-top:1px solid var(--lightbox);font-size:15px;color:var(--muted)}
+.live{min-height:24px;color:var(--magenta);font-size:15px;margin-top:16px}
+.export{margin-top:14px;background:white;padding:22px;border:1px solid var(--lightbox)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.tablewrap{overflow-x:auto}.register table{border-collapse:collapse;width:100%;font-size:15px}.register caption{text-align:left;font-weight:700;margin-bottom:8px}.register th,.register td{border:1px solid var(--lightbox);padding:8px 10px;text-align:left;vertical-align:top}.register th{background:white}.tracknotes p{max-width:72ch}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(max-width:850px){.mast{grid-template-columns:1fr;gap:25px}.work-grid{grid-template-columns:1fr}.panel{position:static;order:-1}.context{padding-left:16px}.page{padding:20px}.tools .plain{margin-left:0}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:40px}.lightbox{padding:22px 12px}.row{grid-template-columns:1fr}.row.off{grid-template-columns:1fr;gap:2px}.plate{position:static;width:100%}.plates{height:auto;display:grid;gap:8px}.row.k-diff .plate-prod,.row.k-stale .plate-prod,.row.k-unknown .plate-prod{transform:none}.plate-prod{border-color:var(--magenta)}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.context{font-size:10pt}.tools,.row-actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.lightbox{background:white;padding:0;border:0}.regmark{display:none}.row{display:block;border-bottom:1px solid #777;break-inside:avoid}.row.off h3,.row.off .state{opacity:1}.untouched{display:none}.plates{height:auto;display:grid;gap:6px}.plate{position:static;width:100%;min-height:0;transform:none!important;mix-blend-mode:normal}.plate-env{border-style:solid}.plate-prod{border-color:#000}.work-grid{display:block}.panel{position:static;border:1px solid #777;margin-top:14px;break-inside:avoid}.reference{break-before:page}details>:not(summary){display:block!important}.register tr{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de omgevingsvergelijking</a>
+<main class="page">
+<div class="demo"><span>FAB / Omgevingsvergelijker</span><strong>Synthetische demonstratie, geen configuratieregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Geldt dit testresultaat ook in productie?</h1>
+<p class="intro">Kies waar een test is uitgevoerd en welk testspoor je wilt meenemen. De vergelijking toont welke onderdelen van die test in productie anders zijn, of nog niet zijn vergeleken. Een geslaagde test in acceptatie bewijst niets over een onderdeel dat in productie verschilt.</p>
+</div>
+<div class="context">
+<p><strong>Zorgoverdracht naar een woonzorglocatie</strong></p>
+<p>CHG-DEMO-LOC-02 / zelfstandige demo v1</p>
+<p>Productie vergeleken met de doelstand na livegang. Momentopnamen van 2026-09-30, peildatum 2026-10-03.</p>
+<p>Demo-afspraak: een momentopname ouder dan 14 dagen telt als verouderd.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<div class="tools interactive">
+<label for="source">
+Getest in
+<select id="source">
+<option value="acc" selected>Acceptatie</option>
+<option value="tst">Test</option>
+</select>
+</label>
+<div class="tracks" role="group" aria-label="Testspoor">
+<button class="track-btn" data-track="T-01" aria-pressed="true">T-01</button>
+<button class="track-btn" data-track="T-02" aria-pressed="false">T-02</button>
+<button class="track-btn" data-track="T-03" aria-pressed="false">T-03</button>
+<button class="track-btn" data-track="T-04" aria-pressed="false">T-04</button>
+<button class="track-btn" data-track="T-05" aria-pressed="false">T-05</button>
+</div>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer vergelijking</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="work-grid">
+<div class="lightbox" aria-labelledby="work-title">
+<svg class="regmark tl" viewBox="0 0 26 26" aria-hidden="true">
+<circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-width="1.6" />
+<path d="M13 1v24M1 13h24" stroke="currentColor" stroke-width="1.6" />
+</svg>
+<svg class="regmark tr" viewBox="0 0 26 26" aria-hidden="true">
+<circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-width="1.6" />
+<path d="M13 1v24M1 13h24" stroke="currentColor" stroke-width="1.6" />
+</svg>
+<svg class="regmark bl" viewBox="0 0 26 26" aria-hidden="true">
+<circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-width="1.6" />
+<path d="M13 1v24M1 13h24" stroke="currentColor" stroke-width="1.6" />
+</svg>
+<svg class="regmark br" viewBox="0 0 26 26" aria-hidden="true">
+<circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-width="1.6" />
+<path d="M13 1v24M1 13h24" stroke="currentColor" stroke-width="1.6" />
+</svg>
+<h2 id="work-title">Productie naast de testomgeving</h2>
+<p class="envlabel"><b>Bovenplaat:</b> testomgeving &nbsp; <b> verschoven plaat:</b> productie-doelstand</p>
+<div id="rows"></div>
+</div>
+<aside class="panel" aria-labelledby="verdict-title">
+<h2 id="verdict-title">Oordeel voor dit testspoor</h2>
+<div id="verdict" aria-live="polite"></div>
+<p class="tally" id="tally"></p>
+</aside>
+</div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Vergelijking om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief open vergelijkingen. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">De volledige vergelijking, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde status bovenaan kan ervan afwijken en geldt nooit als werkelijke vergelijking. De beginstand toont de momentopnamen van 2026-09-30 op peildatum 2026-10-03.</p>
+<div class="register">
+<div class="tablewrap">
+<table>
+<caption>Configuratie-onderdelen per omgeving (synthetische momentopnamen)</caption>
+<thead>
+<tr>
+<th>Onderdeel</th>
+<th>Productie nu</th>
+<th>Doelstand</th>
+<th>Acceptatie</th>
+<th>Test</th>
+<th>Raakt testsporen</th>
+</tr>
+</thead>
+<tbody>
+<tr data-static-aspect="app">
+<td>ECD-versie</td>
+<td>2026.3.2</td>
+<td>2026.3.2</td>
+<td>2026.3.2 (2026-09-30, vergeleken)</td>
+<td>2026.4.0 (2026-09-12, vergeleken)</td>
+<td>T-01, T-02</td>
+</tr>
+<tr data-static-aspect="connector">
+<td>Overdrachtsconnector</td>
+<td>0.2</td>
+<td>0.3</td>
+<td>0.3 (2026-09-30, vergeleken)</td>
+<td>0.3 (2026-09-29, vergeleken)</td>
+<td>T-01, T-03, T-04</td>
+</tr>
+<tr data-static-aspect="mapping">
+<td>Locatie- en rolmapping</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.2 (2026-09-30, opgave, niet vergeleken)</td>
+<td>0.2 met handmatige aanpassing (2026-09-29, vergeleken)</td>
+<td>T-01</td>
+</tr>
+<tr data-static-aspect="rolmodel">
+<td>Rolmodel en locatiescope</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.2 (2026-09-30, vergeleken)</td>
+<td>0.2 (2026-09-29, vergeleken)</td>
+<td>T-02</td>
+</tr>
+<tr data-static-aspect="testroles">
+<td>Testrollen</td>
+<td>Rollen per locatie, ook buiten scope</td>
+<td>Rollen per locatie, ook buiten scope</td>
+<td>Rollen per locatie, ook buiten scope (2026-09-30, vergeleken)</td>
+<td>Eén brede beheerrol (2026-09-29, vergeleken)</td>
+<td>T-02</td>
+</tr>
+<tr data-static-aspect="validation">
+<td>Validatie locatiecode</td>
+<td>0.1</td>
+<td>0.2</td>
+<td>0.2 (2026-09-30, vergeleken)</td>
+<td>0.2 (2026-09-29, vergeleken)</td>
+<td>T-03</td>
+</tr>
+<tr data-static-aspect="dedupe">
+<td>Herverwerkingsvenster</td>
+<td>24 uur</td>
+<td>24 uur</td>
+<td>24 uur (2026-09-30, opgave, niet vergeleken)</td>
+<td>5 minuten, verkort voor testen (2026-09-29, vergeleken)</td>
+<td>T-04</td>
+</tr>
+<tr data-static-aspect="endpoint">
+<td>Ontvangend koppelpunt</td>
+<td>Extern portaal woonzorglocatie</td>
+<td>Extern portaal woonzorglocatie</td>
+<td>Leveranciersstub 1.4 (2026-09-30, vergeleken)</td>
+<td>Leveranciersstub 1.4 (2026-09-29, vergeleken)</td>
+<td>T-01, T-04</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tracknotes">
+<p><strong>T-01 Volledige overdracht</strong> raakt ECD-versie, connector, locatie- en rolmapping en het ontvangend koppelpunt. Beginoordeel Acceptatie: aanvullende test nodig, het koppelpunt verschilt. Beginoordeel Test: aanvullende test nodig, de ECD-versie is verouderd.</p>
+<p><strong>T-02 Geen inzage buiten locatiescope</strong> raakt ECD-versie, rolmodel en testrollen. Beginoordeel Acceptatie: geen bekend verschil. Beginoordeel Test: aanvullende test nodig; de testrol is breder dan de productierollen.</p>
+<p><strong>T-03 Ongeldige locatie afwijzen</strong> raakt connector en validatie locatiecode. Beginoordeel Acceptatie: geen bekend verschil. Beginoordeel Test: geen bekend verschil.</p>
+<p><strong>T-04 Herhaling niet dubbel verwerken</strong> raakt connector, herverwerkingsvenster en koppelpunt. Beginoordeel Acceptatie: aanvullende test nodig. Beginoordeel Test: aanvullende test nodig; het verkorte venster maakt een dubbele aanbieding na 5 minuten niet zichtbaar.</p>
+<p><strong>T-05 Terugval en aansluiting na herstel</strong> raakt geen vergelijkbare onderdelen: oefenomgeving, noodplan en contactroute ontbreken in deze vergelijking. Niet beoordeelbaar; vraag eerst het lokale noodplan op.</p>
+<p><strong>Let op het koppelpunt:</strong> het externe portaal heeft geen eigen test- of acceptatieomgeving (demo-aanname). Vraag de leverancier om bewijs van de eigen portaaltest en spreek in het wijzigingsplan een nacontrole na livegang af. Test niet met echte cliëntgegevens buiten het afgesproken proces. Productie gebruikt echte rollen: vergelijk de rolopbouw, nooit echte accounts.</p>
+</div>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bereidt acceptatie voor en legt verschillen en aanvullende tests vast voor de test-/acceptatieverantwoordelijke; technisch beheer en de leverancier leveren de configuratiegegevens.</p>
+<p><strong>Bron:</strong> synthetische momentopnamen van 2026-09-30, peildatum 2026-10-03; de echte bronhouder en configuratieregistratie zijn niet vastgesteld. Herzie bij iedere versie-, configuratie- of koppelwijziging en vóór ieder acceptatiemoment.</p>
+<p><strong>Regels:</strong> een verschil vraagt een aanvullende test; ongecontroleerd of verouderd telt als onbekend, niet als gelijk. "Geen bekend verschil" is geen productiebewijs.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige omgevingslijst en het testplan op gemiste verschillen en onderhoudslast. Technische werking bewijst geen lokale inhoudelijke juistheid of gebruikerswaarde.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="fab-test-coverage-map.html">Testsporen en bewijs</a><a href="fab-releaseatelier.html#test-coverage">Broncasus in Releaseatelier</a><a href="../landschap_en_processen/fab-life-cycle-map.html">Versies en ondersteuningstermijnen</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een bronreferentie is op zichzelf geen beoordeeld bewijs.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03',PROD_SNAP='2026-09-30',PROD_SRC='Configuratie-export productie, technisch beheer (demo)',TARGET_SRC='Wijzigingsplan CHG-DEMO-LOC-02 v1 (demo)';
+const INITIAL=[
+{id:'app',name:'ECD-versie',prodNow:'2026.3.2',prodTarget:'2026.3.2',env:{acc:{v:'2026.3.2',snap:'2026-09-30',verified:true},tst:{v:'2026.4.0',snap:'2026-09-12',verified:true}}},
+{id:'connector',name:'Overdrachtsconnector',prodNow:'0.2',prodTarget:'0.3',env:{acc:{v:'0.3',snap:'2026-09-30',verified:true},tst:{v:'0.3',snap:'2026-09-29',verified:true}}},
+{id:'mapping',name:'Locatie- en rolmapping',prodNow:'0.1',prodTarget:'0.2',env:{acc:{v:'0.2',snap:'2026-09-30',verified:false},tst:{v:'0.2 met handmatige aanpassing',snap:'2026-09-29',verified:true}}},
+{id:'rolmodel',name:'Rolmodel en locatiescope',prodNow:'0.1',prodTarget:'0.2',env:{acc:{v:'0.2',snap:'2026-09-30',verified:true},tst:{v:'0.2',snap:'2026-09-29',verified:true}}},
+{id:'testroles',name:'Testrollen',prodNow:'Rollen per locatie, ook buiten scope',prodTarget:'Rollen per locatie, ook buiten scope',env:{acc:{v:'Rollen per locatie, ook buiten scope',snap:'2026-09-30',verified:true},tst:{v:'Eén brede beheerrol',snap:'2026-09-29',verified:true}},note:'Productie gebruikt echte rollen. Vergelijk de rolopbouw, nooit echte accounts.'},
+{id:'validation',name:'Validatie locatiecode',prodNow:'0.1',prodTarget:'0.2',env:{acc:{v:'0.2',snap:'2026-09-30',verified:true},tst:{v:'0.2',snap:'2026-09-29',verified:true}}},
+{id:'dedupe',name:'Herverwerkingsvenster',prodNow:'24 uur',prodTarget:'24 uur',env:{acc:{v:'24 uur',snap:'2026-09-30',verified:false},tst:{v:'5 minuten (verkort voor testen)',snap:'2026-09-29',verified:true}},note:'Verkort venster maakt een dubbele aanbieding na 5 minuten niet zichtbaar.'},
+{id:'endpoint',name:'Ontvangend koppelpunt',prodNow:'Extern portaal woonzorglocatie',prodTarget:'Extern portaal woonzorglocatie',env:{acc:{v:'Leveranciersstub 1.4',snap:'2026-09-30',verified:true},tst:{v:'Leveranciersstub 1.4',snap:'2026-09-29',verified:true}},note:'Het externe portaal heeft geen eigen test- of acceptatieomgeving (demo-aanname). Vraag de leverancier om bewijs van de eigen portaaltest en spreek in het wijzigingsplan een nacontrole na livegang af. Test niet met echte cliëntgegevens buiten het afgesproken proces.'}
+];
+const TRACKS={'T-01':{name:'Volledige overdracht',aspects:['app','connector','mapping','endpoint']},'T-02':{name:'Geen inzage buiten locatiescope',aspects:['app','rolmodel','testroles']},'T-03':{name:'Ongeldige locatie afwijzen',aspects:['connector','validation']},'T-04':{name:'Herhaling niet dubbel verwerken',aspects:['connector','dedupe','endpoint']},'T-05':{name:'Terugval en aansluiting na herstel',aspects:[]}};
+const ENVNAME={acc:'Acceptatie',tst:'Test'};
+let aspects,env='acc',track='T-01';
+function day(d){return Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));}
+function initialize(){aspects=INITIAL.map(a=>({id:a.id,name:a.name,prodNow:a.prodNow,prodTarget:a.prodTarget,prodSnap:PROD_SNAP,note:a.note,changed:false,env:{acc:{...a.env.acc},tst:{...a.env.tst}}}));}
+function statusOf(a,e){
+ if(a.changed)return{label:'Herbeoordeling nodig',kind:'unknown',note:'Gewijzigde productieconfiguratie; nog niet opnieuw vergeleken.'};
+ const s=a.env[e];
+ if((day(PEIL)-day(s.snap))/864e5>14||(day(PEIL)-day(a.prodSnap))/864e5>14)return{label:'Verouderd',kind:'unknown',note:'Momentopname ouder dan 14 dagen.'};
+ if(!s.verified)return{label:'Onbekend',kind:'unknown',note:'Opgave, niet vergeleken'};
+ if(s.v===a.prodTarget&&a.prodNow!==a.prodTarget)return{label:'Gelijk aan doelstand',kind:'ok',note:'Verschil met huidige productie is de wijziging zelf.'};
+ if(s.v===a.prodTarget)return{label:'Gelijk',kind:'ok'};
+ return{label:'Verschil',kind:'diff'};
+}
+function verdictParts(){
+ const t=TRACKS[track];
+ if(!t.aspects.length)return{head:'Niet beoordeelbaar',body:'Oefenomgeving, noodplan en contactroute ontbreken in deze vergelijking. Vraag eerst het lokale noodplan op.',rows:[],tally:'0 onderdelen geraakt.'};
+ const rows=t.aspects.map(id=>{const a=aspects.find(x=>x.id===id);return{a,s:statusOf(a,env)};});
+ const diffs=rows.filter(r=>r.s.kind==='diff'),unks=rows.filter(r=>r.s.kind==='unknown'),oks=rows.filter(r=>r.s.kind==='ok');
+ let head,body='';
+ if(diffs.length){head='Aanvullende test nodig';body='<ul>'+diffs.map(r=>`<li><strong>${r.a.name}:</strong> ${ENVNAME[env]} heeft "${r.a.env[env].v}", de productiedoelstand is "${r.a.prodTarget}". Plan een aanvullende test of een afgesproken nacontrole op dit onderdeel.</li>`).join('')+'</ul>';}
+ else if(unks.length)head='Nog niet vast te stellen';
+ else{head='Geen bekend verschil';body='<p>Voor de onderdelen die dit testspoor raakt is geen verschil bekend. Daarmee is werking in productie nog niet bewezen: plan de nacontrole na livegang in het wijzigingsdossier.</p>';}
+ if(unks.length)body+='<p><strong>Eerst vaststellen:</strong></p><ul>'+unks.map(r=>`<li><strong>${r.a.name}:</strong> ${r.s.label} — ${r.s.note||'niet vergeleken'}.</li>`).join('')+'</ul>';
+ return{head,body,rows,tally:`${rows.length} onderdelen geraakt: ${oks.length} gelijk, ${diffs.length} verschil, ${unks.length} onbekend.`};
+}
+function draw(){
+ document.querySelectorAll('.track-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===track)));
+ const touched=TRACKS[track].aspects;
+ document.querySelector('#rows').innerHTML=aspects.map(a=>{
+  const on=touched.includes(a.id),e=a.env[env],s=statusOf(a,env);
+  const kind=s.kind==='ok'?'k-ok':s.kind==='diff'?'k-diff':s.label==='Verouderd'?'k-stale':'k-unknown';
+  const compared=e.verified&&!a.changed&&s.label!=='Verouderd';
+  if(!on)return `<article class="row ${kind} off" data-aspect="${a.id}"><h3>${a.name}</h3><span class="state">${s.label}</span><span class="untouched">Niet geraakt door ${track}</span></article>`;
+  const values=s.kind==='ok'?`<p>Beide: ${e.v}</p>`:!e.verified?`<p>Productie, doelstand: ${a.prodTarget}</p><p>${ENVNAME[env]}: niet vergeleken</p>`:s.label==='Verouderd'?`<p>${ENVNAME[env]}: ${e.v} (momentopname ${e.snap}, verouderd)</p><p>Productie, doelstand: ${a.prodTarget}</p>`:`<p>${ENVNAME[env]}: ${e.v}</p><p>Productie, doelstand: ${a.prodTarget}</p>`;
+  return `<article class="row ${kind}" data-aspect="${a.id}"><h3>${a.name}</h3><div><div class="plates"><div class="plate plate-env"></div><div class="plate plate-prod"></div></div><div class="values">${values}</div>${a.note?`<p class="row-note">${a.note}</p>`:''}<div class="row-actions"><button data-action="compare" data-id="${a.id}" ${compared&&!a.changed?'disabled':''}>Simuleer vergelijking door technisch beheer</button><button data-action="change" data-id="${a.id}" ${a.changed?'disabled':''}>Simuleer gewijzigde productieconfiguratie</button></div></div><span class="state">${s.label}${s.note?`<small>${s.note}</small>`:''}</span></article>`;
+ }).join('');
+ const v=verdictParts();
+ document.querySelector('#verdict').innerHTML=`<h3>${v.head}</h3>${v.body}`;
+ document.querySelector('#tally').textContent=v.tally+(TRACKS[track].aspects.length?'':' Dit spoor heeft geen vergelijkbare onderdelen.');
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const v=verdictParts();
+ const lines=aspects.map(a=>{const parts=Object.keys(ENVNAME).map(e=>{const s=statusOf(a,e);return `${ENVNAME[e]}: ${a.env[e].v} (snapshot ${a.env[e].snap}, ${a.env[e].verified?'vergeleken':'niet vergeleken'}) → ${s.label}${s.note?' — '+s.note:''}`;});return `${a.name}\nProductie nu: ${a.prodNow} (snapshot ${a.prodSnap}, ${PROD_SRC})\nDoelstand: ${a.prodTarget} (${TARGET_SRC})\n${parts.join('\n')}`;});
+ return ['Omgevingsvergelijker / CHG-DEMO-LOC-02 / demo v1 / revisie 2026-10-03','Exportmoment: '+new Date().toISOString(),'Uitsluitend simulatie; geen echte configuratievergelijking of acceptatie.','Getest in: '+ENVNAME[env]+'. Testspoor: '+track+' '+TRACKS[track].name+'.', 'Oordeel: '+v.head+'. '+v.tally,...lines,'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'].join('\n\n');
+}
+document.querySelector('#rows').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=aspects.find(x=>x.id===b.dataset.id);
+ if(b.dataset.action==='compare'){const s=a.env[env];s.verified=true;s.snap=PEIL;a.prodSnap=PEIL;s.by='Technisch beheer (demo), 2026-10-03';a.changed=false;document.querySelector('#message').textContent=`${a.name}: vergelijking gesimuleerd door Technisch beheer (demo), 2026-10-03.`;}
+ if(b.dataset.action==='change'){a.prodTarget+=' (gewijzigd 2026-10-03)';a.changed=true;Object.keys(a.env).forEach(k=>a.env[k].verified=false);document.querySelector('#message').textContent=`${a.name}: productieconfiguratie gewijzigd; herbeoordeling nodig voor beide omgevingen.`;}
+ draw();});
+document.querySelectorAll('.track-btn').forEach(b=>b.addEventListener('click',()=>{track=b.dataset.track;draw();}));
+document.querySelector('#source').addEventListener('change',e=>{env=e.target.value;draw();});
+document.querySelector('#reset').addEventListener('click',()=>{initialize();env='acc';track='T-01';document.querySelector('#source').value='acc';draw();document.querySelector('#message').textContent='Beginstand hersteld; vergelijking opnieuw uit de momentopnamen.';});
+document.querySelector('#copy').addEventListener('click',async()=>{const text=summary();document.querySelector('#export').hidden=false;document.querySelector('#export-text').value=text;try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Vergelijking gekopieerd. De tekst blijft hieronder beschikbaar.';}catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

@@ -246,6 +246,23 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .evidence code { font-size: 10px; }
   footer { margin-top: 12px; font-size: 10px; }
 }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  table.matrix { table-layout: fixed; }
+  .app-head strong, .rol-head strong { overflow-wrap: anywhere; }
+  .lvl-btn { flex-wrap: wrap; text-align: left; gap: 6px; }
+  .lvl-btn .actual-hint { flex: 1 0 100%; overflow-wrap: anywhere; }
+  .lvl-btn .exc-badge { position: static; margin-left: auto; max-width: 100%; }
+}
+@media screen and (max-width: 900px) {
+  .lvl-btn .cell-app { flex-basis: 100%; min-width: 0; }
+}
     </style>
   </head>
   <body>
@@ -902,7 +919,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
     b.className = b.className.replace(/lvl-\d/, `lvl-${a.model}`);
     b.querySelector('.lvl-txt').textContent = LVL[a.model];
     b.querySelectorAll('.lvl-bars i').forEach((bar, n) => bar.classList.toggle('on', n < a.model));
-    const hint = document.createElement('small');
+    const hint = document.createElement('small'); hint.className = 'actual-hint';
     hint.textContent = a.actual === null ? 'Feitelijk: onbekend' : `Feitelijk (demo): ${LVL[a.actual]}`;
     hint.style.display = 'block'; b.appendChild(hint);
     b.setAttribute('aria-label', `${b.dataset.cell}: model ${LVL[a.model]}; ${hint.textContent}; scope apart controleren`);

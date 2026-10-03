@@ -35,6 +35,32 @@ button{font:inherit;color:inherit}
 .review-context th,.review-context td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
 .review-context p { margin:14px 0; }
 @media print { body { background:white;color:black;padding:0; } .page { display:block; } .sidebar { position:static;min-height:0; } .phase-rail,.workspace { display:none; } .review-context details > :not(summary) { display:block!important; } .review-context table { font-size:10pt; } }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen {
+  .page, .sidebar { min-height: 0; }
+  .sidebar { position: static; }
+  .board, .folder { min-height: 0; }
+  .workspace { align-items: start; padding-top: 22px; }
+  .board { grid-template-rows: auto auto auto; }
+  .folder { display: flex; flex-direction: column; }
+  .folder::before { top: 0; translate: 0 -100%; }
+  .board-head { flex-wrap: wrap; }
+  .phase-rail { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .phase { overflow-wrap: anywhere; }
+}
+@media screen and (max-width: 1200px) and (min-width: 1101px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+}
+@media screen and (max-width: 760px) {
+  .phase-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace { padding-top: 0; }
+}
 </style>
 </head>
 <body>

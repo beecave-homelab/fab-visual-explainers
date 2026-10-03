@@ -2,7 +2,7 @@
 
 ## Opzet
 
-Deze map bevat 23 zelfstandige HTML-prototypes voor 22 concepten: 17 FAB-concepten en 5 bron-/kennispatronen. De twee incidentvarianten tonen dezelfde inhoud met andere vormgeving. CSS, JavaScript en synthetische voorbeelddata staan in ieder HTML-bestand; er is geen backend, buildstap of gekoppelde dossierregistratie.
+Deze map bevat 26 zelfstandige HTML-prototypes voor 25 concepten: 20 FAB-concepten en 5 bron-/kennispatronen. De twee incidentvarianten tonen dezelfde inhoud met andere vormgeving. CSS, JavaScript en synthetische voorbeelddata staan in ieder HTML-bestand; er is geen backend, buildstap of gekoppelde dossierregistratie.
 
 De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de inventaris, selectie en actuele status. De blijvende werkafspraken uit de ideeënnotitie en de VVT-review zijn op 1 oktober 2026 hier samengebracht; AGENTS.md is daarvoor de centrale instructiebron. Het afzonderlijke reviewrapport is na verwerking verwijderd en blijft terug te vinden in de Git-historie. De functiebeschrijving is het aangeleverde toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 
@@ -52,6 +52,19 @@ De HTML staat onder `visuals/`, in `incident_en_continuiteit/`, `wijziging_en_ac
 - Bewaar de zelfstandige HTML-opzet en de bestaande vormgeving; voeg geen afhankelijkheden of extra visuals toe zonder concrete taak.
 - Houd bij toevoeging of verwijdering aantallen bestanden, concepten en kandidaten, beheerkaartjes, lokale links en leesbare alternatieven actueel. Elk concept heeft één checkbox; de twee incidentvarianten tellen als één concept. Vink alleen af zodra het HTML-bestand aanwezig is en beschrijf aanwezige interacties los van aanbevelingen. Test kritieke informatie ook zonder JavaScript en in afdrukmodus.
 - Markeer fictieve onderzoeksclaims en ongemeten scores als demonstraties. Claim geen lokale goedkeuring, productierijpheid of gebruikerswaarde zonder bewijs.
+
+## Templates gebruiken voor een bron
+
+Er zijn twee werkstromen. **Bibliotheekonderhoud** wijzigt de prototypes onder `visuals/` en volgt alle ontwikkel-, inventaris- en verificatieafspraken hierboven. **Templategebruik** maakt een afzonderlijke brongebonden kopie; de originele HTML, conceptinventaris en voorbeeldcasussen blijven daarbij ongewijzigd. Een opdracht om een document, rapport of toestand te visualiseren autoriseert die kopie, geen herontwerp van de bibliotheek.
+
+- Gebruik de projectskill [fab-html-template-reuse](.agents/skills/fab-html-template-reuse/SKILL.md). De [hergebruikgids](docs/template-reuse.md) is de centrale bron voor patroonkeuze, bewerkgrenzen, alle bestandskaarten en het uitgewerkte voorbeeld.
+- Bepaal hoofdvraag, doelgroep, gebruiksmoment en bron vóór selectie. Bij bronpresentatie kan de bronhouder onbekend blijven als dit zichtbaar is; dat autoriseert geen operationele werkwijze of formeel besluit. Verzin geen bron, eigenaar, bewijs, akkoord of score om het patroon te vullen.
+- Ontwerp en tests blijven synthetisch. Een brongebonden presentatie mag openbare of door de gebruiker geschoonde informatie bevatten. Vertrouwelijk materiaal vraagt een geschikte openbare of geschoonde bron; maak het niet stilzwijgend deelbaar. Deze uitzondering geldt voor presentatiekopieën, niet voor operationele vrijgave.
+- Sla zonder opgegeven bestemming op onder `outputs/<document-slug>/index.html`. Deze map wordt door Git genegeerd en telt niet mee als prototype. Controleer bestaande uitvoer; kies bij een andere bestaande opdracht een unieke slug. Werk dezelfde uitvoer alleen bij als de opdracht daarop betrekking heeft. Een expliciete bestemming buiten deze map gaat voor; respecteer toepasselijke werkafspraken en schrijfbevoegdheden daar.
+- Vervang brongebonden inhoud in HTML én JavaScript: titel, samenvatting, passages, verwijzingen, versie/peildatum, eigenaar, geldigheid, statussen, detailpanelen en exports. Werk aantallen, sleutels, routes, relaties en leesbare alternatieven samen bij. Houd bronfeiten, interpretatie, voorstel en onbekend uit elkaar; vermeld bronvindplaatsen en de beperkte scope van de visual.
+- Bewaar vormgeving, zelfstandige werking, toetsenbordbediening, veilige tekstweergave en diagnose-/bewijs-/besluitvoorwaarden. Pas alleen in de kopie de noodzakelijke indeling aan aan hoeveelheid of structuur van de bron. Wijzig inhoudelijke reken- of beslisregels uitsluitend met expliciete brondefinities; ontbrekende grondslag betekent onbekend of geen berekening.
+- Een gekopieerde visual mag niet afhankelijk zijn van de checkout: herstel lokale links inclusief fragmenten, verwijder irrelevante demoverwijzingen en bied kritieke inhoud statisch en afdrukbaar aan. Geen nieuwe runtime-afhankelijkheden. Publiceren, delen en formele acties vallen buiten templategebruik.
+- Controleer de gegenereerde kopie zelf volgens de hergebruikgids. De bestaande pytest-suite ontdekt alleen `visuals/` en bewijst geen kwaliteit van `outputs/`. Lever bestand, gekozen patroon, bronstatus, werkelijk uitgevoerde controles en resterende grenzen op.
 
 ## Verificatie
 

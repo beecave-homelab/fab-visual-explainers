@@ -216,6 +216,16 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 }
 .review-context th,.review-context td { padding:10px; text-align:left; vertical-align:top; border-bottom:1px solid currentColor; }
 .review-context p { margin:14px 0; }
+
+@media screen {
+  .review-context { width: min(1440px, calc(100% - 32px)); }
+  .review-context p { max-width: none; }
+}
+
+/* Layout volgt de beschikbare paneelbreedte. */
+@media screen and (max-width: 480px) {
+  .node strong { overflow-wrap: anywhere; }
+}
     </style>
   </head>
   <body>
