@@ -1,9 +1,16 @@
-"""Bewijsfasen, herstelvoorwaarden en overlap in drie zelfstandige taakviews."""
+"""Bewijsfasen, omgevingverschillen, bekende fouten en levenscyclustermijnen in de taakviews."""
 
 from playwright.sync_api import Page
 from support import visual_path
 
-FILES = ["fab-test-coverage-map.html", "fab-continuiteitskaart.html", "fab-data-quality-map.html"]
+FILES = [
+    "fab-test-coverage-map.html",
+    "fab-continuiteitskaart.html",
+    "fab-data-quality-map.html",
+    "fab-omgevingsvergelijker.html",
+    "fab-known-error-map.html",
+    "fab-life-cycle-map.html",
+]
 
 
 def ensure(value: bool, message: str) -> None:
@@ -245,3 +252,264 @@ def test_quality__overlap_and_controlled_repair(page: Page) -> None:
     page.locator('[data-select="DQ-03"]').focus()
     page.keyboard.press("Enter")
     ensure(page.locator("#detail-DQ-03").is_visible(), "Quality: keyboard opens rule")
+
+
+def test_environments__staleness_and_reassessment(page: Page) -> None:
+    """Verschil, veroudering en gewijzigde productie sturen oordeel en export."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[3])
+
+    def state(aspect: str) -> str:
+        """Lees de statuscel van een aspectrij."""
+        return page.locator(f'[data-aspect="{aspect}"] .state').inner_text()
+
+    ensure(state("app") == "Gelijk", "Environments: equal aspect is Gelijk")
+    ensure(
+        "Gelijk aan doelstand" in state("connector"),
+        "Environments: change itself is not a difference",
+    )
+    ensure(
+        "Onbekend" in state("mapping") and "Opgave, niet vergeleken" in state("mapping"),
+        "Environments: unverified entry is unknown, not equal",
+    )
+    ensure("Verschil" in state("endpoint"), "Environments: supplier stub differs from portal")
+    ensure(
+        "Aanvullende test nodig" in page.locator("#verdict").inner_text(),
+        "Environments: a difference requires an extra test",
+    )
+    page.locator('[data-track="T-02"]').focus()
+    page.keyboard.press("Enter")
+    ensure(
+        "Geen bekend verschil" in page.locator("#verdict").inner_text(),
+        "Environments: T-02 on acceptatie has no known difference",
+    )
+    page.locator("#source").select_option("tst")
+    ensure("Verouderd" in state("app"), "Environments: snapshot older than 14 days is stale")
+    ensure("Verschil" in state("testroles"), "Environments: broad test role differs")
+    ensure(
+        "Aanvullende test nodig" in page.locator("#verdict").inner_text(),
+        "Environments: difference and staleness keep extra test verdict",
+    )
+    page.locator("#source").select_option("acc")
+    page.locator('[data-track="T-01"]').click()
+    page.locator('[data-aspect="mapping"] [data-action="compare"]').click()
+    ensure(
+        "Gelijk aan doelstand" in state("mapping"),
+        "Environments: simulated comparison verifies entry",
+    )
+    ensure(
+        "Aanvullende test nodig" in page.locator("#verdict").inner_text(),
+        "Environments: remaining endpoint difference keeps verdict",
+    )
+    page.locator('[data-track="T-02"]').click()
+    page.locator('[data-aspect="rolmodel"] [data-action="change"]').click()
+    ensure(
+        "Herbeoordeling nodig" in state("rolmodel"),
+        "Environments: changed production invalidates comparison",
+    )
+    ensure(
+        "Nog niet vast te stellen" in page.locator("#verdict").inner_text(),
+        "Environments: reassessment counts as unknown",
+    )
+    page.locator("#copy").click()
+    ensure(
+        "Kopiëren niet beschikbaar" in page.locator("#message").inner_text(),
+        "Environments: denied clipboard shows fallback",
+    )
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        "Herbeoordeling nodig" in exported and "Nog niet vast te stellen" in exported,
+        "Environments: export follows the simulated screen state",
+    )
+    page.emulate_media(media="print")
+    ensure(
+        page.locator("[data-action]:visible").count() == 0,
+        "Environments: print hides simulation buttons",
+    )
+    ensure(
+        page.locator(".register tr[data-static-aspect]:visible").count() == 8,
+        "Environments: print shows the full register",
+    )
+
+
+def test_known_errors__signs_conditions_and_approval(page: Page) -> None:
+    """Kenmerken zijn aanwijzingen; goedkeuring, versie en voorwaarden begrenzen gebruik."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[4])
+    ensure(
+        page.locator(".tear").all_inner_texts() == ["Geen aanwijzing"] * 4,
+        "Known errors: no sign means no indication",
+    )
+    ensure(
+        "Geen goedgekeurde werkwijze toepasbaar" in page.locator("#verdict").inner_text(),
+        "Known errors: empty triage verdict",
+    )
+    page.locator('[data-select="KE-DEMO-03"]').focus()
+    page.keyboard.press("Enter")
+    ensure(
+        page.locator("#detail-KE-DEMO-03").is_visible(),
+        "Known errors: keyboard opens hang tag",
+    )
+    page.locator('[data-select="KE-DEMO-07"]').click()
+    for sign in ("s1", "s2", "s3"):
+        page.locator(f'[data-sign="{sign}"]').check()
+    tag7 = page.locator('[data-select="KE-DEMO-07"]')
+    ensure(
+        "Past bij 3 van 3 kenmerken" in tag7.inner_text(),
+        "Known errors: matched signs counted on tear strip",
+    )
+    outcome = page.locator("#detail-KE-DEMO-07 .outcome")
+    ensure(
+        "Niet als goedgekeurd gebruiken" in outcome.inner_text(),
+        "Known errors: expired review blocks approved use",
+    )
+    ensure(
+        page.locator("#detail-KE-DEMO-07 [data-condition]").first.is_disabled(),
+        "Known errors: conditions stay disabled while review expired",
+    )
+    page.locator('[data-action="reconfirm"][data-ke="KE-DEMO-07"]').click()
+    ensure(
+        "Controleer de toepassingsvoorwaarden" in outcome.inner_text(),
+        "Known errors: reconfirmed item still needs its conditions",
+    )
+    for box in page.locator("#detail-KE-DEMO-07 [data-condition]").all():
+        box.check()
+    ensure(
+        "Toepasbaar binnen deze oefening" in outcome.inner_text(),
+        "Known errors: all confirmed conditions allow use",
+    )
+    page.locator("#copy").click()
+    ensure(
+        "Toepasbaar binnen deze oefening" in page.locator("#export-text").input_value(),
+        "Known errors: export matches simulated approval",
+    )
+    page.locator('[data-sign="s7"]').check()
+    ensure(
+        "Kenmerk past niet" in outcome.inner_text()
+        and "continuïteitsroute" in outcome.inner_text(),
+        "Known errors: excluded sign blocks use and points to continuity route",
+    )
+    ensure(
+        page.locator("#detail-KE-DEMO-07 [data-condition]:checked").count() == 0,
+        "Known errors: changed signs reset confirmations",
+    )
+    page.locator('[data-sign="s7"]').uncheck()
+    page.locator("#version").select_option("2026.4")
+    ensure(
+        "Geldigheid voor ECD 2026.4 niet vastgesteld" in outcome.inner_text(),
+        "Known errors: unassessed version is not usable",
+    )
+    page.locator('[data-sign="s5"]').check()
+    ensure(
+        "Alleen escalatieroute" in page.locator("#detail-KE-DEMO-11 .outcome").inner_text()
+        and "Verwijder of herverwerk niets zelf" in page.locator("#detail-KE-DEMO-11").inner_text(),
+        "Known errors: concept item offers escalation only",
+    )
+    page.locator('[data-sign="s6"]').check()
+    page.locator('[data-select="KE-DEMO-14"]').click()
+    page.locator('[data-action="revise"][data-ke="KE-DEMO-14"]').click()
+    ensure(
+        "Concept" in page.locator("#detail-KE-DEMO-14").inner_text()
+        and "eerdere goedkeuring ongeldig" in page.locator("#detail-KE-DEMO-14").inner_text(),
+        "Known errors: changed workaround invalidates earlier approval",
+    )
+    page.locator("#reset").click()
+    ensure(
+        page.locator(".tear").all_inner_texts() == ["Geen aanwijzing"] * 4,
+        "Known errors: reset restores the starting board",
+    )
+    page.emulate_media(media="print")
+    ensure(
+        page.locator("[data-action]:visible").count() == 0,
+        "Known errors: print hides simulation buttons",
+    )
+    ensure(
+        page.locator(".register article:visible").count() == 4,
+        "Known errors: print shows every known error",
+    )
+
+
+def test_lifecycle__dates_thresholds_and_dependencies(page: Page) -> None:
+    """Uiterlijke start, afhankelijkheid en onbevestigde bronnen sturen de status."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[5])
+    states = page.locator(".stateline").all_inner_texts()
+    ensure(
+        "Start uiterlijk verstreken" in states[0],
+        "Lifecycle: tablet dependency pulls ECD start past the peildatum",
+    )
+    ensure(
+        states[1] == "Start binnen 8 weken (op basis van onbevestigde opgave)",
+        "Lifecycle: unconfirmed source stays visible",
+    )
+    ensure(states[2] == "Einddatum onbekend", "Lifecycle: unknown end gives no calculation")
+    ensure(states[3] == "Bewaken", "Lifecycle: distant start stays on watch")
+    ensure(states[4] == "Start binnen 8 weken", "Lifecycle: tablet OS within threshold")
+    ensure(
+        "1 verstreken, 2 binnen 8 weken, 1 bewaken, 0 buiten ondersteuning, 1 einddatum onbekend"
+        in page.locator("#summary").inner_text(),
+        "Lifecycle: summary counts each status",
+    )
+    page.locator('[data-select="tabletos"]').focus()
+    page.keyboard.press("Enter")
+    ensure(
+        page.locator("#detail-tabletos").is_visible(),
+        "Lifecycle: keyboard opens column detail",
+    )
+    page.locator("#date").focus()
+    for _ in range(4):
+        page.keyboard.press("ArrowRight")
+    ensure(
+        page.locator("#date-label").inner_text() == "2027-02-01",
+        "Lifecycle: arrow keys move the peildatum",
+    )
+    states = page.locator(".stateline").all_inner_texts()
+    ensure(
+        states[1].startswith("Buiten ondersteuning")
+        and states[4].startswith("Buiten ondersteuning"),
+        "Lifecycle: past the end means unsupported",
+    )
+    page.locator("#reset").click()
+    page.locator('[data-action="roadmap"]').click()
+    ensure(
+        "Bewaken (op basis van onbevestigde opgave)"
+        in page.locator(".stateline").all_inner_texts()[1],
+        "Lifecycle: later roadmap pushes start beyond threshold",
+    )
+    ensure(
+        "Herbeoordeling nodig" in page.locator("#detail-rooster").inner_text(),
+        "Lifecycle: changed roadmap requires reassessment",
+    )
+    page.locator('[data-action="confirm"]').click()
+    ensure(
+        page.locator(".stateline").all_inner_texts()[1] == "Bewaken",
+        "Lifecycle: confirmation removes the unconfirmed marker",
+    )
+    page.locator('[data-select="connector"]').click()
+    page.locator('[data-action="enddate"]').click()
+    ensure(
+        page.locator(".stateline").all_inner_texts()[2] == "Bewaken",
+        "Lifecycle: fixed end date enables a calculated start",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        "Vastgesteld in wijzigingsplan (simulatie)" in exported
+        and "Bevestigd (simulatie)" in exported,
+        "Lifecycle: export follows the simulated source state",
+    )
+    page.emulate_media(media="print")
+    ensure(
+        page.locator("[data-action]:visible").count() == 0,
+        "Lifecycle: print hides simulation buttons",
+    )
+    ensure(
+        page.locator(".register article:visible").count() == 5,
+        "Lifecycle: print shows every register entry",
+    )

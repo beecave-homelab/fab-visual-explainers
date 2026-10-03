@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische bekende-foutenkaart: herken kenmerken van een melding en beoordeel of een goedgekeurde tijdelijke werkwijze past.">
+    <title>FAB Bekende fouten — welke tijdelijke werkwijze mag hier?</title>
+    <style>
+:root{--wall:#D8DCD6;--board:#45534F;--hole:#36423F;--tag:#EBD59C;--tag-edge:#C9AF6B;--ink:#2B2219;--void:#B3261E;--display:"Rockwell","Roboto Slab","Sitka Heading",Cambria,serif;--body:"Optima","Candara","Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--wall);color:var(--ink);font:17px/1.55 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--void);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(34px,4.6vw,60px);font-weight:700;line-height:1.08;max-width:18ch}h2{font-family:var(--display);font-size:25px;font-weight:700}h3{font-family:var(--display);font-size:19px;font-weight:700}button:disabled,input:disabled{cursor:default}button:disabled{opacity:.5}:focus-visible{outline:3px solid var(--void);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #9aa39c;padding-bottom:14px;font-size:15px}.demo strong{color:var(--void)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 34px}.intro{margin-top:18px;max-width:54ch}.report{background:#FBF7EC;border:1px solid var(--tag-edge);padding:18px 20px;font-size:15px;transform:rotate(.6deg)}.report p+p{margin-top:8px}.report blockquote{margin:0;font-style:italic}
+.tools{display:flex;gap:12px 20px;align-items:flex-start;flex-wrap:wrap;margin:24px 0}.tools>label{display:flex;align-items:center;gap:10px}select{max-width:100%;min-height:44px;background:white;border:1px solid #9aa39c;padding:8px 12px}.signs{display:flex;gap:8px;flex-wrap:wrap;max-width:760px}.signs legend{font-weight:600;width:100%;margin-bottom:2px}.chip{display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid #9aa39c;border-radius:20px;padding:8px 14px;min-height:44px;cursor:pointer}.chip input{width:20px;height:20px;accent-color:var(--board)}.plain{background:white;border:1px solid #9aa39c;border-radius:4px;padding:9px 16px}.tools .plain{margin-left:auto}
+.interactive{display:none}body.ready .interactive{display:flex}
+.board{background:var(--board) radial-gradient(var(--hole) 2.5px, transparent 2.8px);background-size:26px 26px;padding:34px 26px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px;border:3px solid var(--hole)}
+.tag{position:relative;background:var(--tag);border:1px solid var(--tag-edge);clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%,0 14px);padding:30px 16px 0;display:flex;flex-direction:column;text-align:left;font-family:var(--body);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.tag::before{content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--board);box-shadow:inset 0 0 0 3px var(--tag-edge)}
+.tag::after{content:"";position:absolute;top:-16px;left:50%;width:2px;height:16px;background:var(--tag-edge)}
+.tag .ke{font-family:var(--display);font-weight:700;font-size:14px}.tag .tagtitle{font-family:var(--display);font-size:18px;font-weight:700;line-height:1.25;margin:4px 0 6px}.tag .app{font-size:14px}.tag .stateline{font-size:14px;margin-top:8px;font-weight:600}
+.tag .tear{margin:14px -16px 0;border-top:2px dashed var(--tag-edge);padding:10px 16px 12px;font-size:14px;min-height:44px}
+.tag.concept{background:white;border-style:dashed}.tag.excluded .tear{text-decoration:line-through}
+.voidband{position:absolute;top:22px;left:-6%;width:112%;transform:rotate(-4deg);background:var(--void);color:white;text-align:center;font-weight:700;padding:4px;font-size:12px}.tag.hasvoid{padding-top:78px}
+.detail{background:#FBF7EC;border:1px solid var(--tag-edge);padding:20px 22px;margin-top:20px}.detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:26px;margin-top:12px}.detail dl{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:15px}.detail dt{font-weight:700}.detail ul{margin:6px 0;padding-left:22px}
+.conditions{border:1px solid var(--tag-edge);padding:12px 16px;margin-top:14px;display:grid;gap:4px}.conditions legend{font-weight:700;padding:0 6px}.conditions label{display:flex;gap:10px;align-items:flex-start;min-height:44px;padding:6px 0}.conditions input{width:20px;height:20px;margin-top:2px;accent-color:var(--board);flex:none}
+.detail-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.detail-actions button{background:transparent;border:1px solid var(--ink);border-radius:4px;padding:8px 14px;font-size:15px;min-height:44px}
+.outcome{margin-top:14px;padding:12px 16px;border-left:5px solid var(--board);background:white;font-size:16px}.outcome.bad{border-color:var(--void)}
+.verdict{background:white;border:2px solid var(--board);padding:18px 22px;margin-top:22px}.verdict ul{margin:8px 0;padding-left:22px}.verdict li{margin-bottom:6px}
+.live{min-height:24px;color:var(--void);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:#FBF7EC;padding:22px;border:1px solid var(--tag-edge)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid #9aa39c}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(max-width:900px){.board{grid-template-columns:1fr 1fr}.mast{grid-template-columns:1fr;gap:25px}.detail-grid{grid-template-columns:1fr}.page{padding:20px}.tools .plain{margin-left:0}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:38px}.board{grid-template-columns:1fr;padding:22px 14px 30px}.detail dl{grid-template-columns:1fr}.detail dd{margin-bottom:8px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.report{font-size:10pt}.tools,.detail-actions,.skip,nav,.live,.interactive,body.ready .interactive.interactive{display:none!important}.board{display:block;background:white;border:0;padding:0}.tag{clip-path:none;border:1px solid #777;margin-bottom:10px;box-shadow:none;break-inside:avoid}.tag::before,.tag::after{display:none}.voidband{position:static;transform:none;display:block;width:auto;margin:8px 0}.detail{border:1px solid #777;break-inside:avoid}.detail[hidden]{display:block!important}.conditions input{width:auto;height:auto}.verdict{border:1px solid #777;break-inside:avoid}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de bekende fouten</a>
+<main class="page">
+<div class="demo"><span>FAB / Bekende fouten</span><strong>Synthetische demonstratie, geen kennisbank</strong></div>
+<header class="mast">
+<div>
+<h1>Past deze melding bij een bekende fout?</h1>
+<p class="intro">Vink aan wat je in de melding herkent. Een passend kenmerk is een aanwijzing, geen diagnose. Een tijdelijke werkwijze mag je alleen gebruiken als die goedgekeurd en actueel is en de toepassingsvoorwaarden kloppen.</p>
+</div>
+<div class="report">
+<p><strong>INC-DEMO-0412, ontvangen 2026-10-03 07:10</strong></p>
+<blockquote>
+<p>“Bij de ochtendoverdracht is de aftekenlijst op de gedeelde tablet leeg. Gisteravond werkte hij nog.”</p>
+</blockquote>
+<p>Locatie: woonzorg De Linde (fictief). Gebruiksmoment: uitvoering bij triage, of opleiding.</p>
+</div>
+</header>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title" style="margin-bottom:6px">Bekende fouten aan het bord</h2>
+<p style="margin-bottom:18px;max-width:60ch">Elk label is een kennisitem in oefenvorm. Open een label voor de werkwijze, voorwaarden en escalatie.</p>
+<div class="tools interactive">
+<fieldset class="signs">
+<legend>Kenmerken in de melding</legend>
+<label class="chip">
+<input type="checkbox" data-sign="s1">Gedeelde tablet of werkplek
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s2">Na dienstwissel of opnieuw openen
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s3">Lijst of overzicht is leeg
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s4">Weergave toont de verkeerde datum
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s5">Bericht of registratie dubbel zichtbaar
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s6">Rapportage na nachtelijke verversing
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s7">Meerdere cliënten of teams tegelijk geraakt
+</label>
+<label class="chip">
+<input type="checkbox" data-sign="s8">Registratie lijkt verdwenen of gewijzigd
+</label>
+</fieldset>
+<label for="version">
+Versie bij melder
+<select id="version">
+<option value="2026.3" selected>ECD 2026.3</option>
+<option value="2026.4">ECD 2026.4</option>
+<option value="unknown">Onbekend</option>
+</select>
+</label>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer triage-notitie</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="board" id="board"></div>
+<div id="details"></div>
+<div class="verdict" aria-labelledby="verdict-title">
+<h2 id="verdict-title">Triage-oordeel</h2>
+<div id="verdict" aria-live="polite"></div>
+</div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Triage-notitie om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief bevestigde voorwaarden. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle bekende fouten, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde status bovenaan kan ervan afwijken en geldt nooit als werkelijke goedkeuring. Peildatum 2026-10-03.</p>
+<div class="register">
+<article id="ke-static-03">
+<h3>KE-DEMO-03 — Rooster toont gisteren na middernacht (Roosterportaal 4.2)</h3>
+<p><strong>Kenmerken:</strong> na dienstwissel of opnieuw openen; weergave toont de verkeerde datum. <strong>Past niet bij:</strong> meerdere cliënten of teams tegelijk geraakt; registratie lijkt verdwenen of gewijzigd.</p>
+<p><strong>Tijdelijke werkwijze:</strong> ververs de dagweergave en controleer de datum bovenaan voordat je de dienst leest. <strong>Voorwaarden:</strong> alleen de weergave is fout, er is niets geregistreerd of gewijzigd; na verversen staat de juiste datum bovenaan. <strong>Zorgimpact:</strong> hinder.</p>
+<p><strong>Status:</strong> goedgekeurd, kennisitem v2 door Proceseigenaar planning (demo), 2026-07-01; herbeoordeling 2026-12-01. <strong>Structureel:</strong> leveranciersmelding LEV-DEMO-221; herstel gepland in 4.3 — gepland is nog niet opgelost. <strong>Eigenaar:</strong> kennisitemeigenaar planning (voorgestelde rol). <strong>Escalatie:</strong> blijft de datum fout na verversen? Behandel als nieuwe verstoring en zet door naar FAB planning.</p>
+</article>
+<article id="ke-static-07">
+<h3>KE-DEMO-07 — Aftekenlijst leeg na dienstwissel op gedeelde tablet (ECD 2026.3)</h3>
+<p><strong>Kenmerken:</strong> gedeelde tablet of werkplek; na dienstwissel of opnieuw openen; lijst of overzicht is leeg. <strong>Past niet bij:</strong> meerdere cliënten of teams tegelijk geraakt; registratie lijkt verdwenen of gewijzigd.</p>
+<p><strong>Tijdelijke werkwijze:</strong> laat de medewerker volledig uitloggen en opnieuw inloggen op de tablet; controleer daarna of de lijst gevuld is. <strong>Voorwaarden:</strong> het gaat om een gedeelde tablet met ECD 2026.3; na opnieuw inloggen is de lijst gevuld; andere medewerkers en cliënten hebben hun lijst wel. <strong>Zorgimpact:</strong> stilgevallen zorgondersteuning; mogelijk zorgrisico.</p>
+<p><strong>Status:</strong> goedgekeurd, kennisitem v2 door Proceseigenaar zorg (demo), 2026-03-15; herbeoordeling 2026-09-15 — verlopen. <strong>Structureel:</strong> probleem PRB-DEMO-031 bij de leverancier, oplossing nog niet gepland. <strong>Eigenaar:</strong> kennisitemeigenaar zorgdossier (voorgestelde rol). <strong>Escalatie:</strong> blijft de lijst leeg? Escaleer direct als zorgkritische verstoring en volg de lokaal goedgekeurde noodwerkwijze. Teken niet op papier af tenzij het lokale noodplan dat voorschrijft. Zie ook <a href="fab-continuiteitskaart.html">de continuïteitskaart</a>.</p>
+</article>
+<article id="ke-static-11">
+<h3>KE-DEMO-11 — Overdrachtsbericht dubbel zichtbaar in ontvangend portaal (Connector 0.2)</h3>
+<p><strong>Kenmerken:</strong> bericht of registratie dubbel zichtbaar. <strong>Past niet bij:</strong> registratie lijkt verdwenen of gewijzigd.</p>
+<p><strong>Tijdelijke werkwijze:</strong> geen voor gebruikers. Verwijder of herverwerk niets zelf; meld het bericht met referentie aan integratiebeheer. <strong>Zorgimpact:</strong> risico op dubbele registratie; mogelijk financiële gevolgen.</p>
+<p><strong>Status:</strong> concept v1, niet goedgekeurd. <strong>Structureel:</strong> wordt opgelost met connector 0.3 (CHG-DEMO-LOC-02); nog niet getest in productie. <strong>Eigenaar:</strong> integratiebeheer met proceseigenaar. Zie ook <a href="../gegevens_en_ketens/fab-ketenkaart.html">de ketenkaart</a> en <a href="../wijziging_en_acceptatie/fab-omgevingsvergelijker.html">de omgevingsvergelijker</a>.</p>
+</article>
+<article id="ke-static-14">
+<h3>KE-DEMO-14 — Bezettingsrapportage toont nul na nachtelijke verversing (Rapportageplatform 9)</h3>
+<p><strong>Kenmerken:</strong> rapportage na nachtelijke verversing; lijst of overzicht is leeg. <strong>Past niet bij:</strong> registratie lijkt verdwenen of gewijzigd.</p>
+<p><strong>Tijdelijke werkwijze:</strong> gebruik de rapportage van de vorige dag en vermeld die peildatum in elke overdracht of verantwoording. <strong>Voorwaarden:</strong> de verversingstijd in de rapportage is van vóór vandaag; de vorige dagrapportage is volledig. <strong>Zorgimpact:</strong> verantwoording en planning; geen directe zorgimpact bekend.</p>
+<p><strong>Status:</strong> goedgekeurd, kennisitem v1 door Rapportage-eigenaar (demo), 2026-08-20; herbeoordeling 2026-11-20. <strong>Structureel:</strong> bewaking op mislukte verversing ingericht door BI; werking niet gecontroleerd. <strong>Eigenaar:</strong> rapportage-eigenaar met BI.</p>
+</article>
+</div>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB en tweede lijn bij triage of terugkerende meldingen; de uitkomst is een goedgekeurde instructie of een escalatie, nooit een diagnose.</p>
+<p><strong>Bron:</strong> synthetische kennisitems, demo v1, revisie 2026-10-03. De echte kennisbank (bijvoorbeeld TOPdesk of een lokaal afgesproken registratie) en de kennisitemeigenaren zijn niet vastgesteld. Herzie bij een nieuwe versie, een gewijzigde werkwijze of een verlopen herbeoordeling.</p>
+<p><strong>Regels:</strong> kenmerken zijn aanwijzingen, geen uitsluiting of bewijs. Verlopen, concept of een andere versie betekent niet gebruiken. Een geplande structurele oplossing is nog niet opgelost.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met het bestaande kennisitem op juiste instructie, gemiste uitsluitingen en zoektijd. Technische werking bewijst geen lokale inhoudelijke juistheid of gebruikerswaarde.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="incident-onepager.html">Van melding naar oplossing</a><a href="fab-oorzaakopsporing.html">Oorzaakopsporing</a><a href="fab-continuiteitskaart.html">Continuïteit en noodwerkwijze</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een bronreferentie is op zichzelf geen beoordeeld bewijs.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03';
+const SIGNS={s1:'Gedeelde tablet of werkplek',s2:'Na dienstwissel of opnieuw openen',s3:'Lijst of overzicht is leeg',s4:'Weergave toont de verkeerde datum',s5:'Bericht of registratie dubbel zichtbaar',s6:'Rapportage na nachtelijke verversing',s7:'Meerdere cliënten of teams tegelijk geraakt',s8:'Registratie lijkt verdwenen of gewijzigd'};
+const INITIAL=[
+{id:'KE-DEMO-03',title:'Rooster toont gisteren na middernacht',app:'Roosterportaal',appLabel:'Roosterportaal 4.2',ecd:false,versions:['4.2'],signs:['s2','s4'],excludes:['s8','s7'],workaround:'Ververs de dagweergave en controleer de datum bovenaan voordat je de dienst leest.',conditions:['Alleen de weergave is fout; er is niets geregistreerd of gewijzigd','Na verversen staat de juiste datum bovenaan'],impact:'hinder',kind:'approved',version:2,approval:'Proceseigenaar planning (demo), 2026-07-01',review:'2026-12-01',structural:'Leveranciersmelding LEV-DEMO-221; herstel gepland in 4.3. Gepland is nog niet opgelost.',owner:'Kennisitemeigenaar planning (voorgestelde rol)',escalation:'Blijft de datum fout na verversen? Behandel als nieuwe verstoring en zet door naar FAB planning.'},
+{id:'KE-DEMO-07',title:'Aftekenlijst leeg na dienstwissel op gedeelde tablet',app:'ECD',appLabel:'ECD 2026.3',ecd:true,versions:['2026.3'],signs:['s1','s2','s3'],excludes:['s7','s8'],workaround:'Laat de medewerker volledig uitloggen en opnieuw inloggen op de tablet. Controleer daarna of de lijst gevuld is.',conditions:['Het gaat om een gedeelde tablet met ECD 2026.3','Na opnieuw inloggen is de lijst gevuld','Andere medewerkers en cliënten hebben hun lijst wel'],impact:'Stilgevallen zorgondersteuning; mogelijk zorgrisico',kind:'approved',version:2,approval:'Proceseigenaar zorg (demo), 2026-03-15',review:'2026-09-15',structural:'Probleem PRB-DEMO-031 bij leverancier, oplossing nog niet gepland.',owner:'Kennisitemeigenaar zorgdossier (voorgestelde rol)',escalation:'Blijft de lijst leeg? Escaleer direct als zorgkritische verstoring en volg de lokaal goedgekeurde noodwerkwijze. Teken niet op papier af tenzij het lokale noodplan dat voorschrijft.',links:[['fab-continuiteitskaart.html','Continuïteit en noodwerkwijze']]},
+{id:'KE-DEMO-11',title:'Overdrachtsbericht dubbel zichtbaar in ontvangend portaal',app:'Overdrachtskoppeling',appLabel:'Connector 0.2',ecd:false,versions:['0.2'],signs:['s5'],excludes:['s8'],workaround:null,noWorkaround:'Geen tijdelijke werkwijze voor gebruikers. Verwijder of herverwerk niets zelf; meld het bericht met referentie aan integratiebeheer.',conditions:[],impact:'Risico op dubbele registratie; mogelijk financiële gevolgen',kind:'concept',version:1,approval:'Geen goedkeuring',review:'n.v.t.',structural:'Wordt opgelost met connector 0.3 (CHG-DEMO-LOC-02); nog niet getest in productie.',owner:'Integratiebeheer met proceseigenaar',escalation:'Meld het bericht met referentie aan integratiebeheer.',links:[['../gegevens_en_ketens/fab-ketenkaart.html','Ketenkaart'],['../wijziging_en_acceptatie/fab-omgevingsvergelijker.html','Omgevingsvergelijker']]},
+{id:'KE-DEMO-14',title:'Bezettingsrapportage toont nul na nachtelijke verversing',app:'Rapportageplatform',appLabel:'Rapportageplatform 9',ecd:false,versions:['9'],signs:['s6','s3'],excludes:['s8'],workaround:'Gebruik de rapportage van de vorige dag en vermeld die peildatum in elke overdracht of verantwoording.',conditions:['De verversingstijd in de rapportage is van vóór vandaag','De vorige dagrapportage is volledig'],impact:'Verantwoording en planning; geen directe zorgimpact bekend',kind:'approved',version:1,approval:'Rapportage-eigenaar (demo), 2026-08-20',review:'2026-11-20',structural:'Bewaking op mislukte verversing ingericht door BI; werking niet gecontroleerd.',owner:'Rapportage-eigenaar met BI',escalation:'Blijft de rapportage leeg of onvolledig? Meld bij rapportage-eigenaar en BI.'}
+];
+let kes,checked,selected='KE-DEMO-07',version='2026.3';
+function initialize(){kes=INITIAL.map(k=>({...k,confirmed:new Set(),revised:false}));checked=new Set();}
+function matched(k){return k.signs.filter(s=>checked.has(s));}
+function excluded(k){return k.excludes.filter(s=>checked.has(s));}
+function expired(k){return k.kind==='approved'&&k.review<PEIL;}
+function assess(k){
+ const m=matched(k),x=excluded(k);
+ if(x.length)return{code:'excluded',label:'Kenmerk past niet',text:`Niet toepassen: '${SIGNS[x[0]]}' wijst op iets anders. Behandel als nieuwe verstoring.`+(k.id==='KE-DEMO-07'&&x.includes('s7')?' Meerdere cliënten geraakt: start bij zorgimpact de afgesproken continuïteitsroute.':'')};
+ if(!m.length)return{code:'none',label:'Geen aanwijzing',text:''};
+ if(k.kind==='concept')return{code:'concept',label:'Alleen escalatieroute',text:'Nog niet goedgekeurd. '+(k.noWorkaround||'')};
+ if(expired(k))return{code:'expired',label:'Niet als goedgekeurd gebruiken',band:'Herbeoordeling verlopen',text:`De herbeoordeling van ${k.review} is verlopen. Escaleer naar de kennisitemeigenaar (${k.owner}) voor herbevestiging; gebruik de werkwijze niet als goedgekeurd.`};
+ if(k.ecd&&!k.versions.includes(version))return{code:'version',label:version==='unknown'?'Versie onbekend':`Geldigheid voor ECD ${version} niet vastgesteld`,text:version==='unknown'?'Versie onbekend: vraag de versie na.':`Het kennisitem is alleen beoordeeld voor ${k.versions.join(', ')}. Vraag de kennisitemeigenaar om beoordeling voor ECD ${version}.`};
+ if(!k.conditions.length)return{code:'usable',label:'Toepasbaar binnen deze oefening',text:`Leg de toepassing vast in de melding en koppel die aan ${k.id}. Volg de herbeoordeling.`};
+ if(k.conditions.every((c,i)=>k.confirmed.has(i)))return{code:'usable',label:'Toepasbaar binnen deze oefening',text:`Leg de toepassing vast in de melding en koppel die aan ${k.id}. Volg de herbeoordeling.`};
+ return{code:'conditions',label:'Controleer de toepassingsvoorwaarden',text:'Bevestig elke toepassingsvoorwaarde met de melder voordat je de werkwijze toepast.'};
+}
+function statusLine(k){
+ if(k.kind==='concept')return`Concept v${k.version}, niet goedgekeurd`;
+ if(expired(k))return`Herbeoordeling verlopen (${k.review}), kennisitem v${k.version}`;
+ return`Goedgekeurd, kennisitem v${k.version}; herbeoordeling ${k.review}`;
+}
+function draw(){
+ document.querySelector('#board').innerHTML=kes.map(k=>{
+  const a=assess(k),m=matched(k);
+  const cls=(a.code==='excluded'?'excluded':'')+(k.kind==='concept'?' concept':'')+(expired(k)?' hasvoid':'');
+  const strip=a.code==='excluded'?'Kenmerk past niet':m.length?`Past bij ${m.length} van ${k.signs.length} kenmerken`:'Geen aanwijzing';
+  return`<button class="tag ${cls}" data-select="${k.id}" aria-expanded="${selected===k.id}" aria-controls="detail-${k.id}"><span class="ke">${k.id}</span><span class="tagtitle">${k.title}</span><span class="app">${k.appLabel}</span><span class="stateline">${statusLine(k)} — ${a.label}</span>${expired(k)?'<span class="voidband">Herbeoordeling verlopen</span>':''}<span class="tear">${strip}</span></button>`;
+ }).join('');
+ document.querySelector('#details').innerHTML=kes.map(k=>{
+  const a=assess(k);
+  const conds=k.conditions.length?`<fieldset class="conditions"><legend>Toepassingsvoorwaarden — bevestigd met melder</legend>${k.conditions.map((c,i)=>`<label><input type="checkbox" data-condition="${i}" data-ke="${k.id}" ${a.code==='conditions'?'':'disabled'} ${k.confirmed.has(i)?'checked':''}>${c}</label>`).join('')}</fieldset>`:'';
+  return`<div class="detail" id="detail-${k.id}" ${selected===k.id?'':'hidden'}><h3>${k.id} — ${k.title}</h3><div class="detail-grid"><div><p><strong>Tijdelijke werkwijze:</strong> ${k.workaround||k.noWorkaround}</p>${conds}<p style="margin-top:12px"><strong>Escalatie:</strong> ${k.escalation}</p>${k.links?`<p style="margin-top:8px">${k.links.map(l=>`<a href="${l[0]}">${l[1]}</a>`).join(' · ')}</p>`:''}</div><dl><dt>Zorgimpact</dt><dd>${k.impact}</dd><dt>Status</dt><dd>${statusLine(k)}${k.revised?'; eerdere goedkeuring ongeldig':''}</dd><dt>Goedkeuring</dt><dd>${k.approval}</dd><dt>Structurele oplossing</dt><dd>${k.structural}</dd><dt>Eigenaar</dt><dd>${k.owner}</dd></dl></div><div class="detail-actions"><button data-action="reconfirm" data-ke="${k.id}" ${expired(k)?'':'disabled'}>Simuleer herbevestiging door kennisitemeigenaar</button><button data-action="revise" data-ke="${k.id}">Simuleer gewijzigde werkwijze</button></div><p class="outcome ${['excluded','expired','concept','version'].includes(a.code)?'bad':''}">${a.label}${a.text?' — '+a.text:''}</p></div>`;
+ }).join('');
+ const withSign=kes.filter(k=>matched(k).length||excluded(k).length);
+ let html;
+ if(!withSign.length)html='<p>Geen goedgekeurde werkwijze toepasbaar. Volg de gewone triage en escalatie.</p>';
+ else{
+  html='<ul>'+withSign.map(k=>{const a=assess(k);return`<li><strong>${k.id}</strong> (${k.appLabel}): ${a.label}${a.text?' — '+a.text:''}</li>`;}).join('')+'</ul>';
+  const best=withSign.slice().sort((a,b)=>matched(b).length-matched(a).length)[0];
+  html+=`<p>Zorgimpact van de sterkste aanwijzing (${best.id}): ${best.impact}.</p>`;
+  if(!withSign.some(k=>assess(k).code==='usable'))html+='<p>Geen goedgekeurde werkwijze toepasbaar. Volg de gewone triage en escalatie.</p>';
+ }
+ document.querySelector('#verdict').innerHTML=html;
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function summary(){
+ const lines=kes.map(k=>{const a=assess(k);return`${k.id} / ${k.title} (${k.appLabel})\nKenmerken passend: ${matched(k).length} van ${k.signs.length}; uitgesloten kenmerk aangevinkt: ${excluded(k).length?'ja':'nee'}\nWerkwijze: ${k.workaround||k.noWorkaround}\nVoorwaarden bevestigd: ${k.conditions.length?k.confirmed.size+' van '+k.conditions.length:'n.v.t.'}\nUitkomst: ${a.label}${a.text?' — '+a.text:''}\nStatus: ${statusLine(k)}; goedkeuring: ${k.approval}; zorgimpact: ${k.impact}\nStructureel: ${k.structural}\nEigenaar: ${k.owner}; escalatie: ${k.escalation}`;});
+ return['Bekende fouten / INC-DEMO-0412 / demo v1 / revisie 2026-10-03','Exportmoment: '+new Date().toISOString(),'Uitsluitend simulatie; geen echte diagnose, goedkeuring of werkwijzevrijgave.','Versie bij melder: '+(version==='unknown'?'onbekend':'ECD '+version)+'. Aangevinkte kenmerken: '+([...checked].map(s=>SIGNS[s]).join('; ')||'geen')+'.','Oordeel: '+document.querySelector('#verdict').textContent,...lines,'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'].join('\n\n');
+}
+function resetConditions(k){k.confirmed=new Set();}
+document.querySelector('.signs').addEventListener('change',e=>{const s=e.target.dataset.sign;if(!s)return;e.target.checked?checked.add(s):checked.delete(s);kes.forEach(resetConditions);draw();});
+document.querySelector('#version').addEventListener('change',e=>{version=e.target.value;kes.forEach(resetConditions);draw();});
+document.querySelector('#board').addEventListener('click',e=>{const t=e.target.closest('[data-select]');if(!t)return;selected=selected===t.dataset.select?null:t.dataset.select;draw();const n=document.querySelector(`[data-select="${t.dataset.select}"]`);if(n)n.focus();});
+document.querySelector('#details').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b)return;const k=kes.find(x=>x.id===b.dataset.ke);
+ if(b.dataset.action==='reconfirm'&&expired(k)){k.version++;k.review='2027-01-15';k.approval='Kennisitemeigenaar (demo), 2026-10-03';resetConditions(k);document.querySelector('#message').textContent=`${k.id}: herbevestigd als kennisitem v${k.version} (simulatie).`;}
+ if(b.dataset.action==='revise'){k.kind='concept';k.version++;k.revised=true;k.approval='Eerdere goedkeuring ongeldig';resetConditions(k);document.querySelector('#message').textContent=`${k.id}: gewijzigde werkwijze; terug naar concept v${k.version} (simulatie).`;}
+ draw();});
+document.querySelector('#details').addEventListener('change',e=>{const c=e.target.closest('[data-condition]');if(!c)return;const k=kes.find(x=>x.id===c.dataset.ke);c.checked?k.confirmed.add(+c.dataset.condition):k.confirmed.delete(+c.dataset.condition);draw();});
+document.querySelector('#reset').addEventListener('click',()=>{initialize();selected='KE-DEMO-07';version='2026.3';document.querySelector('#version').value='2026.3';document.querySelectorAll('[data-sign]').forEach(i=>i.checked=false);draw();document.querySelector('#message').textContent='Beginstand hersteld; alle kenmerken en bevestigingen zijn gewist.';});
+document.querySelector('#copy').addEventListener('click',async()=>{const text=summary();document.querySelector('#export').hidden=false;document.querySelector('#export-text').value=text;try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Triage-notitie gekopieerd. De tekst blijft hieronder beschikbaar.';}catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>
