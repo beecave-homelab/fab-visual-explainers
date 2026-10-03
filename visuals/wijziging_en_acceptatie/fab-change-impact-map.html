@@ -71,20 +71,21 @@ select { min-height: 44px; border: 1px solid var(--rule); border-radius: 5px; pa
 .pulse { fill: none; stroke: var(--accent); stroke-width: 3; opacity: .7; animation: ripple .9s ease-out forwards; }
 @keyframes ripple { from { r: 60; opacity: .7; } to { r: 640; opacity: 0; } }
 .src-block {
-  position: absolute;
-  left: calc(8 / 1480 * 100%); top: calc(272 / 740 * 100%);
-  width: calc(196 / 1480 * 100%); height: auto; aspect-ratio: 1;
-  border: 2px solid var(--ink); border-radius: 50%; background: var(--surface);
-  padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 5px;
+  margin: 0; padding: 22px 24px; border-bottom: 1px solid var(--rule);
+  background: var(--surface); display: grid;
+  grid-template-columns: minmax(240px, .8fr) minmax(0, 1.7fr);
+  gap: 5px 32px; text-align: left; align-items: start;
 }
+.src-block .src-kind, .src-block strong, .src-block .src-rfc { grid-column: 1; }
+.src-block .src-meta { grid-column: 2; grid-row: 1 / 4; align-self: center; max-width: 72ch; }
 .src-block .src-kind { font-size: clamp(10px, .8vw, 12px); color: var(--muted); }
-.src-block strong { font: 700 clamp(13px, 1.15vw, 18px)/1.15 var(--display); letter-spacing: -.01em; }
-.src-block .src-meta { font-size: clamp(10px, .82vw, 12px); color: var(--muted); }
+.src-block strong { font: 700 clamp(16px, 1.4vw, 20px)/1.25 var(--display); letter-spacing: -.01em; }
+.src-block .src-meta { font-size: 14px; line-height: 1.6; color: var(--muted); }
 .src-block .src-rfc { margin-top: 6px; font-size: clamp(10px, .82vw, 12px); color: var(--accent); font-weight: 600; }
 .pt {
   position: absolute;
-  left: calc(var(--x) / 1480 * 100%); top: calc(var(--y) / 740 * 100%);
-  width: calc(var(--w) / 1480 * 100%); height: calc(var(--h) / 740 * 100%);
+  left: calc((var(--x) - 160) / 1320 * 100%); top: calc(var(--y) / 740 * 100%);
+  width: calc(var(--w) / 1320 * 100%); height: calc(var(--h) / 740 * 100%);
   text-align: left; border: 0; border-bottom: 2px solid var(--rule); border-radius: 0;
   background: var(--ptbg, var(--surface)); padding: 6px 8px 6px 26px; display: flex; flex-direction: column; gap: 2px;
   overflow: hidden;
@@ -166,7 +167,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .grid-svg { display: none; }
   .src-block { position: static; width: auto; height: auto; aspect-ratio: auto; border-radius: 14px; text-align: left; padding: 14px; }
   .src-block .src-rfc { margin-top: 6px; }
-  .pt { position: static; width: auto; height: auto; min-height: 44px; }
+  .pt { position: relative; left: auto; top: auto; width: auto; height: auto; min-height: 44px; }
   .pt .pt-where { display: inline; }
   .board-foot { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
   .legend { gap: 12px; font-size: 12px; }
@@ -200,7 +201,7 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
   .pt, .src-block, .grid-svg { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .pt strong { font-size: 11px; }
   .pt .pt-meta { font-size: 9px; }
-  .stage { aspect-ratio: 1480 / 560; }
+  .stage { aspect-ratio: 1320 / 560; }
   .impact-summary { flex-direction: row; padding: 10px 0 14px; }
   .impact-summary strong, .impact-summary p { font-size: 11px; }
   .inspector { grid-template-columns: .8fr 1.6fr; gap: 24px; padding-top: 14px; break-inside: avoid; }
@@ -222,9 +223,16 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
 
 /* Layout volgt de beschikbare paneelbreedte. */
 @media screen and (min-width: 1181px) {
-  .stage { aspect-ratio: 1480 / 900; }
-  .src-block { padding: 12px; overflow-wrap: anywhere; }
+  .stage { aspect-ratio: 1320 / 780; }
+
   .pt { overflow-wrap: anywhere; min-height: 72px; }
+}
+@media screen and (max-width: 1180px) {
+  .src-block { display: flex; flex-direction: column; gap: 8px; padding: 18px; }
+}
+@media print {
+  .src-block { padding: 12px 0; grid-template-columns: 1fr 2fr; gap: 4px 24px; }
+  .src-block .src-meta { font-size: 11px; }
 }
     </style>
   </head>
@@ -278,9 +286,15 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
           <h2 id="boardTitle">Van wijziging naar gevolg</h2>
           <p>Kolommen zijn beheergebieden, rijen de orde van het effect. Selecteer een punt om de hele keten te zien.</p>
         </div>
+        <div class="src-block">
+          <span class="src-kind">De wijziging</span>
+          <strong>Teams per wijk in plaats van per locatie</strong>
+          <span class="src-meta">Het ECD deelt zorgteams vanaf 2 november 2026 in per wijk. Teamcodes, autorisaties en koppelingen volgen die indeling.</span>
+          <span class="src-rfc">RFC-2026-118 · ECD 2026.4</span>
+        </div>
         <div class="stage">
           <svg class="grid-svg"
-               viewBox="0 0 1480 740"
+               viewBox="160 0 1320 740"
                preserveAspectRatio="none"
                role="img"
                aria-labelledby="imp-title imp-desc">
@@ -299,12 +313,6 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
             <g id="wireLayer">
             </g>
           </svg>
-          <div class="src-block">
-            <span class="src-kind">De wijziging</span>
-            <strong>Teams per wijk in plaats van per locatie</strong>
-            <span class="src-meta">Het ECD deelt zorgteams vanaf 2 november 2026 in per wijk. Teamcodes, autorisaties en koppelingen volgen die indeling.</span>
-            <span class="src-rfc">RFC-2026-118 · ECD 2026.4</span>
-          </div>
           <button type="button"
                   class="pt"
                   data-pt="intake"
@@ -673,11 +681,9 @@ footer { margin-top: 18px; display: flex; justify-content: space-between; flex-w
     const g = $('gridLayer');
     const add = (name, attrs) => { const el = document.createElementNS(svgNS, name); for (const k in attrs) el.setAttribute(k, attrs[k]); g.appendChild(el); return el; };
     const x0 = 200, x1 = 1480, w = (x1 - x0) / 6, y0 = 52, y1 = 740, h = (y1 - y0) / 3;
-    const ECX = 106, ECY = 370;
     ORDERS.forEach((name, i) => add('rect', { x: x0, y: y0 + h * i, width: x1 - x0, height: h, class: 'band-' + i }));
-    for (let r = 220; r <= 1500; r += 160) add('circle', { cx: ECX, cy: ECY, r, class: 'ring' });
     AREAS.forEach((name, i) => { const t = add('text', { x: x0 + w * i + w / 2, y: 34, 'text-anchor': 'middle', class: 'col-head' }); t.textContent = name; });
-    ORDERS.forEach((name, i) => { const cy = y0 + h * i + h / 2; const t = add('text', { x: 214, y: cy, 'text-anchor': 'middle', transform: `rotate(-90 214 ${cy})`, class: 'row-head' }); t.textContent = name; });
+    ORDERS.forEach((name, i) => { const cy = y0 + h * i + h / 2; const t = add('text', { x: 185, y: cy, 'text-anchor': 'middle', transform: `rotate(-90 185 ${cy})`, class: 'row-head' }); t.textContent = name; });
     for (let i = 0; i <= 6; i++) add('line', { x1: x0 + w * i, y1: y0, x2: x0 + w * i, y2: y1, class: 'grid-line' });
     add('line', { x1: x0, y1: y0, x2: x1, y2: y0, class: 'grid-line' });
     add('line', { x1: 194, y1: y0, x2: 194, y2: y1, class: 'grid-line' });
