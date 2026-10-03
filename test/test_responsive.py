@@ -114,3 +114,59 @@ def test_responsive__short_screen_and_nojs(
     assert page.locator("#continuity").is_visible()
     page.emulate_media(media="print")
     assert page.locator("#continuity").is_visible()
+
+
+@pytest.mark.parametrize("width", (1181, 1280, 1440, 1920))
+def test_change_map__source_and_axis_labels_remain_separate(page: Page, width: int) -> None:
+    """De wijzigingsomschrijving en assen bedekken geen impactpunt of elkaar."""
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(visual_path("fab-change-impact-map.html").as_uri(), wait_until="networkidle")
+    conflicts = page.evaluate("""() => {
+        const labels = [...document.querySelectorAll('.src-block, .row-head, .col-head')];
+        const points = [...document.querySelectorAll('.pt')];
+        const conflicts = [];
+        const overlap = (a, b) => Math.min(a.right, b.right) > Math.max(a.left, b.left) + 1
+            && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top) + 1;
+        for (let i = 0; i < labels.length; i++) {
+            const a = labels[i].getBoundingClientRect();
+            for (const other of [...labels.slice(i + 1), ...points]) {
+                if (overlap(a, other.getBoundingClientRect())) {
+                    conflicts.push([labels[i].textContent.trim(), other.textContent.trim()]);
+                }
+            }
+        }
+        return conflicts;
+    }""")
+    assert not conflicts, f"Overlap bij {width}px: {conflicts}"
+    assert page.locator(".src-block").evaluate("""el => {
+        const box = el.getBoundingClientRect();
+        return [...el.children].every(child => {
+            const range = document.createRange();
+            range.selectNodeContents(child);
+            const text = range.getBoundingClientRect();
+            return text.left >= box.left + 10 && text.right <= box.right - 10
+                && text.top >= box.top + 10 && text.bottom <= box.bottom - 10;
+        });
+    }"""), "De bronomschrijving heeft onvoldoende ruimte binnen haar kader"
+    assert page.locator(".stage").evaluate("""el => {
+        const box = el.getBoundingClientRect();
+        return [...el.querySelectorAll('.row-head, .col-head')].every(label => {
+            const text = label.getBoundingClientRect();
+            return text.left >= box.left + 2 && text.right <= box.right - 2
+                && text.top >= box.top + 2 && text.bottom <= box.bottom - 2;
+        });
+    }"""), "Een aslabel wordt afgesneden aan de rand van de kaart"
+
+
+@pytest.mark.parametrize("width", (390, 1180))
+def test_change_map__severity_marks_stay_with_mobile_points(page: Page, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(visual_path("fab-change-impact-map.html").as_uri(), wait_until="networkidle")
+    assert page.locator(".stage").evaluate("""el =>
+        [...el.querySelectorAll('.pt')].every(point => {
+            const box = point.getBoundingClientRect();
+            const mark = point.querySelector('.mark').getBoundingClientRect();
+            return mark.left >= box.left && mark.right <= box.right
+                && mark.top >= box.top && mark.bottom <= box.bottom;
+        })
+    """), "Een ernstmarkering staat buiten het bijbehorende impactpunt"
