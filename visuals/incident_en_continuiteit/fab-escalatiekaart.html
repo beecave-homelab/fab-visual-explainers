@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+          content="Synthetische escalatiekaart: peilschaal bepaalt welke rol aan zet is en welk escalatiepakket de overdracht vraagt.">
+    <title>FAB Escalatiekaart — wie moet nu handelen?</title>
+    <style>
+:root{--foam:#E3EBE8;--paper:#FFFFFF;--sea:#2E5E66;--shallow:#BFD3D1;--mark:#C21F32;--ink:#18272B;--silt:#5C6E6B;--display:"PT Sans Narrow","Arial Narrow","Bahnschrift Condensed",sans-serif;--body:"Verdana","Tahoma","Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--foam);color:var(--ink);font:15.5px/1.6 var(--body)}button,select,textarea,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}a{color:var(--sea);text-underline-offset:4px}p{max-width:72ch}h1,h2,h3,h4,p,dl,dd,ul,ol,fieldset{margin:0}h1{font-family:var(--display);font-size:clamp(34px,4.6vw,58px);font-weight:700;line-height:1.08;max-width:18ch}h2{font-family:var(--display);font-size:25px;font-weight:700}h3{font-family:var(--display);font-size:20px;font-weight:700}button:disabled,input:disabled{cursor:default}button:disabled{opacity:.5}:focus-visible{outline:3px solid var(--mark);outline-offset:4px}[hidden]{display:none!important}.skip{position:absolute;left:12px;top:-100px;background:white;padding:12px;z-index:10}.skip:focus{top:12px}.page{max-width:1400px;margin:auto;padding:28px 40px}
+.demo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid #9ab0ad;padding-bottom:14px;font-size:15px}.demo strong{color:var(--mark)}
+.mast{display:grid;grid-template-columns:1.1fr minmax(280px,.8fr);gap:44px;align-items:end;padding:25px 0 30px}.intro{margin-top:18px;max-width:54ch}.report{background:var(--paper);border-left:6px solid var(--sea);padding:18px 20px;font-size:15px}.report p+p{margin-top:8px}.report blockquote{margin:0;font-style:italic}
+.context-note{font-size:14px;color:var(--silt);max-width:80ch;margin:-8px 0 22px}
+.tools{display:flex;gap:12px 20px;align-items:flex-start;flex-wrap:wrap;margin:20px 0}.tools>label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}select{max-width:100%;min-width:0;min-height:44px;background:var(--paper);border:1px solid #9ab0ad;padding:8px 12px}.impact{display:flex;gap:8px;flex-wrap:wrap;max-width:860px;border:0;padding:0}.impact legend{font-weight:600;width:100%;margin-bottom:2px}.chip{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid #9ab0ad;border-radius:20px;padding:8px 14px;min-height:44px;cursor:pointer}.chip input{width:20px;height:20px;accent-color:var(--sea)}.plain{background:var(--paper);border:1px solid var(--sea);border-radius:4px;padding:9px 16px}
+.interactive{display:none}body.ready .interactive{display:flex}
+.stage{display:grid;grid-template-columns:1fr;gap:26px;align-items:start}
+.gauge{display:grid;grid-template-columns:120px 1fr;gap:0 16px;position:relative}
+.seg{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:64px;border:1px solid var(--sea);min-height:120px}
+.seg.red{background:var(--mark);color:var(--paper)}.seg.white{background:var(--paper);color:var(--ink)}
+.seg.sub-red{background:#1E4749;color:var(--paper)}.seg.sub-white{background:var(--sea);color:var(--paper)}
+.wave{grid-column:1/3;z-index:3;align-self:start;height:0;overflow:visible;position:relative;transition:grid-row .4s}.wave svg{position:absolute;top:-7px;left:0;width:100%;height:14px;display:block}
+.level{background:var(--paper);padding:14px 18px;border-left:6px solid transparent;margin-bottom:10px}
+.level.wet{border-left-color:var(--sea)}
+.lvl-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.state{font-family:var(--display);font-weight:700;font-size:16px;color:var(--silt)}.level.now .state{color:var(--sea)}.level.now h3{color:var(--sea)}
+.roleline{margin-top:6px;font-size:15px}.task{color:var(--silt);font-size:14px;margin-top:2px}
+.route{font-size:14px;margin-top:8px}.route .stale{color:var(--mark);font-weight:600}.route .fresh{color:var(--sea)}
+.handover{font-size:14px;margin-top:6px;border-top:1px dashed #c6d3d1;padding-top:8px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.acts button{background:transparent;border:1px solid var(--sea);border-radius:4px;padding:8px 14px;font-size:14px;min-height:44px}
+.branch{display:grid;grid-template-columns:120px 1fr;gap:0 16px;margin-top:6px}.branch-label{grid-column:1/3;font-family:var(--display);font-weight:700;font-size:16px;color:var(--silt);margin-bottom:6px}.minigauge{position:relative;border:1px solid var(--sea);background:var(--paper);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:40px;min-height:96px}.pwater{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--sea);opacity:.55;transition:height .4s}.minigauge.filled .pwater{height:100%}
+.panel{background:var(--paper);border:1px solid var(--shallow);padding:18px 20px}
+.panel h3{margin-bottom:4px}.panel .hint{color:var(--silt);font-size:14px;margin-bottom:10px}
+.pkg-fields{display:grid;gap:4px}.pkg-fields label{display:flex;gap:10px;align-items:flex-start;min-height:44px;padding:6px 0;font-size:14px}.pkg-fields input{width:20px;height:20px;margin-top:2px;accent-color:var(--sea);flex:none}
+.pkg-fields .req{font-size:12px;color:var(--sea);font-weight:600}.pkg-fields .warn{color:var(--mark);font-size:13px;display:block}.pkg-fields .hint2{color:var(--silt);font-size:13px}
+.pkg-sub{font-family:var(--display);font-weight:700;font-size:17px;margin:14px 0 4px;color:var(--silt)}
+.verdict{background:var(--paper);border:2px solid var(--sea);padding:18px 22px;margin-top:22px}.verdict p{margin-top:8px}.verdict ul{margin:8px 0;padding-left:22px}.verdict li{margin-bottom:6px}
+.live{min-height:24px;color:var(--mark);font-size:15px;margin-top:14px}
+.export{margin-top:14px;background:var(--paper);padding:22px;border:1px solid var(--shallow)}textarea{display:block;width:100%;min-height:220px;margin-top:12px;padding:12px;resize:vertical;font-size:15px}
+.reference{margin-top:32px;padding-top:24px;border-top:2px solid var(--ink)}.reference p{margin-top:14px;font-size:16px}.register{margin-top:18px}.register article{padding:18px 0;border-bottom:1px solid #9ab0ad}.register h3{margin-bottom:8px}.register p{margin:6px 0;font-size:15px}
+summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.foot{margin-top:24px;font-size:14px}
+@media(min-width:1100px){.stage{grid-template-columns:1fr 340px}.panel{position:sticky;top:20px}}
+@media(max-width:900px){.mast{grid-template-columns:1fr;gap:25px}.page{padding:20px}}
+@media(max-width:700px){.gauge,.branch{grid-template-columns:48px 1fr}.seg{font-size:30px;min-height:96px}.minigauge{font-size:24px;min-height:72px}.level{padding:12px 14px}}
+@media(max-width:480px){.page{padding:16px 12px}h1{font-size:36px}}
+@media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:26pt}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.intro,.report{font-size:10pt}.tools,.acts,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action],.water,.wave,.pwater{display:none!important}.stage,.gauge,.branch{display:block}.seg{display:none}.minigauge{display:none}.level{border:1px solid #777;margin-bottom:10px;break-inside:avoid}.panel{border:1px solid #777;break-inside:avoid;margin-top:14px}.pkg-fields label{min-height:0}.verdict{border:1px solid #777;break-inside:avoid}.reference{break-before:page}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}.export textarea{min-height:260px}*{box-shadow:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Naar de peilschaal</a>
+<main class="page">
+<div class="demo"><span>FAB / Escalatiekaart</span><strong>Synthetische demonstratie, geen contactregistratie</strong></div>
+<header class="mast">
+<div>
+<h1>Wie moet nu handelen, en met welke informatie?</h1>
+<p class="intro">Geef aan wat je over de verstoring weet. Het peil laat zien welke rol aan zet is en wat het escalatiepakket moet bevatten. Een overdracht telt pas als de ontvanger die heeft aangenomen.</p>
+</div>
+<div class="report">
+<p><strong>INC-DEMO-0427, ontvangen 2026-10-03 06:52</strong></p>
+<blockquote>
+<p>“Op de afdelingen Esdoorn en Hazelaar laadt de medicatieaftekenlijst niet. Collega's tekenen nu niets af.”</p>
+</blockquote>
+<p>Woonzorglocatie De Linde (fictief), ECD 2026.3. Gebruiksmoment: uitvoering bij triage en overleg, of opleiding.</p>
+</div>
+</header>
+<p class="context-note">Peilen, rollen en contactroutes zijn demo-afspraken. Een contactroute die langer dan 90 dagen niet is geverifieerd, telt als verouderd.</p>
+<section id="work" aria-labelledby="work-title">
+<h2 id="work-title">Peilschaal van de escalatie</h2>
+<div class="tools interactive">
+<fieldset class="impact">
+<legend>Vastgestelde gevolgen</legend>
+<label class="chip">
+<input type="checkbox" data-impact="hinder">Hinder bij het werk
+</label>
+<label class="chip">
+<input type="checkbox" data-impact="zorg">Zorgondersteuning stilgevallen
+</label>
+<label class="chip">
+<input type="checkbox" data-impact="privacy">Mogelijk privacyrisico
+</label>
+<label class="chip">
+<input type="checkbox" data-impact="financieel">Mogelijke financiële gevolgen
+</label>
+</fieldset>
+<label for="cause">
+Vermoedelijke oorzaak
+<select id="cause">
+<option value="unknown" selected>Nog onbekend</option>
+<option value="local">Lokale inrichting</option>
+<option value="vendor">Leverancierssoftware</option>
+<option value="chain">Koppeling of ketenpartner</option>
+</select>
+</label>
+<label for="workaround">
+Goedgekeurde werkwijze
+<select id="workaround">
+<option value="unknown" selected>Nog niet nagegaan</option>
+<option value="applied">Beschikbaar en toegepast</option>
+<option value="none">Niet beschikbaar</option>
+</select>
+</label>
+<label for="duration">
+Duur tot nu
+<select id="duration">
+<option value="lt1" selected>Korter dan 1 uur</option>
+<option value="1to4">1 tot 4 uur</option>
+<option value="gt4">Langer dan 4 uur</option>
+</select>
+</label>
+<button class="plain" id="reset">Herstel beginstand</button><button class="plain" id="copy">Kopieer escalatieoverzicht</button><button class="plain" id="print">Druk af</button>
+</div>
+<div class="stage">
+<div>
+<div class="gauge" id="gauge"></div>
+<div class="branch" id="branch"></div>
+</div>
+<aside class="panel" id="package" aria-labelledby="package-title">
+<h3 id="package-title">Escalatiepakket</h3>
+<p class="hint" id="package-hint"></p>
+<div class="pkg-fields" id="package-fields"></div>
+</aside>
+</div>
+<div class="verdict" aria-labelledby="verdict-title">
+<h2 id="verdict-title">Oordeel</h2>
+<div id="verdict" aria-live="polite"></div>
+</div>
+<p class="live" id="message" role="status"></p>
+<section class="export" id="export" hidden aria-labelledby="export-title">
+<h2 id="export-title">Escalatieoverzicht om zelf te kopiëren</h2>
+<p>De tekst volgt de huidige simulatie, inclusief peil, routes en overdrachten. Acties en besluiten blijven in de bronregistratie.</p>
+<label for="export-text">Samenvatting</label><textarea id="export-text" readonly></textarea>
+</section>
+</section>
+<section class="reference" aria-labelledby="ref-title">
+<h2 id="ref-title">Alle peilen en de zijtak, ook zonder interactie</h2>
+<p>Dit register blijft leesbaar zonder JavaScript. De gesimuleerde statussen bovenaan kunnen ervan afwijken en gelden nooit als werkelijke overdracht. Peildatum 2026-10-03; een route ouder dan 90 dagen telt als verouderd.</p>
+<div class="register">
+<article id="esc-static-l0">
+<h3>Peil 0 — Registreren: Servicedesk</h3>
+<p><strong>Taak:</strong> registreert de melding en doet de eerste triage. <strong>Actief:</strong> altijd; alleen aan zet zolang nog geen gevolg is vastgesteld.</p>
+<p><strong>Contactroute (demo):</strong> servicedesk-wachtrij in de meldingsregistratie; geverifieerd 2026-09-01, actueel op de peildatum. <strong>Vereiste velden:</strong> f1–f4 (meldingsnummer en tijdstip; rol van de melder, geen naam; applicatie en versie; wat de melder ziet, in eigen woorden).</p>
+<p><strong>Overdracht:</strong> registratie en triage lopen door in de meldingsregistratie; er is geen aparte overdracht op peil 0.</p>
+</article>
+<article id="esc-static-l1">
+<h3>Peil 1 — Analyseren: FAB zorgdossier</h3>
+<p><strong>Taak:</strong> analyseert, zoekt een bekende fout en beoordeelt een goedgekeurde werkwijze. <strong>Actief:</strong> zodra een gevolg is vastgesteld (hinder, zorg, privacy of financieel).</p>
+<p><strong>Contactroute (demo):</strong> FAB-wachtrij zorgdossier; geverifieerd 2026-09-20, actueel op de peildatum. <strong>Vereiste velden:</strong> f1–f8.</p>
+<p><strong>Overdracht:</strong> overdracht pas mogelijk met een volledig pakket en een actuele route; de overdracht telt na aanname door FAB zorgdossier.</p>
+</article>
+<article id="esc-static-l2">
+<h3>Peil 2 — Opschalen: Applicatie-eigenaar zorgdossier</h3>
+<p><strong>Taak:</strong> beslist over prioriteit en de inzet van leverancier of integratiebeheer; FAB stelt het pakket op. <strong>Actief:</strong> oorzaak vermoedelijk bij leverancier of koppeling/ketenpartner, óf langer dan 4 uur zonder toegepaste werkwijze.</p>
+<p><strong>Contactroute (demo):</strong> leveranciersportaal, contractroute; geverifieerd 2026-05-14, verouderd op de peildatum. <strong>Vereiste velden:</strong> f1–f12, waaronder een voorbeeldreferentie zonder cliëntgegevens.</p>
+<p><strong>Overdracht:</strong> overdracht pas mogelijk met een volledig pakket en een actuele route; de overdracht telt na aanname door de applicatie-eigenaar.</p>
+</article>
+<article id="esc-static-l3">
+<h3>Peil 3 — Continuïteit: Continuïteitscoördinator met proceseigenaar zorg</h3>
+<p><strong>Taak:</strong> start de lokaal goedgekeurde noodwerkwijze; de analyse loopt intussen door. <strong>Actief:</strong> zorgondersteuning is stilgevallen.</p>
+<p><strong>Contactroute (demo):</strong> bereikbaarheidsdienst continuïteit, ook buiten het ECD vindbaar; niet geverifieerd op de peildatum. <strong>Vereiste velden:</strong> f1–f15.</p>
+<p><strong>Overdracht:</strong> de start wacht niet op een volledig pakket of geverifieerde route; gebruik desnoods de route uit het lokaal goedgekeurde noodplan en vul het pakket aan tijdens de overdracht. Gestart telt pas na bevestiging door de coördinator.</p>
+</article>
+<article id="esc-static-pv">
+<h3>Parallel — Privacy: Privacy officer via de lokale datalekprocedure</h3>
+<p><strong>Taak:</strong> beoordeelt of er sprake is van een datalek; FAB beslist dat niet zelf. <strong>Actief:</strong> mogelijk privacyrisico is aangevinkt; loopt parallel en verhoogt het peil niet.</p>
+<p><strong>Contactroute (demo):</strong> lokale datalekprocedure; geverifieerd 2026-08-30, actueel op de peildatum. <strong>Vereiste velden:</strong> f1, f3 en f16–f18 (soort gegevens zonder inhoud; welke rollen mogelijk toegang hadden; genomen beheersmaatregel).</p>
+<p><strong>Overdracht:</strong> overdracht pas mogelijk met een volledig pakket en een actuele route; de overdracht telt na aanname door de privacy officer.</p>
+</article>
+</div>
+<p><strong>Regels in volgorde:</strong> geen gevolg vastgesteld betekent peil 0; een vastgesteld gevolg activeert peil 1; een vermoedelijke oorzaak bij leverancier of koppeling/ketenpartner activeert peil 2, evenals langer dan 4 uur zonder toegepaste werkwijze; stilgevallen zorgondersteuning activeert peil 3 en start het continuïteitsproces direct; mogelijk privacyrisico activeert de parallelle privacytak; mogelijke financiële gevolgen geven geen extra peil maar horen in het pakket. Het hoogste actieve peil is aan zet, lagere actieve peilen zijn betrokken. Overgedragen is pas aangenomen na bevestiging; een gewijzigd pakket maakt een eerdere overdracht ongeldig; verouderde routes blijven zichtbaar.</p>
+<details>
+<summary>Taak, bronbeheer en grenzen</summary>
+<p><strong>Gebruiker en uitkomst:</strong> FAB bij triage en ketenproblemen, met servicedesk, applicatie-eigenaar en continuïteitscoördinator; de uitkomst is een volledig escalatiepakket en een aangenomen overdracht, geen besluit over prioriteit, datalek of noodwerkwijze.</p>
+<p><strong>Bron:</strong> synthetische rollen en contactroutes, demo v1, revisie 2026-10-03; de echte contact- en escalatieregistratie en de bronhouder (coördinator incident- en continuïteitsproces) zijn niet vastgesteld; deze kaart is geen tweede adresboek. Herzie bij een gewijzigde rol, contractroute of noodplan; verifieer routes minstens elk kwartaal (demo).</p>
+<p><strong>Regels:</strong> gevolgen bepalen het peil, niet het aantal melders; bij stilgevallen zorgondersteuning start het continuïteitsproces direct; privacy loopt parallel; overgedragen is pas aangenomen na bevestiging; een gewijzigd pakket maakt een eerdere overdracht ongeldig; verouderde routes blijven zichtbaar.</p>
+<p><strong>Praktijktoets:</strong> vergelijk met de huidige escalatielijst en het noodplan op juiste rol, volledigheid van het pakket, zoektijd en herkenning van verouderde routes.</p>
+</details>
+<nav aria-label="Gerelateerde views">
+<a href="incident-onepager.html">Van melding naar oplossing</a><a href="fab-known-error-map.html">Bekende fouten</a><a href="fab-continuiteitskaart.html">Continuïteit en noodwerkwijze</a><a href="fab-serviceradar.html">Serviceradar</a>
+</nav>
+<p class="foot">Alle gegevens zijn synthetisch. Invoer blijft alleen in dit tabblad en verdwijnt bij herladen. Deel geen cliëntgegevens, accounts of volledige logs. Een gesimuleerde overdracht is geen echte afspraak.</p>
+</section>
+</main>
+<script>
+const PEIL='2026-10-03',DAYS=90;
+const FIELDS={
+f1:'Meldingsnummer en tijdstip',f2:'Rol van de melder, geen naam',f3:'Applicatie en versie',f4:'Wat de melder ziet, in eigen woorden',
+f5:'Getroffen zorgproces en afdelingen',f6:'Soort gevolg: hinder, zorg, privacy of financieel',f7:'Sinds wanneer, en of het nog loopt',f8:'Al genomen stappen en hun uitkomst',
+f9:'Stappen om het te reproduceren',f10:'Omgeving en versie waarin het optreedt',f11:'Voorbeeldreferentie zonder cliëntgegevens',f12:'Aantal getroffen afdelingen of locaties',
+f13:'Welk zorgproces stilligt en waar',f14:'Verwijzing naar het goedgekeurde noodplan',f15:'Verwachte duur, of onbekend',
+f16:'Soort gegevens, zonder inhoud',f17:'Welke rollen mogelijk toegang hadden',f18:'Genomen beheersmaatregel'};
+const LEVELS=[
+{id:'l0',n:0,title:'Peil 0 — Registreren',role:'Servicedesk',task:'Registreert de melding en doet de eerste triage.',route:'Servicedesk-wachtrij in de meldingsregistratie (demo)',verified:'2026-09-01',fields:['f1','f2','f3','f4'],req:['f1','f2','f3','f4']},
+{id:'l1',n:1,title:'Peil 1 — Analyseren',role:'FAB zorgdossier',task:'Analyseert, zoekt een bekende fout en beoordeelt een goedgekeurde werkwijze.',route:'FAB-wachtrij zorgdossier (demo)',verified:'2026-09-20',fields:['f5','f6','f7','f8'],req:['f1','f2','f3','f4','f5','f6','f7','f8'],sendLabel:'Simuleer overdracht'},
+{id:'l2',n:2,title:'Peil 2 — Opschalen',role:'Applicatie-eigenaar zorgdossier',task:'Beslist over prioriteit en de inzet van leverancier of integratiebeheer. FAB stelt het pakket op.',route:'Leveranciersportaal, contractroute (demo)',verified:'2026-05-14',fields:['f9','f10','f11','f12'],req:['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12'],sendLabel:'Simuleer overdracht'},
+{id:'l3',n:3,title:'Peil 3 — Continuïteit',role:'Continuïteitscoördinator met proceseigenaar zorg',task:'Start de lokaal goedgekeurde noodwerkwijze. De analyse loopt intussen door.',route:'Bereikbaarheidsdienst continuïteit (demo), ook buiten het ECD vindbaar',verified:null,fields:['f13','f14','f15'],req:['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','f14','f15'],sendLabel:'Simuleer start continuïteitsproces'},
+{id:'pv',n:-1,title:'Parallel — Privacy',role:'Privacy officer via de lokale datalekprocedure',task:'Beoordeelt of er sprake is van een datalek. FAB beslist dat niet zelf.',route:'Lokale datalekprocedure (demo)',verified:'2026-08-30',fields:['f16','f17','f18'],req:['f1','f3','f16','f17','f18'],sendLabel:'Simuleer overdracht'}];
+let impacts,cause,workaround,duration,present,handover,voided,verifications;
+function initialize(){
+ impacts=new Set();cause='unknown';workaround='unknown';duration='lt1';present=new Set();
+ handover={l1:'none',l2:'none',l3:'none',pv:'none'};voided=new Set();
+ verifications={l0:'2026-09-01',l1:'2026-09-20',l2:'2026-05-14',l3:null,pv:'2026-08-30'};
+}
+function daysBetween(a,b){return Math.round((new Date(a)-new Date(b))/864e5);}
+function routeStatus(l){
+ const v=verifications[l.id];
+ if(!v)return{ok:false,text:`${l.route}. Niet geverifieerd`,cls:''};
+ const stale=daysBetween(PEIL,v)>DAYS;
+ return stale?{ok:false,text:`${l.route}. Verouderd: laatst geverifieerd ${v}`,cls:'stale'}:{ok:true,text:`${l.route}. Geverifieerd ${v}`,cls:'fresh'};
+}
+function peil(){
+ const active={l0:true,l1:false,l2:false,l3:false,pv:false},reasons=[];let note='';
+ if(!impacts.size)reasons.push('Nog geen gevolg vastgesteld.');
+ if(impacts.size){active.l1=true;reasons.push('Er is een gevolg vastgesteld.');}
+ if(cause==='vendor'){active.l2=true;reasons.push('De oorzaak ligt vermoedelijk bij de leverancier.');}
+ if(cause==='chain'){active.l2=true;reasons.push('De oorzaak ligt vermoedelijk bij een koppeling of ketenpartner.');}
+ if(duration==='gt4'&&workaround!=='applied'){active.l2=true;reasons.push('Langer dan 4 uur zonder toegepaste werkwijze.');}
+ if(impacts.has('zorg')){active.l3=true;reasons.push('Zorgondersteuning is stilgevallen: start het continuïteitsproces nu, ook als de analyse nog loopt.');}
+ if(impacts.has('privacy')){active.pv=true;reasons.push('Mogelijk privacyrisico: leg dit parallel voor via de datalekprocedure.');}
+ if(impacts.has('financieel'))note='Mogelijke financiële gevolgen: vermeld dit in het pakket. De proceseigenaar financiën beoordeelt de gevolgen.';
+ let highest=0;
+ for(const l of LEVELS)if(l.n>0&&active[l.id]&&l.n>highest)highest=l.n;
+ return{active,reasons,note,highest};
+}
+function partner(){
+ if(cause==='vendor')return'Leverancier via de contractroute';
+ if(cause==='chain')return'Integratiebeheer en ketenpartner';
+ return'Technisch beheer; oorzaakrichting nog vaststellen';
+}
+function missing(l){return l.req.filter(f=>!present.has(f));}
+function canSend(l,p){
+ if(l.id==='pv'&&!p.active.pv)return false;
+ if(l.n>0&&!p.active[l.id])return false;
+ if(handover[l.id]!=='none')return false;
+ if(l.id==='l3')return true;
+ return missing(l).length===0&&routeStatus(l).ok;
+}
+function blockedReason(l){
+ const m=missing(l);
+ if(m.length)return`Pakket onvolledig: ${m.length} ontbreken`;
+ const r=routeStatus(l);
+ if(!r.ok)return r.cls==='stale'?'Contactroute verouderd':'Contactroute niet geverifieerd';
+ return'';
+}
+function handoverText(l){
+ const h=handover[l.id];
+ if(h==='accepted')return`Aangenomen door ${l.role} (simulatie), ${PEIL}`;
+ if(h==='sent'){
+  if(l.id==='l3'){
+   let t='Continuïteitsproces gestart (simulatie), nog niet bevestigd door de coördinator';
+   const m=missing(l);
+   if(m.length)t+=` Pakket onvolledig: ${m.length} ontbreken. Vul aan tijdens de overdracht.`;
+   if(!routeStatus(l).ok&&!routeStatus(l).cls)t+=' Contactroute niet geverifieerd: gebruik de route uit het lokaal goedgekeurde noodplan.';
+   return t;
+  }
+  return'Overgedragen, nog niet aangenomen';
+ }
+ if(voided.has(l.id))return'Pakket gewijzigd na overdracht; eerdere overdracht vervalt';
+ if(l.id==='l0')return'Registratie en triage lopen door in de meldingsregistratie';
+ if(l.id==='l3')return'Nog niet overgedragen';
+ const b=blockedReason(l);
+ return'Nog niet overgedragen'+(b?`. ${b}`:'');
+}
+function stateText(l,p){
+ if(l.id==='pv'){
+  if(p.active.pv)return'Parallel aan zet';
+  return'Niet nodig volgens demo-regels'+(handover.pv!=='none'?'; eerder overgedragen, trek in via de bronregistratie':'');
+ }
+ if(p.highest===0)return l.id==='l0'?'Nu aan zet':'Niet nodig volgens demo-regels';
+ if(l.id==='l0')return'Betrokken';
+ if(l.n===p.highest)return'Nu aan zet';
+ if(p.active[l.id]&&l.n<p.highest)return'Betrokken';
+ return'Niet nodig volgens demo-regels'+(handover[l.id]!=='none'?'; eerder overgedragen, trek in via de bronregistratie':'');
+}
+function draw(){
+ const p=peil();
+ const gauge=document.querySelector('#gauge');
+ const order=['l3','l2','l1','l0'];
+ let html='';
+ order.forEach((id,i)=>{
+  const l=LEVELS.find(x=>x.id===id),r=routeStatus(l),st=stateText(l,p);
+  const row=i+1;
+  const submerged=l.n<=p.highest;
+  html+=`<div class="seg ${submerged?(row%2?'sub-red':'sub-white'):(row%2?'red':'white')}" style="grid-column:1;grid-row:${row}" aria-hidden="true"><span>${l.n}</span></div>`;
+  html+=`<section class="level${l.n<=p.highest?' wet':''}${st==='Nu aan zet'?' now':''}" data-level="${l.id}" style="grid-column:2;grid-row:${row}">
+  <div class="lvl-head"><h3>${l.title}</h3><span class="state">${st}</span></div>
+  <p class="roleline"><strong>${l.role}</strong></p>
+  <p class="task">${l.task}</p>
+  ${l.id==='l2'?`<p class="task">Partner: ${partner()}</p>`:''}
+  <p class="route">Contactroute: <span class="${r.cls}">${r.text}</span></p>
+  <p class="handover">${handoverText(l)}</p>
+  ${l.id!=='l0'?`<div class="acts">
+   <button data-action="verify" data-level="${l.id}" ${r.ok||!p.active[l.id]?'disabled':''}>Simuleer verificatie van de contactroute</button>
+   <button data-action="send" data-level="${l.id}" ${canSend(l,p)?'':'disabled'}>${l.sendLabel}</button>
+   <button data-action="accept" data-level="${l.id}" ${handover[l.id]==='sent'&&p.active[l.id]?'':'disabled'}>Simuleer aanname door ${l.role}</button>
+  </div>`:''}
+  </section>`;
+ });
+ const wrow=4-p.highest;
+ html+=`<div class="wave" id="wave" style="grid-column:1/3;grid-row:${wrow}" aria-hidden="true"><svg viewBox="0 0 200 14" preserveAspectRatio="none" focusable="false"><path d="M0 7 Q 12.5 1 25 7 T 50 7 T 75 7 T 100 7 T 125 7 T 150 7 T 175 7 T 200 7" fill="none" stroke="var(--sea)" stroke-width="2.5"/></svg></div>`;
+ gauge.innerHTML=html;
+ const pv=LEVELS.find(x=>x.id==='pv'),pr=routeStatus(pv),pst=stateText(pv,p);
+ document.querySelector('#branch').innerHTML=`
+ <div class="branch-label">Parallel: privacy</div>
+ <div class="minigauge${p.active.pv?' filled':''}" aria-hidden="true"><span>P</span><div class="pwater"></div></div>
+ <section class="level${p.active.pv?' wet':''}" data-level="pv">
+ <div class="lvl-head"><h3>${pv.title}</h3><span class="state">${pst}</span></div>
+ <p class="roleline"><strong>${pv.role}</strong></p>
+ <p class="task">${pv.task}</p>
+ <p class="route">Contactroute: <span class="${pr.cls}">${pr.text}</span></p>
+ <p class="handover">${handoverText(pv)}</p>
+ <div class="acts">
+  <button data-action="verify" data-level="pv" ${pr.ok||!p.active.pv?'disabled':''}>Simuleer verificatie van de contactroute</button>
+  <button data-action="send" data-level="pv" ${canSend(pv,p)?'':'disabled'}>${pv.sendLabel}</button>
+  <button data-action="accept" data-level="pv" ${handover.pv==='sent'&&p.active.pv?'':'disabled'}>Simuleer aanname door ${pv.role}</button>
+ </div>
+ </section>`;
+ const top=LEVELS.find(x=>x.n===p.highest);
+ const fieldIds=[...top.req];
+ const pvFields=p.active.pv?pv.req.filter(f=>!fieldIds.includes(f)):[];
+ const reqSet=new Set(top.req),pvSet=new Set(pv.req);
+ document.querySelector('#package-hint').textContent=`Velden voor ${top.title.toLowerCase()} (cumulatief)${p.active.pv?' plus de privacyvelden':''}. Vink aan wat al aanwezig is in dezelfde melding.`;
+ document.querySelector('#package-fields').innerHTML=
+  fieldIds.map(f=>fieldHtml(f,reqSet.has(f))).join('')
+  +(p.active.pv?`<p class="pkg-sub">Parallel: privacyvelden</p>`+pv.req.filter(f=>!fieldIds.includes(f)||!reqSet.has(f)).map(f=>fieldHtml(f,pvSet.has(f))).join(''):'');
+ verdict(p);
+ if(!document.querySelector('#export').hidden)document.querySelector('#export-text').value=summary();
+}
+function fieldHtml(f,req){
+ return`<label><input type="checkbox" data-field="${f}" ${present.has(f)?'checked':''}><span>${FIELDS[f]}${f==='f11'?'<span class="warn">Stuur geen namen, BSN, medische gegevens of volledige logs mee.</span>':''} <span class="hint2">Aanwezig in de melding.</span>${req?' <span class="req">Vereist</span>':''}</span></label>`;
+}
+function verdict(p){
+ const el=document.querySelector('#verdict');
+ let html;
+ if(p.highest===0){
+  html='<p><strong>Peil 0.</strong> De servicedesk registreert en doet de eerste triage. Leg eerst vast welk gevolg de verstoring heeft.</p>';
+ }else{
+  const l=LEVELS.find(x=>x.n===p.highest);
+  let stap;
+  const m=missing(l),r=routeStatus(l);
+  if(handover[l.id]==='sent')stap='wacht op aanname en blijf eigenaar van de melding tot die er is';
+  else if(handover[l.id]==='accepted')stap=`volg de afspraken van ${l.role}; de melding blijft in de bronregistratie`;
+  else if(l.id==='l3')stap='start het continuïteitsproces nu en vul het pakket aan tijdens de overdracht';
+  else if(m.length)stap=`vul het pakket aan (${m.length} ontbreken)`;
+  else if(!r.ok)stap='verifieer de contactroute';
+  else stap='draag over met het pakket';
+  html=`<p><strong>Peil ${l.n}.</strong> Nu aan zet: ${l.role}${l.id==='l2'?` (${partner()})`:''}. Volgende stap: ${stap}.</p>`;
+  if(p.active.pv)html+=`<p>Parallel: privacy officer via de datalekprocedure, ${handoverText(pv_level())}.</p>`;
+ }
+ html+='<ul>'+p.reasons.map(r=>`<li>${r}</li>`).join('')+'</ul>';
+ if(p.note)html+=`<p>${p.note}</p>`;
+ html+='<p>Peilen en drempels zijn demo-afspraken, geen lokaal escalatiebeleid.</p>';
+ el.innerHTML=html;
+}
+function pv_level(){return LEVELS.find(x=>x.id==='pv');}
+function summary(){
+ const p=peil();
+ const lines=[...LEVELS].reverse().map(l=>`${l.title}: rol ${l.role}. Status: ${stateText(l,p)}. Route: ${routeStatus(l).text}. Overdracht: ${handoverText(l)}.`);
+ const allFields=Object.keys(FIELDS);
+ const top=LEVELS.find(x=>x.n===p.highest);
+ const ontbrekend=top.req.filter(f=>!present.has(f));
+ return[
+  'Escalatiekaart / INC-DEMO-0427 / demo v1 / revisie 2026-10-03',
+  'Exportmoment: '+new Date().toISOString(),
+  'Uitsluitend simulatie; geen echte escalatie, routeverificatie of overdracht.',
+  `Vastgestelde gevolgen: ${[...impacts].join(', ')||'geen'}; oorzaak: ${cause}; goedgekeurde werkwijze: ${workaround}; duur: ${duration}. Hoogste peil: ${p.highest}${p.active.pv?', privacytak parallel actief':''}.`,
+  'Oordeel: '+document.querySelector('#verdict').textContent.trim(),
+  ...lines,
+  `Pakket velden aanwezig: ${[...present].map(f=>`${f} ${FIELDS[f]}`).join('; ')||'geen'}.`,
+  `Ontbrekend voor ${top.title}: ${ontbrekend.map(f=>`${f} ${FIELDS[f]}`).join('; ')||'geen'}.`,
+  `Alle pakketvelden: ${allFields.map(f=>`${f} ${FIELDS[f]}`).join('; ')}.`,
+  'Peilen, rollen en contactroutes zijn demo-afspraken, geen lokaal escalatiebeleid of adresboek.',
+  'FAB adviseert; bevoegde rollen besluiten. Echte acties blijven in de bronregistratie.'
+ ].join('\n\n');
+}
+function syncInputs(){
+ document.querySelectorAll('[data-impact]').forEach(i=>{i.checked=impacts.has(i.dataset.impact);});
+ document.querySelector('#cause').value=cause;
+ document.querySelector('#workaround').value=workaround;
+ document.querySelector('#duration').value=duration;
+}
+document.querySelector('.impact').addEventListener('change',e=>{
+ const i=e.target.dataset.impact;if(!i)return;
+ e.target.checked?impacts.add(i):impacts.delete(i);draw();
+});
+document.querySelector('#cause').addEventListener('change',e=>{cause=e.target.value;draw();});
+document.querySelector('#workaround').addEventListener('change',e=>{workaround=e.target.value;draw();});
+document.querySelector('#duration').addEventListener('change',e=>{duration=e.target.value;draw();});
+document.querySelector('#package-fields').addEventListener('change',e=>{
+ const f=e.target.dataset.field;if(!f)return;
+ if(e.target.checked)present.add(f);
+ else{
+  present.delete(f);
+  for(const l of LEVELS){
+   if(l.id!=='l0'&&l.req.includes(f)&&(handover[l.id]==='sent'||handover[l.id]==='accepted')){
+    handover[l.id]='none';voided.add(l.id);
+    document.querySelector('#message').textContent=`${l.title}: pakket gewijzigd na overdracht; eerdere overdracht vervalt.`;
+   }
+  }
+ }
+ draw();
+});
+document.querySelector('.stage').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');if(!b)return;
+ const id=b.dataset.level,l=LEVELS.find(x=>x.id===id),p=peil();
+ if(b.dataset.action==='verify'&&!routeStatus(l).ok){
+  verifications[id]=PEIL;
+  document.querySelector('#message').textContent=`${l.title}: contactroute geverifieerd ${PEIL} door FAB (demo).`;
+ }
+ if(b.dataset.action==='send'&&canSend(l,p)){
+  handover[id]='sent';voided.delete(id);
+  document.querySelector('#message').textContent=id==='l3'?`${l.title}: continuïteitsproces gestart (simulatie).`:`${l.title}: overgedragen (simulatie), wacht op aanname.`;
+ }
+ if(b.dataset.action==='accept'&&handover[id]==='sent'){
+  handover[id]='accepted';
+  document.querySelector('#message').textContent=`${l.title}: aangenomen door ${l.role} (simulatie).`;
+ }
+ draw();
+});
+document.querySelector('#reset').addEventListener('click',()=>{
+ initialize();syncInputs();draw();
+ document.querySelector('#message').textContent='Beginstand hersteld; alle vinkjes, verificaties en overdrachten zijn gewist.';
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+ const text=summary();
+ document.querySelector('#export').hidden=false;
+ document.querySelector('#export-text').value=text;
+ try{await navigator.clipboard.writeText(text);document.querySelector('#message').textContent='Escalatieoverzicht gekopieerd. De tekst blijft hieronder beschikbaar.';}
+ catch{document.querySelector('#message').textContent='Kopiëren niet beschikbaar. Selecteer de tekst hieronder en kopieer zelf.';document.querySelector('#export-text').focus();document.querySelector('#export-text').select();}
+});
+document.querySelector('#print').addEventListener('click',()=>window.print());
+initialize();draw();document.body.classList.add('ready');
+</script>
+</body>
+</html>

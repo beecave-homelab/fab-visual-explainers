@@ -10,6 +10,9 @@ FILES = [
     "fab-omgevingsvergelijker.html",
     "fab-known-error-map.html",
     "fab-life-cycle-map.html",
+    "fab-escalatiekaart.html",
+    "fab-risk-control-map.html",
+    "fab-pilot-cockpit.html",
 ]
 
 
@@ -512,4 +515,349 @@ def test_lifecycle__dates_thresholds_and_dependencies(page: Page) -> None:
     ensure(
         page.locator(".register article:visible").count() == 5,
         "Lifecycle: print shows every register entry",
+    )
+
+
+def test_escalation__levels_routes_and_handover(page: Page) -> None:
+    """Gevolgen bepalen het peil; pakket en actuele route begrenzen de overdracht."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[6])
+
+    def level(n: str):
+        """Peilrij of privacytak op peil n."""
+        return page.locator(f'section[data-level="{n}"]')
+
+    ensure(
+        level("l0").locator(".state").inner_text() == "Nu aan zet",
+        "Escalation: servicedesk starts on duty",
+    )
+    for n in ("l1", "l2", "l3", "pv"):
+        ensure(
+            level(n).locator(".state").inner_text() == "Niet nodig volgens demo-regels",
+            f"Escalation: {n} inactive without an established impact",
+        )
+        ensure(
+            level(n).locator("[data-action]:enabled").count() == 0,
+            f"Escalation: {n} offers no actions while inactive",
+        )
+    ensure(
+        "Peil 0" in page.locator("#verdict").inner_text(),
+        "Escalation: empty state stays at level 0",
+    )
+    page.locator('[data-impact="hinder"]').check()
+    ensure(
+        level("l1").locator(".state").inner_text() == "Nu aan zet"
+        and level("l0").locator(".state").inner_text() == "Betrokken",
+        "Escalation: an established impact puts analysis on duty",
+    )
+    ensure(
+        level("l1").locator('[data-action="send"]').is_disabled()
+        and "Pakket onvolledig: 8 ontbreken" in level("l1").locator(".handover").inner_text(),
+        "Escalation: incomplete package blocks handover",
+    )
+    for f in range(1, 9):
+        page.locator(f'[data-field="f{f}"]').check()
+    ensure(
+        level("l1").locator('[data-action="send"]').is_enabled(),
+        "Escalation: complete package enables handover",
+    )
+    level("l1").locator('[data-action="send"]').click()
+    ensure(
+        "Overgedragen, nog niet aangenomen" in level("l1").locator(".handover").inner_text(),
+        "Escalation: sent is not yet accepted",
+    )
+    level("l1").locator('[data-action="accept"]').click()
+    ensure(
+        "Aangenomen door FAB zorgdossier" in level("l1").locator(".handover").inner_text(),
+        "Escalation: acceptance confirms the handover",
+    )
+    page.locator('[data-field="f6"]').uncheck()
+    ensure(
+        "Pakket gewijzigd na overdracht; eerdere overdracht vervalt"
+        in level("l1").locator(".handover").inner_text(),
+        "Escalation: removed required field voids the handover",
+    )
+    page.locator('[data-field="f6"]').check()
+    page.locator("#cause").select_option("vendor")
+    ensure(
+        level("l2").locator(".state").inner_text() == "Nu aan zet"
+        and level("l1").locator(".state").inner_text() == "Betrokken",
+        "Escalation: supplier cause escalates to the application owner",
+    )
+    ensure(
+        "Leverancier via de contractroute" in page.locator("#verdict").inner_text(),
+        "Escalation: verdict names the supplier partner",
+    )
+    for f in range(9, 13):
+        page.locator(f'[data-field="f{f}"]').check()
+    ensure(
+        level("l2").locator('[data-action="send"]').is_disabled()
+        and "Verouderd: laatst geverifieerd 2026-05-14"
+        in level("l2").locator(".route").inner_text(),
+        "Escalation: stale route still blocks a complete package",
+    )
+    level("l2").locator('[data-action="verify"]').click()
+    ensure(
+        level("l2").locator('[data-action="send"]').is_enabled(),
+        "Escalation: verification reopens the route",
+    )
+    page.locator("#reset").click()
+    page.locator('[data-impact="hinder"]').check()
+    page.locator("#duration").select_option("gt4")
+    ensure(
+        level("l2").locator(".state").inner_text() == "Nu aan zet"
+        and "Technisch beheer; oorzaakrichting nog vaststellen" in level("l2").inner_text(),
+        "Escalation: long outage without workaround escalates with unknown partner",
+    )
+    page.locator("#workaround").select_option("applied")
+    ensure(
+        level("l1").locator(".state").inner_text() == "Nu aan zet",
+        "Escalation: applied workaround de-escalates to analysis",
+    )
+    page.locator("#reset").click()
+    page.locator('[data-impact="zorg"]').check()
+    ensure(
+        level("l3").locator(".state").inner_text() == "Nu aan zet",
+        "Escalation: halted care support activates continuity",
+    )
+    ensure(
+        level("l3").locator('[data-action="send"]').is_enabled(),
+        "Escalation: continuity start waits for no package",
+    )
+    level("l3").locator('[data-action="send"]').click()
+    ensure(
+        "Continuïteitsproces gestart" in level("l3").locator(".handover").inner_text()
+        and "Pakket onvolledig: 15 ontbreken" in level("l3").locator(".handover").inner_text()
+        and "Niet geverifieerd" in level("l3").locator(".route").inner_text(),
+        "Escalation: started continuity still shows gaps and unverified route",
+    )
+    page.locator('[data-impact="privacy"]').check()
+    ensure(
+        level("pv").locator(".state").inner_text() == "Parallel aan zet"
+        and "datalekprocedure" in page.locator("#verdict").inner_text(),
+        "Escalation: privacy risk runs parallel without raising the level",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Escalatiekaart / INC-DEMO-0427 / demo v1 / revisie 2026-10-03"),
+        "Escalation: export header identifies the simulation",
+    )
+    ensure(
+        "FAB zorgdossier" in exported
+        and "Overdracht" in exported
+        and "aanwezig" in exported
+        and "Ontbrekend" in exported,
+        "Escalation: export lists roles, states, routes, handovers and package fields",
+    )
+    page.locator("#reset").click()
+    ensure(
+        "Peil 0" in page.locator("#verdict").inner_text()
+        and page.locator("[data-field]:checked").count() == 0,
+        "Escalation: reset restores the starting state",
+    )
+
+
+def test_risk_controls__only_tested_controls_lower_residual(page: Page) -> None:
+    """Alleen getoetste werkzame maatregelen verlagen het aangetoonde restrisico."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[7])
+
+    def risk(n: str):
+        """Risicoartikel n."""
+        return page.locator(f'article[data-risk="{n}"]')
+
+    def control(n: str):
+        """Maatregelregel n."""
+        return page.locator(f'li[data-control="{n}"]')
+
+    ensure(
+        "Midden, privacyrisico" in risk("R1").locator(".residual").inner_text()
+        and "Ernstig restrisico" in risk("R1").locator(".residual").inner_text(),
+        "Risk: untested privacy risk stays severe",
+    )
+    ensure(
+        "Laag, privacyrisico" in risk("R1").locator(".expected").inner_text(),
+        "Risk: expected residual shown separately",
+    )
+    ensure(
+        "Laag, financiële gevolgen" in risk("R2").locator(".residual").inner_text()
+        and "Ernstig" not in risk("R2").locator(".residual").inner_text(),
+        "Risk: tested control lowers demonstrated residual",
+    )
+    ensure(
+        "Midden, stilgevallen zorgondersteuning" in risk("R3").locator(".residual").inner_text()
+        and "Ernstig" in risk("R3").locator(".residual").inner_text(),
+        "Risk: proposed measures leave the severe residual",
+    )
+    ensure(
+        control("C6").locator('[data-action="pass"]').is_disabled()
+        and control("C6").locator('[data-action="fail"]').is_disabled()
+        and "noodplan ontbreekt" in control("C6").inner_text(),
+        "Risk: missing local plan blocks testing",
+    )
+    ensure(
+        "3 risico's: 0 met geaccepteerd restrisico, 3 zonder acceptatie, 2 met ernstig"
+        " aangetoond restrisico. 1 van 6 maatregelen getoetst."
+        == page.locator("#tally").inner_text(),
+        "Risk: tally counts acceptances, severe residuals and tested controls",
+    )
+    control("C1").locator('[data-action="pass"]').click()
+    ensure(
+        "Laag, privacyrisico" in risk("R1").locator(".residual").inner_text()
+        and "Ernstig" not in risk("R1").locator(".residual").inner_text(),
+        "Risk: tested working control lowers demonstrated residual",
+    )
+    ensure(
+        "1 met ernstig" in page.locator("#tally").inner_text()
+        and "2 van 6" in page.locator("#tally").inner_text(),
+        "Risk: tally follows the tested control",
+    )
+    risk("R1").locator('[data-action="accept"]').click()
+    ensure(
+        "Geaccepteerd (simulatie)" in risk("R1").locator(".acceptance").inner_text()
+        and "nog niet getoetste maatregelen: 1" in risk("R1").locator(".acceptance").inner_text(),
+        "Risk: acceptance records residual and open controls",
+    )
+    control("C2").locator('[data-action="execute"]').click()
+    ensure(
+        "Acceptatie vervallen" in risk("R1").locator(".acceptance").inner_text(),
+        "Risk: control change after acceptance voids it",
+    )
+    control("C4").locator('[data-action="fail"]').click()
+    ensure(
+        "Getoetst, niet werkzaam" in control("C4").locator(".state").inner_text()
+        and "Laag, financiële gevolgen" in risk("R2").locator(".residual").inner_text(),
+        "Risk: failed control leaves residual on the working one",
+    )
+    control("C3").locator('[data-action="change"]').click()
+    ensure(
+        "Gewijzigd, opnieuw toetsen" in control("C3").locator(".state").inner_text()
+        and "Hoog, financiële gevolgen" in risk("R2").locator(".residual").inner_text()
+        and "Ernstig" in risk("R2").locator(".residual").inner_text(),
+        "Risk: changed control loses its demonstrated effect",
+    )
+    control("C6").locator('[data-action="execute"]').click()
+    ensure(
+        "Uitgevoerd, niet getoetst" in control("C6").locator(".state").inner_text()
+        and control("C6").locator('[data-action="pass"]').is_disabled()
+        and control("C6").locator('[data-action="fail"]').is_disabled(),
+        "Risk: executed fallback stays untestable without a plan",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Risk & Control Map / RFC-2026-118 / demo v1 / revisie 2026-10-03")
+        and "Aangetoond restrisico" in exported
+        and "Verwacht als alle maatregelen werken" in exported
+        and "Acceptatie" in exported,
+        "Risk: export carries residual, expectation and acceptance",
+    )
+    page.locator("#reset").click()
+    ensure(
+        "1 van 6 maatregelen getoetst" in page.locator("#tally").inner_text(),
+        "Risk: reset restores the starting state",
+    )
+
+
+def test_pilot__counted_weeks_brakes_and_advice(page: Page) -> None:
+    """Alleen gecontroleerde weken tellen; niet gemeten is onbekend, niet groen."""
+    page.add_init_script(
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText: async () => {throw new Error('Forced test denial')}}})"
+    )
+    open_file(page, FILES[8])
+
+    def brake(n: str):
+        """Statustekst van stopcriterium n."""
+        return page.locator(f'li[data-brake="{n}"] .state')
+
+    points = page.evaluate(
+        """() => {
+          const pl = [...document.querySelectorAll('#chart polyline')]
+            .find(el => !el.getAttribute('stroke-dasharray'));
+          return pl.getAttribute('points').trim().split(/\\s+/)
+            .map(pair => pair.split(',').map(Number));
+        }"""
+    )
+    ensure(
+        len(points) == 7
+        and all(120 < x < 700 and 20 < y < 320 for x, y in points)
+        and all(points[i][0] < points[i + 1][0] for i in range(6)),
+        "Pilot: chart marks every visible week in its own column, not week 8",
+    )
+    ensure(
+        "3 van minimaal 4" in page.locator("#advice").inner_text()
+        and "Nog niet te beoordelen" in page.locator("#advice").inner_text(),
+        "Pilot: three counted weeks cannot be assessed",
+    )
+    ensure(
+        "Niet gemeten" in brake("S2").inner_text(),
+        "Pilot: unperformed fallback test stays unknown",
+    )
+    ensure(
+        "Niet geraakt" in brake("S3").inner_text() and "Niet geraakt" in brake("S4").inner_text(),
+        "Pilot: measured brakes below threshold",
+    )
+    ensure(
+        "Aangeleverd, niet gecontroleerd" in page.locator('li[data-week="6"]').inner_text(),
+        "Pilot: delivered week is not counted",
+    )
+    page.locator('[data-action="control"][data-week="6"]').click()
+    ensure(
+        "Gecontroleerd, telt niet mee: noemer 38, minder dan 40"
+        in page.locator('li[data-week="6"]').inner_text()
+        and "3 van minimaal 4" in page.locator("#advice").inner_text(),
+        "Pilot: checked week under denominator threshold stays out",
+    )
+    page.locator('[data-action="control"][data-week="7"]').click()
+    ensure(
+        "Aanwijzing voor effect" in page.locator("#advice").inner_text()
+        and "doorgaan pas na meting van" in page.locator("#advice").inner_text()
+        and "Overdracht niet beschikbaar bij storing" in page.locator("#advice").inner_text(),
+        "Pilot: indication waits for the unmeasured brake",
+    )
+    page.locator('[data-action="fallback-pass"]').click()
+    ensure(
+        "Aanwijzing voor effect; voorleggen voor een besluit over doorgaan"
+        in page.locator("#advice").inner_text(),
+        "Pilot: measured brakes release the indication",
+    )
+    page.locator('[data-action="incident"]').click()
+    ensure(
+        "Stoppen en voorleggen aan de pilot-eigenaar" in page.locator("#advice").inner_text(),
+        "Pilot: hit stop criterion overrides the indication",
+    )
+    page.locator("#reset").click()
+    page.locator('[data-action="control"][data-week="7"]').click()
+    page.locator("#week").fill("5")
+    ensure(
+        "Nog niet te beoordelen" in page.locator("#advice").inner_text(),
+        "Pilot: earlier cutoff leaves three counted weeks",
+    )
+    page.locator("#reset").click()
+    page.locator('[data-action="control"][data-week="7"]').click()
+    page.locator('[data-action="correct"][data-week="3"]').click()
+    ensure(
+        "Gecorrigeerd, opnieuw controleren" in page.locator('li[data-week="3"]').inner_text()
+        and "Nog niet te beoordelen" in page.locator("#advice").inner_text(),
+        "Pilot: correction returns the week to unchecked",
+    )
+    page.locator("#copy").click()
+    exported = page.locator("#export-text").input_value()
+    ensure(
+        exported.startswith("Pilot Cockpit / PILOT-DEMO-04 / demo v1 / revisie 2026-10-03")
+        and "Hypothese" in exported
+        and "Nulmeting" in exported
+        and "Stopcriterium" in exported
+        and "Advies" in exported,
+        "Pilot: export carries definition, weeks, brakes and advice",
+    )
+    page.locator("#reset").click()
+    ensure(
+        "Nog niet te beoordelen" in page.locator("#advice").inner_text(),
+        "Pilot: reset restores the starting state",
     )
