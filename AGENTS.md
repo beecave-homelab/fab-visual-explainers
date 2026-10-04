@@ -50,6 +50,8 @@ De HTML staat onder `visuals/`, in `incident_en_continuiteit/`, `wijziging_en_ac
 ## Wijzigingen
 
 - Bewaar de zelfstandige HTML-opzet en de bestaande vormgeving; voeg geen afhankelijkheden of extra visuals toe zonder concrete taak.
+- Iedere visual heeft in de HTML-`<head>` precies één `<meta name="description" content="…">` met een korte, inhoudelijke beschrijving in één of twee zinnen. Beschrijf in begrijpelijk Nederlands wat de gebruiker kan bekijken of onderzoeken, zodat ook een onbekende visualnaam zonder doorklikken duidelijk wordt. Herhaal niet alleen de titel of hoofdkop en claim geen onbewezen meerwaarde, goedkeuring of functionaliteit. Dit geldt voor alle nieuwe visuals en blijft bij inhoudelijke wijzigingen actueel.
+- De landingspagina haalt beschrijvingen uit deze HTML-metadata; houd geen afzonderlijke beschrijvingenlijst bij. De terugval naar een inleiding of hoofdkop vervangt de verplichte metadata niet. Werk na toevoeging, verwijdering, verplaatsing of wijziging van titel of beschrijving het opgeslagen overzicht bij met `python3 scripts/visual_library.py --generate` en controleer de beschrijvingen en inventarislinks met `uv run --locked pytest test/test_library.py`.
 - Houd bij toevoeging of verwijdering aantallen bestanden, concepten en kandidaten, beheerkaartjes, lokale links en leesbare alternatieven actueel. Elk concept heeft één checkbox; de twee incidentvarianten tellen als één concept. Vink alleen af zodra het HTML-bestand aanwezig is en beschrijf aanwezige interacties los van aanbevelingen. Test kritieke informatie ook zonder JavaScript en in afdrukmodus.
 - Markeer fictieve onderzoeksclaims en ongemeten scores als demonstraties. Claim geen lokale goedkeuring, productierijpheid of gebruikerswaarde zonder bewijs.
 

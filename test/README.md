@@ -27,6 +27,8 @@ Gebruik voor `--basetemp` uitsluitend een aparte testmap: pytest verwijdert best
 
 ## Dekking
 
+`test_library.py` toetst de landingspagina: actuele ontdekking van toevoegingen en verwijderingen, nieuwe categorieën, veilige metadata en bestandsroutes, inventarislinks, zoek- en categoriefilters, focusbehoud, nieuw tabblad, 320/390/768/1440 px, werking zonder JavaScript en volledige afdruk na filtering. HTTP-controles gebruiken een eigen tijdelijke server op een door het besturingssysteem toegewezen poort; de server wordt altijd gestopt.
+
 | Bestand                       | Doel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `test_inventory.py`           | Recursieve ontdekking, lege inventaris, dubbele namen en ontbrekende gevraagde prototypes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -47,19 +49,19 @@ Behoud bewijslast: maak een falende controle niet groen door de verwachting te v
 ## Formatter- en lintcommando’s
 
 ```sh
-uv run --locked ruff check test
-uv run --locked ruff format --check test
+uv run --locked ruff check test scripts
+uv run --locked ruff format --check test scripts
 uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check visuals/
+uv run --locked djlint --check visuals/ index.html
 ```
 
 Opmaak bijwerken:
 
 ```sh
-uv run --locked ruff check test --fix
-uv run --locked ruff format test
+uv run --locked ruff check test scripts --fix
+uv run --locked ruff format test scripts
 uv run --locked mdformat *.md test/README.md
-uv run --locked djlint --reformat visuals/
+uv run --locked djlint --reformat visuals/ index.html
 ```
 
 Ruff controleert Python, mdformat met GFM en frontmatter ondersteunt tabellen, checkboxes en YAML-metadata, djLint verzorgt HTML-opmaak. CSS en JavaScript binnen HTML worden niet door djLint geformatteerd. Voer na HTML-opmaak de browserregressies uit; formatterchecks beoordelen geen werking of visuele toegankelijkheid.
