@@ -63,6 +63,11 @@ nav{display:flex;gap:14px 26px;flex-wrap:wrap;margin-top:22px;font-size:16px}.fo
 @media(max-width:480px){.page{padding:16px 12px}h1{font-size:34px}.stamp{width:160px}}
 @media print{body{background:white;color:#000;font-size:11pt}.page{padding:0;max-width:none}h1{font-size:24pt}h2{font-size:16pt}h3{font-size:13pt}.demo{border-color:#999}.demo strong,.live,a{color:#000}.context{border-color:#777}.mast{grid-template-columns:1fr 1fr;gap:20px;padding:12px 0;align-items:start}.tools,.skip,nav,.live,.interactive,body.ready .interactive.interactive,[data-action]{display:none!important}.passport{display:block;box-shadow:none;background:white}.leaf{padding:10px 0;background-image:none;border:0}.visas{display:block;padding:0}.hop{break-inside:avoid;border:0;border-top:1px solid #999;padding:12px 0;margin-top:10px}.hop.zone{border-left:0}.hop-zone{color:#000}.stamp{width:auto;min-height:0;height:auto;border:2px solid #555;border-radius:0;transform:none;clip-path:none;outline:none;display:block;text-align:left;padding:8px 10px;margin-bottom:8px}.stamp::after{display:none}.stamp .value{display:inline}.pagenr{position:static}.outcome{display:block}.verdict,.proposal{border:1px solid #777;break-inside:avoid;margin-top:12px}.export textarea{min-height:260px}.reference{break-before:page;border-color:#000}details>:not(summary){display:block!important}.register article{break-inside:avoid}.export[hidden]{display:none!important}*{box-shadow:none!important}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>

@@ -6,14 +6,24 @@ De inventaris wordt recursief uit `visuals/` opgebouwd. `support.py` biedt `visu
 
 ## Omgeving
 
-Python 3.11 of hoger, uv en lokaal geïnstalleerd Google Chrome zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
+Python 3.11 of hoger, uv en Google Chrome of de bij Playwright passende Chromium-installatie zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
 
 ```sh
 uv sync --locked
 uv run --locked pytest
 ```
 
-De eerste installatie kan netwerktoegang nodig hebben. Na installatie kan `uv run --offline --locked pytest` worden gebruikt. Ontbrekend Chrome of ontbrekende dependencies zijn fouten, geen stilzwijgend overgeslagen tests.
+De eerste installatie kan netwerktoegang nodig hebben. Na installatie kan `uv run --offline --locked pytest` worden gebruikt. Standaard (`--browser-channel auto`) gebruikt de suite lokaal Chrome. Alleen wanneer die distributie ontbreekt, probeert zij Playwright Chromium. De uitvoer meldt de gebruikte browser en versie; crashes, permissiefouten en ontbrekend Chromium blijven fouten. Er worden geen tests overgeslagen of assertions aangepast en tijdens pytest wordt niets geïnstalleerd.
+
+Voor een review-host zonder Chrome, of een expliciete browservergelijking:
+
+```sh
+uv run --locked playwright install chromium
+uv run --locked pytest --browser-channel chromium
+uv run --locked pytest --browser-channel chrome
+```
+
+De laatste opdracht vereist Chrome en valt nooit terug. Chromium en Chrome kunnen door browserversie, fonts en besturingssysteem verschillende layoutuitkomsten geven. Een fallback maakt zulke failures niet automatisch omgevingsgebonden: reproduceer ze op dezelfde browser met de basisversie van de betrokken bestanden. Ontbrekende dependencies blijven fouten.
 
 ## Gerichte uitvoering
 
@@ -27,6 +37,8 @@ Gebruik voor `--basetemp` uitsluitend een aparte testmap: pytest verwijdert best
 
 ## Dekking
 
+`test_browser_selection.py` controleert browserkeuze, de begrensde fallback en het behouden van startfouten zonder een browser te starten.
+
 | Bestand                       | Doel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `test_inventory.py`           | Recursieve ontdekking, lege inventaris, dubbele namen en ontbrekende gevraagde prototypes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -37,6 +49,7 @@ Gebruik voor `--basetemp` uitsluitend een aparte testmap: pytest verwijdert best
 | `test_review_edges.py`        | Drempels, afkeuring, onbekende uitkomsten, toetsenbord en exportfallbacks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `test_management.py`          | Beheeracceptatie, gewijzigde bewijsbron, afkeuring en reset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `test_task_views.py`          | Testbewijs, herbeoordeling, filterfocus, continuïteitsvoorwaarden, overlappende kwaliteitsafwijkingen, omgevingsverschillen en -veroudering, bekende fouten met voorwaarden, levenscyclus-startdata, escalatiepeilen met route- en pakketoverdracht, getoetste maatregelen en restrisicoacceptatie, en meetweken met stopcriteria en pilotadvies; lineage-vergelijkingen met verversing, plek en vervallen voorstel; releasepunten met inbak, doelgroepfilter en gewijzigde releasenotes; en adoptielagen met drempels, draagkracht en instructiewijziging. |
+| `test_source_patterns.py`     | Volledige bronlijsten zonder JavaScript en in afdruk, inhoudspariteit per bronselectie, werkelijke zichtbaarheid van ingeklapte details, zoekresultaten en navigatie, bewijsdialoog en focus, selectiestatus, veilige brontekst en blijvende exporttekst bij clipboardweigering.                                                                                                                                                                                                                                                                            |
 | `test_ketenkaart.py`          | Routes, verstoring, toetsenbord, mobiele grenzen, afdruk, SVG-labels en vertraagde clipboardacties.                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 Iedere test krijgt een eigen browsercontext. Externe HTTP(S)-requests worden geblokkeerd; onverwachte requests worden als fout gerapporteerd. De bekende Google Fonts-aanvraag van de algemene incidentpagina is een expliciete uitzondering op de foutmelding, maar wordt eveneens geblokkeerd zodat de lokale fallback wordt getoetst; JavaScript-fouten worden ook op aanvullende pagina’s bijgehouden. Browsercontexten worden na succes en fouten gesloten. De tests gebruiken synthetische gegevens en wijzigen geen HTML-bronbestand.

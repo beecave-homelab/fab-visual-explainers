@@ -217,7 +217,7 @@
       .evidence-rail{border-top:2px solid var(--d-line)}
     }
     @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-  
+
 
 body{background:#061923;color:#e8f2f4}
 #atlas.design{display:block;min-height:100vh}
@@ -250,9 +250,44 @@ body{background:#061923;color:#e8f2f4}
 @media screen and (max-width: 650px) {
   .atlas-map { min-height: 0; padding: 16px; }
 }
+
+/* Het volledige bronmodel blijft leesbaar zonder scripts en in afdruk. */
+[hidden] { display: none !important; }
+.source-register { max-width:1440px; margin:24px auto; padding:24px; border:1px solid currentColor; border-radius:16px; line-height:1.6; overflow-wrap:anywhere; }
+.source-register summary { cursor:pointer; font-weight:700; }
+.source-register article { margin-top:24px; padding-top:16px; border-top:1px solid currentColor; }
+.source-register h3 { font-size:1.2rem; line-height:1.4; }
+.source-register a { color:inherit; }
+.source-register blockquote { margin:16px 0; padding:12px; border-left:3px solid currentColor; }
+.source-register :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+@media screen and (max-width:760px) { .source-register { margin:16px; padding:16px; } }
+@media print {
+  @page { size:A4; margin:12mm; }
+  body { background:white!important; color:black!important; font-size:11pt!important; }
+  .review-context, .source-register { max-width:none!important; width:auto!important; margin:0!important; padding:12pt 0!important; border:0!important; color:black!important; }
+  .source-register { display:block!important; }
+  .review-context, .source-register { line-height:1.45; }
+  .review-context h2, .source-register h2 { font-size:16pt; }
+  .source-register h3 { font-size:13pt; }
+  .source-register article { margin-top:12pt; padding-top:8pt; }
+  .source-register summary { list-style:none; }
+  .source-register summary::marker { content:""; }
+  .source-register article { break-inside:avoid; }
+  .source-register a { text-decoration:none; }
+}
+
+@media print { #atlas { display:none!important; } }
+
+/* Ook ingeklapte native details worden volledig afgedrukt. */
+@media print {
+  details::details-content { content-visibility:visible!important; }
+}
 </style>
 </head>
 <body>
+<noscript><style>button, input[type="search"] { display:none!important; }</style>
+<p class="source-register">JavaScript staat uit. Lees alle demo-inhoud in de bronlijst onderaan.</p>
+</noscript>
 <section class="review-context" aria-label="Beheerkaart en bronstatus" style="max-width:1440px;margin:24px auto;padding:24px;border:1px solid currentColor;border-radius:16px;line-height:1.6;overflow-wrap:anywhere">
 <h2>Helpt dit netwerk bij een terugkerende beheer- of leervraag?</h2>
 <p><strong>Fictieve bron:</strong> inzichten, bronverwijzingen, metingen, pilot- en tijdwinstclaims hieronder zijn verzonnen; er is geen uitgevoerd onderzoek of aangetoonde gebruikerswaarde. Verbanden zijn demonstraties, geen bewezen oorzaken.</p>
@@ -374,6 +409,8 @@ body{background:#061923;color:#e8f2f4}
 </section>
 <script>
 (() => {
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
   const atlasData = {
     adoption:{type:'Centraal inzicht',title:'Gebruik stijgt pas na vereenvoudiging',summary:'De bron laat zien dat mensen informatie pas structureel gebruiken wanneer de eerste leeslaag sterk is teruggebracht. Volledigheid blijft beschikbaar, maar wordt pas zichtbaar na een bewuste klik.',why:'De grootste winst zit niet in méér samenvatten, maar in een betere volgorde: eerst betekenis, daarna bewijs en pas daarna detail.',evidence:['Gebruikers vinden hoofdpunten sneller wanneer de eerste laag beperkt blijft.','Context blijft beschikbaar via bronverwijzingen en verdiepingspanelen.'],source:'Bron: hoofdstuk 3 · bevinding 4'},
     fragmentation:{type:'Oorzaak',title:'Versnipperde informatie vertraagt oriëntatie',summary:'Wanneer definities, uitzonderingen en bewijs verspreid staan, kost het lezers veel tijd om eerst zelf een mentaal model te bouwen.',why:'De interface moet daarom niet alleen tekst verkorten, maar expliciet laten zien hoe onderdelen bij elkaar horen.',evidence:['Herhaalde begrippen komen op meerdere plekken terug.','Lezers wisselen vaak tussen hoofdstukken om verbanden te reconstrueren.'],source:'Bron: hoofdstuk 2 · analyse 2'},
@@ -388,31 +425,139 @@ body{background:#061923;color:#e8f2f4}
   const atlasNodes = [...document.querySelectorAll('.atlas-node')];
   const setAtlasNode = (id) => {
     const d = atlasData[id]; if(!d) return;
-    atlasNodes.forEach(n => n.classList.toggle('active', n.dataset.node === id));
+    atlasNodes.forEach(n => {n.classList.toggle('active', n.dataset.node === id);n.setAttribute('aria-pressed',String(n.dataset.node === id));});
     document.getElementById('atlasType').textContent = d.type;
     document.getElementById('atlasTitle').textContent = d.title;
     document.getElementById('atlasSummary').textContent = d.summary;
     document.getElementById('atlasWhy').textContent = d.why;
-    document.getElementById('atlasEvidence').innerHTML = d.evidence.map(x => `<li>${x}</li>`).join('');
+    document.getElementById('atlasEvidence').innerHTML = d.evidence.map(x => `<li>${escapeHtml(x)}</li>`).join('');
     document.getElementById('atlasSource').textContent = d.source;
   };
   atlasNodes.forEach(n => n.addEventListener('click', () => setAtlasNode(n.dataset.node)));
 
   const routeButtons = [...document.querySelectorAll('[data-route]')];
   const applyRoute = (route) => {
-    routeButtons.forEach(b => b.classList.toggle('active', b.dataset.route === route));
+    routeButtons.forEach(b => {b.classList.toggle('active', b.dataset.route === route);b.setAttribute('aria-pressed',String(b.dataset.route === route));});
     let visible = 0;
     atlasNodes.forEach(n => {
       const show = route === 'all' || n.dataset.routeKind === route;
       n.classList.toggle('dim', !show);
       if(show) visible++;
     });
-    document.getElementById('atlasStats').textContent = `${visible} zichtbaar · klik voor detail`;
+    document.getElementById('atlasStats').textContent = `${visible} in deze route · ${atlasNodes.length-visible} gedimd, ook te openen`;
   };
   routeButtons.forEach(b => b.addEventListener('click', () => applyRoute(b.dataset.route)));
+  setAtlasNode('adoption');
+  applyRoute('all');
 
 
 })();
 </script>
+<section class="source-register" aria-label="Volledig leesbaar bronmodel">
+<h2>Kennisatlas — volledig bronmodel</h2>
+<details id="source-register" open>
+<summary>Alle demo-inhoud als leesbare bronlijst</summary>
+<p>Dit register bevat alle thema’s, antwoorden, onderbouwingen en beperkingen van het synthetische bronmodel (demo v3, revisie 2026-10-01). Verwijzingen en onderzoeksclaims zijn fictief; bronhouder onbekend, niet lokaal gevalideerd. Het is een lees- en afdrukalternatief voor dezelfde demo, geen echte bron of afzonderlijke registratie.</p>
+<article id="source-section-0" data-source-key="adoption">
+<h3>Gebruik stijgt pas na vereenvoudiging</h3>
+<p>Centraal inzicht</p>
+<p>De bron laat zien dat mensen informatie pas structureel gebruiken wanneer de eerste leeslaag sterk is teruggebracht. Volledigheid blijft beschikbaar, maar wordt pas zichtbaar na een bewuste klik.</p>
+<p>De grootste winst zit niet in méér samenvatten, maar in een betere volgorde: eerst betekenis, daarna bewijs en pas daarna detail.</p>
+<ul>
+<li>Gebruikers vinden hoofdpunten sneller wanneer de eerste laag beperkt blijft.</li>
+<li>Context blijft beschikbaar via bronverwijzingen en verdiepingspanelen.</li>
+</ul>
+<p>Bron: hoofdstuk 3 · bevinding 4</p>
+</article><article id="source-section-1" data-source-key="fragmentation">
+<h3>Versnipperde informatie vertraagt oriëntatie</h3>
+<p>Oorzaak</p>
+<p>Wanneer definities, uitzonderingen en bewijs verspreid staan, kost het lezers veel tijd om eerst zelf een mentaal model te bouwen.</p>
+<p>De interface moet daarom niet alleen tekst verkorten, maar expliciet laten zien hoe onderdelen bij elkaar horen.</p>
+<ul>
+<li>Herhaalde begrippen komen op meerdere plekken terug.</li>
+<li>Lezers wisselen vaak tussen hoofdstukken om verbanden te reconstrueren.</li>
+</ul>
+<p>Bron: hoofdstuk 2 · analyse 2</p>
+</article><article id="source-section-2" data-source-key="measurement">
+<h3>Meetbare tijdswinst bij gerichte verdieping</h3>
+<p>Onderbouwing</p>
+<p>In de pilot werd informatie sneller teruggevonden wanneer gebruikers eerst konden kiezen welk type vraag zij wilden beantwoorden.</p>
+<p>Een scanlaag is alleen waardevol als die aantoonbaar sneller naar de relevante bron leidt.</p>
+<ul>
+<li>Kortere zoektijd voor specifieke bevindingen.</li>
+<li>Minder terugscrollen naar eerdere context.</li>
+</ul>
+<p>Bron: pilotmeting · tabel 5</p>
+</article><article id="source-section-3" data-source-key="ownership">
+<h3>Duidelijk eigenaarschap houdt de bron betrouwbaar</h3>
+<p>Randvoorwaarde</p>
+<p>Een visuele samenvatting werkt alleen als iemand verantwoordelijk blijft voor actualiteit, definities en bronverwijzingen.</p>
+<p>Zonder eigenaarschap ontstaat een mooi overzicht dat na verloop van tijd afwijkt van de oorspronkelijke bron.</p>
+<ul>
+<li>Versiebeheer moet zichtbaar zijn.</li>
+<li>Elke samenvatting moet naar een controleerbare bronlaag leiden.</li>
+</ul>
+<p>Bron: governance · paragraaf 6.2</p>
+</article><article id="source-section-4" data-source-key="quality">
+<h3>De kwaliteit van brondata wisselt</h3>
+<p>Onzekerheid</p>
+<p>Niet alle onderdelen van de bron zijn even stevig onderbouwd. Sommige conclusies rusten op metingen, andere op interviews of aannames.</p>
+<p>De visualisatie moet verschil in bewijskracht tonen in plaats van alle informatie dezelfde visuele status te geven.</p>
+<ul>
+<li>Kwantitatieve en kwalitatieve bronnen zijn gecombineerd.</li>
+<li>Enkele deelconclusies hebben een beperkte steekproef.</li>
+</ul>
+<p>Bron: methodologie · beperkingen</p>
+</article><article id="source-section-5" data-source-key="pilot">
+<h3>Pilot laat snellere oriëntatie zien</h3>
+<p>Onderbouwing</p>
+<p>Deelnemers konden na een korte introductie zelfstandig de hoofdstructuur herkennen en gericht naar detail navigeren.</p>
+<p>Dat ondersteunt het idee dat informatiearchitectuur een groot deel van de cognitieve belasting kan wegnemen.</p>
+<ul>
+<li>De meeste deelnemers vonden de kern zonder lineair lezen.</li>
+<li>Broninformatie bleef bereikbaar zonder extra navigatielaag.</li>
+</ul>
+<p>Bron: gebruikerstest · sessies 1–6</p>
+</article><article id="source-section-6" data-source-key="overload">
+<h3>Te veel detail in de eerste laag remt gebruik</h3>
+<p>Risico</p>
+<p>Wanneer samenvatting, nuance, definities en bewijs tegelijk zichtbaar zijn, verdwijnt het voordeel van een interactieve one-pager.</p>
+<p>De eerste laag moet durven weglaten. Detail is geen probleem zolang het één klik verder beschikbaar blijft.</p>
+<ul>
+<li>Dichte schermen leiden tot langere zoektijd.</li>
+<li>Gebruikers negeren detail wanneer de hiërarchie onduidelijk is.</li>
+</ul>
+<p>Bron: observaties · patroon 3</p>
+</article><article id="source-section-7" data-source-key="confidence">
+<h3>Meer vertrouwen in besluitvorming</h3>
+<p>Effect</p>
+<p>Lezers geven aan zekerder te zijn wanneer een kernconclusie direct gekoppeld is aan de onderliggende argumenten en beperkingen.</p>
+<p>Transparantie hoeft niet te betekenen dat alles tegelijk zichtbaar is. Het betekent dat verdieping controleerbaar en voorspelbaar is.</p>
+<ul>
+<li>Bronpad blijft zichtbaar tijdens het lezen.</li>
+<li>Onzekerheden worden naast conclusies gepresenteerd.</li>
+</ul>
+<p>Bron: evaluatie · thema vertrouwen</p>
+</article>
+<article id="source-relations">
+<h3>Verbanden uit de fictieve kaart</h3>
+<p>Verbanden uit de fictieve kaart; geen bewezen oorzaken.</p>
+<ul>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Versnipperde informatie</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Duidelijk eigenaarschap</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Kwaliteit brondata wisselt</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Te veel detail remt gebruik</li>
+<li>Gebruik stijgt pas na vereenvoudiging ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Versnipperde informatie ↔ Meetbare tijdswinst</li>
+<li>Duidelijk eigenaarschap ↔ Meetbare tijdswinst</li>
+<li>Kwaliteit brondata wisselt ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Te veel detail remt gebruik ↔ Pilot laat snellere oriëntatie zien</li>
+<li>Versnipperde informatie ↔ Kwaliteit brondata wisselt</li>
+<li>Duidelijk eigenaarschap ↔ Te veel detail remt gebruik</li>
+</ul>
+</article>
+</details>
+</section>
+<script>document.getElementById('source-register').open = false;</script>
 </body>
 </html>
