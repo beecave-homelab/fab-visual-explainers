@@ -15,6 +15,10 @@ uv run --locked pytest
 
 De eerste installatie kan netwerktoegang nodig hebben. Na installatie kan `uv run --offline --locked pytest` worden gebruikt. Ontbrekend Chrome of ontbrekende dependencies zijn fouten, geen stilzwijgend overgeslagen tests.
 
+## Codex-sandbox op macOS
+
+Start checks die lokaal Chrome openen vanuit Codex direct met de toegestane uitvoering buiten de sandbox (`exec_command`, `sandbox_permissions: "require_escalated"`). Binnen de beperkte sandbox kan Chrome bij appregistratie afbreken met `SIGABRT`, waarna macOS een crashvenster toont, ook in headless-modus. Doe in deze omgeving geen eerste proefstart of herhaalde startpogingen binnen de sandbox. Dit geldt ook voor losse Playwright-screenshotscripts. Controles zonder browser hebben deze uitvoering niet nodig. Zie [de uitvoerafspraak in AGENTS.md](../AGENTS.md#browserchecks-vanuit-codex-op-macos).
+
 ## Gerichte uitvoering
 
 ```sh
