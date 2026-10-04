@@ -72,7 +72,7 @@ Er zijn twee werkstromen. **Bibliotheekonderhoud** wijzigt de prototypes onder `
 
 De permanente pytest-browserregressies staan in `test/`; [test/README.md](test/README.md) beschrijft dekking, gerichte uitvoering en tijdelijke uitvoer. `pyproject.toml` definieert de ontwikkelafhankelijkheden en kwaliteitsinstellingen; `uv.lock` legt versies vast. De tooling voegt geen runtime-afhankelijkheid of buildstap aan de HTML toe.
 
-Python 3.11 of hoger, uv en lokaal geïnstalleerd Google Chrome zijn vereist:
+Python 3.11 of hoger, uv en Google Chrome of Playwright Chromium zijn vereist:
 
 ```sh
 uv sync --locked
@@ -85,7 +85,7 @@ uv run --locked djlint --check visuals/
 
 Gebruik na installatie desgewenst `uv run --offline --locked pytest`. Werk dependencies bewust via `pyproject.toml` en `uv lock` bij; commit de lockfile samen met dependencywijzigingen. Er is geen Markdown-build of Python-distributie.
 
-De tests gebruiken `sync_playwright()` en `chromium.launch(channel='chrome', headless=True)`, openen bestanden via `Path.as_uri()` en wachten op `networkidle`. Iedere test heeft een eigen browsercontext; onverwachte externe requests en JavaScript-fouten laten de test falen. De bekende Google Fonts-aanvraag van de algemene incidentpagina wordt geblokkeerd; die pagina wordt met lokale fallbackfonts getoetst. Screenshots en PDF’s gaan naar pytest-tijdelijke mappen. Gebruik `--basetemp` uitsluitend voor een aparte testmap, omdat pytest de bestaande inhoud verwijdert.
+De tests gebruiken `sync_playwright()` en standaard lokaal Chrome. Alleen bij ontbrekend Chrome valt `--browser-channel auto` terug op geïnstalleerd Playwright Chromium; browser en versie worden gemeld. `--browser-channel chrome` vereist Chrome; `--browser-channel chromium` kiest de fallback expliciet. Startfouten blijven fouten; pytest installeert niets en verzwakt geen assertions. Zie `test/README.md` voor installatie en browservergelijking. De tests openen bestanden via `Path.as_uri()` en wachten op `networkidle`. Iedere test heeft een eigen browsercontext; onverwachte externe requests en JavaScript-fouten laten de test falen. De bekende Google Fonts-aanvraag van de algemene incidentpagina wordt geblokkeerd; die pagina wordt met lokale fallbackfonts getoetst. Screenshots en PDF’s gaan naar pytest-tijdelijke mappen. Gebruik `--basetemp` uitsluitend voor een aparte testmap, omdat pytest de bestaande inhoud verwijdert.
 
 ### Browserchecks vanuit Codex op macOS
 

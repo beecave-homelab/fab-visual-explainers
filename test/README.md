@@ -6,14 +6,24 @@ De inventaris wordt recursief uit `visuals/` opgebouwd. `support.py` biedt `visu
 
 ## Omgeving
 
-Python 3.11 of hoger, uv en lokaal geïnstalleerd Google Chrome zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
+Python 3.11 of hoger, uv en Google Chrome of de bij Playwright passende Chromium-installatie zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
 
 ```sh
 uv sync --locked
 uv run --locked pytest
 ```
 
-De eerste installatie kan netwerktoegang nodig hebben. Na installatie kan `uv run --offline --locked pytest` worden gebruikt. Ontbrekend Chrome of ontbrekende dependencies zijn fouten, geen stilzwijgend overgeslagen tests.
+De eerste installatie kan netwerktoegang nodig hebben. Na installatie kan `uv run --offline --locked pytest` worden gebruikt. Standaard (`--browser-channel auto`) gebruikt de suite lokaal Chrome. Alleen wanneer die distributie ontbreekt, probeert zij Playwright Chromium. De uitvoer meldt de gebruikte browser en versie; crashes, permissiefouten en ontbrekend Chromium blijven fouten. Er worden geen tests overgeslagen of assertions aangepast en tijdens pytest wordt niets geïnstalleerd.
+
+Voor een review-host zonder Chrome, of een expliciete browservergelijking:
+
+```sh
+uv run --locked playwright install chromium
+uv run --locked pytest --browser-channel chromium
+uv run --locked pytest --browser-channel chrome
+```
+
+De laatste opdracht vereist Chrome en valt nooit terug. Chromium en Chrome kunnen door browserversie, fonts en besturingssysteem verschillende layoutuitkomsten geven. Een fallback maakt zulke failures niet automatisch omgevingsgebonden: reproduceer ze op dezelfde browser met de basisversie van de betrokken bestanden. Ontbrekende dependencies blijven fouten.
 
 ## Codex-sandbox op macOS
 
@@ -32,6 +42,8 @@ Gebruik voor `--basetemp` uitsluitend een aparte testmap: pytest verwijdert best
 ## Dekking
 
 `test_library.py` toetst de landingspagina: actuele ontdekking van toevoegingen en verwijderingen, nieuwe categorieën, veilige metadata en bestandsroutes, inventarislinks, zoek- en categoriefilters, focusbehoud, nieuw tabblad, 320/390/768/1440 px, werking zonder JavaScript en volledige afdruk na filtering. HTTP-controles gebruiken een eigen tijdelijke server op een door het besturingssysteem toegewezen poort; de server wordt altijd gestopt.
+
+`test_browser_selection.py` controleert browserkeuze, de begrensde fallback en het behouden van startfouten zonder een browser te starten.
 
 | Bestand                       | Doel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
