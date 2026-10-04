@@ -29,7 +29,7 @@ De ideeënnotitie bevat links naar alle prototypes. Documentatie en configuratie
 
 ## Ontwikkelen en controleren
 
-Gebruik Python 3.11 of hoger, uv en lokaal Google Chrome:
+Gebruik Python 3.11 of hoger, uv en Google Chrome of Playwright Chromium (zie [browserkeuze](test/README.md#omgeving)):
 
 ```sh
 uv sync --locked

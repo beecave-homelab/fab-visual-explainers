@@ -1,11 +1,36 @@
-"""Geïsoleerde Chrome-contexten, lokale requests en automatische opruiming."""
+"""Geïsoleerde browsercontexten, lokale requests en automatische opruiming."""
 
 from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
-from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
+from playwright.sync_api import Browser, BrowserContext, BrowserType, Error, Page, sync_playwright
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--browser-channel",
+        choices=("auto", "chrome", "chromium"),
+        default="auto",
+        help="auto: Chrome, of Playwright Chromium uitsluitend als Chrome ontbreekt",
+    )
+
+
+def pytest_report_header(config: pytest.Config) -> str:
+    return f"Browserkeuze: {config.getoption('browser_channel')}"
+
+
+def launch_browser(browser_type: BrowserType, channel: str) -> tuple[Browser, str]:
+    """Val alleen terug bij ontbrekend Chrome, nooit bij crashes of permissiefouten."""
+    if channel == "chromium":
+        return browser_type.launch(headless=True), "Playwright Chromium"
+    try:
+        return browser_type.launch(channel="chrome", headless=True), "Google Chrome"
+    except Error as error:
+        if channel != "auto" or "distribution 'chrome' is not found" not in str(error):
+            raise
+        return browser_type.launch(headless=True), "Playwright Chromium (Chrome ontbreekt)"
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -15,11 +40,16 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 @pytest.fixture(scope="session")
-def browser() -> Iterator[Browser]:
-    """Gebruik lokaal Chrome; sluit het ook na een mislukte test."""
+def browser(pytestconfig: pytest.Config) -> Iterator[Browser]:
+    """Meld de werkelijk gebruikte browser en sluit die ook na een mislukte test."""
     with sync_playwright() as playwright:
-        instance = playwright.chromium.launch(channel="chrome", headless=True)
+        instance, selected = launch_browser(
+            playwright.chromium, pytestconfig.getoption("browser_channel")
+        )
         try:
+            reporter = pytestconfig.pluginmanager.getplugin("terminalreporter")
+            if reporter:
+                reporter.write_line(f"Browser gestart: {selected} {instance.version}")
             yield instance
         finally:
             instance.close()
