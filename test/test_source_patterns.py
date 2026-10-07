@@ -179,12 +179,6 @@ def test_legacy_exports__denial_retains_complete_text(
             "#atlasEvidence",
         ),
         (
-            "vraagdossier.html",
-            "  let currentQuestion = 'main';",
-            "dossierData.main.takeaway=payload;dossierData.main.evidence[0].text=payload;dossierData.main.evidence[0].kind=payload;",
-            "#briefBody",
-        ),
-        (
             "vraagkompas.html",
             '  const order=["why","what","evidence","risk","action","who"];',
             "items.why.short=payload;items.why.refs=[[payload,payload]];",
@@ -267,3 +261,125 @@ def test_sources__readable_route_matches_each_interactive_selection(
         static_text = article.text_content()
         for value in page.locator(content).all_text_contents():
             assert value.strip() in static_text, f"{filename}, {heading}: ontbreekt {value!r}"
+
+
+def test_dossier__all_depths_and_evidence_follow_register(page: Page) -> None:
+    """Iedere vraag, leesdiepte en bewijsdetail leest dezelfde statische broninhoud."""
+    page.goto(visual_path("vraagdossier.html").as_uri(), wait_until="networkidle")
+    for article in page.locator("#source-register article[data-source-key]").all():
+        key = article.get_attribute("data-source-key")
+        question = page.locator(f'[data-question="{key}"]')
+        question.click()
+        expect(question).to_be_focused()
+        expect(question.locator("span")).to_have_text(
+            article.locator('[data-field="question"]').text_content()
+        )
+        for depth, body_field in (("short", "medium"), ("medium", "source"), ("source", None)):
+            button = page.locator(f'[data-depth="{depth}"]')
+            button.click()
+            expect(button).to_be_focused()
+            expect(button).to_have_attribute("aria-pressed", "true")
+            expect(page.locator("#evidencePopover")).to_be_hidden()
+            expect(page.locator("#briefDeck")).to_have_text(
+                article.locator(f'[data-field="{depth}"]').text_content()
+            )
+            if body_field:
+                expect(page.locator("#briefBody > p")).to_have_text(
+                    article.locator(f'[data-field="{body_field}"]').text_content()
+                )
+            else:
+                expect(page.locator("#briefBody > p")).to_contain_text("Bronlaag actief")
+            for field, selector in (
+                ("title", "#briefTitle"),
+                ("question", "#briefQuestion"),
+                ("takeaway", "#briefBody .margin-note"),
+                ("trail", "#sourceTrail"),
+            ):
+                expect(page.locator(selector)).to_contain_text(
+                    article.locator(f'[data-field="{field}"]').text_content()
+                )
+            evidence = article.locator("[data-evidence-item]")
+            expect(page.locator("#evidenceList button")).to_have_count(evidence.count())
+            for index, item in enumerate(evidence.all()):
+                opener = page.locator("#evidenceList button").nth(index)
+                expect(opener).to_contain_text(item.locator('[data-field="text"]').text_content())
+                opener.focus()
+                page.keyboard.press("Enter")
+                expect(page.locator("#closeEvidence")).to_be_focused()
+                expect(page.locator("#evidenceTitle")).to_have_text(
+                    item.locator('[data-field="tag"]').text_content()
+                )
+                expect(page.locator("#evidenceDetail")).to_have_text(
+                    item.locator('[data-field="detail"]').text_content()
+                )
+                page.keyboard.press("Escape")
+                expect(opener).to_be_focused()
+                expect(page.locator("#evidencePopover")).to_be_hidden()
+            # A new question/depth must dismiss the old detail without stealing focus.
+            page.locator("#evidenceList button").first.click()
+
+
+@pytest.mark.parametrize("javascript", [True, False], ids=["interactive", "nojs"])
+def test_dossier__editing_register_updates_every_reading_route(
+    new_context: Callable[..., BrowserContext], javascript: bool
+) -> None:
+    """Bewerk de echte inhoudsbron; test geen private JavaScript-variabelen."""
+    import html
+    import re
+
+    payload = '<img data-injected="yes" src="x" onerror="window.injected=true"> & bron'
+    source = visual_path("vraagdossier.html").read_text()
+    fields = (
+        "title",
+        "question",
+        "short",
+        "medium",
+        "source",
+        "takeaway",
+        "trail",
+        "tag",
+        "text",
+        "detail",
+        "kind",
+    )
+    for field in fields:
+        source, count = re.subn(
+            rf'(<(?:h3|p|span) data-field="{field}">).*?(</(?:h3|p|span)>)',
+            lambda match, field=field: match[1] + html.escape(payload + " " + field) + match[2],
+            source,
+            count=1,
+            flags=re.S,
+        )
+        assert count == 1
+    page = new_context(java_script_enabled=javascript).new_page()
+    page.route(
+        visual_path("vraagdossier.html").as_uri(),
+        lambda route: route.fulfill(body=source, content_type="text/html"),
+    )
+    page.goto(visual_path("vraagdossier.html").as_uri(), wait_until="networkidle")
+    if javascript:
+        expect(page.locator("#briefTitle")).to_have_text(payload + " title")
+        expect(page.locator('[data-question="main"] span')).to_have_text(payload + " question")
+        for depth in ("short", "medium", "source"):
+            page.locator(f'[data-depth="{depth}"]').click()
+            expect(page.locator("#briefDeck")).to_have_text(payload + " " + depth)
+        expect(page.locator("#briefBody")).to_contain_text(payload + " takeaway")
+        expect(page.locator("#sourceTrail")).to_have_text(payload + " trail")
+        opener = page.locator("#evidenceList button").first
+        expect(opener).to_contain_text(payload + " text")
+        expect(page.locator("#evidenceList .evidence-item").first).to_have_attribute(
+            "data-kind", payload + " kind"
+        )
+        opener.click()
+        expect(page.locator("#evidenceTitle")).to_have_text(payload + " tag")
+        expect(page.locator("#evidenceDetail")).to_have_text(payload + " detail")
+    else:
+        expect(page.locator("#dossier")).to_be_hidden()
+        expect(page.locator("#source-register article").first).to_be_visible()
+    page.emulate_media(media="print")
+    article = page.locator("#source-register article").first
+    expect(article).to_be_visible()
+    for field in fields:
+        expect(article).to_contain_text(payload + " " + field)
+    expect(page.locator("[data-injected]")).to_have_count(0)
+    assert page.evaluate("window.injected !== true")

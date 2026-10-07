@@ -69,3 +69,6 @@ target/
 # Brongebonden presentatiekopieën; geen bibliotheekprototypes
 /outputs/
 .vscode/settings.json
+
+# Lokaal architectuurreviewverslag
+/docs/architectuur-verdieping-2026-10-04.md

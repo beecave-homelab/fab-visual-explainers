@@ -34,3 +34,43 @@ def test_inventory__rejects_missing_requested_file() -> None:
     """Een gerichte test voor een ontbrekend prototype krijgt een duidelijke fout."""
     with pytest.raises(FileNotFoundError, match="HTML-prototype ontbreekt"):
         visual_path("ontbrekend-testprototype.html")
+
+
+@pytest.mark.parametrize("consumer", ["tests", "library"])
+def test_inventory__consumers_share_duplicate_rules(tmp_path: Path, consumer: str) -> None:
+    from scripts import visual_library
+
+    for category in ("a", "b"):
+        path = tmp_path / "visuals" / category / "voorbeeld.html"
+        path.parent.mkdir(parents=True)
+        path.write_text("<title>Voorbeeld</title>")
+    with pytest.raises(ValueError, match="Dubbele HTML-bestandsnaam"):
+        if consumer == "library":
+            visual_library.discover(tmp_path)
+        else:
+            discover_visuals(tmp_path / "visuals")
+
+
+@pytest.mark.parametrize("consumer", ["tests", "library"])
+def test_inventory__only_existing_files_inside_visuals(tmp_path: Path, consumer: str) -> None:
+    """Buitenliggende, kapotte en directorylinks worden door beide routes genegeerd."""
+    from scripts import visual_library
+
+    directory = tmp_path / "visuals"
+    directory.mkdir()
+    outside = tmp_path / "private.html"
+    outside.write_text("<title>Niet opnemen</title>")
+    (directory / "outside.html").symlink_to(outside)
+    (directory / "broken.html").symlink_to(tmp_path / "missing.html")
+    (directory / "folder.html").mkdir()
+    (directory / "linked-directory").symlink_to(tmp_path, target_is_directory=True)
+    actual = directory / "nested" / "voorbeeld.html"
+    actual.parent.mkdir()
+    actual.write_text("<title>Voorbeeld</title>")
+    alias = directory / "alias.html"
+    alias.symlink_to(actual)
+    expected = {alias, actual}
+    if consumer == "library":
+        assert {tmp_path / entry["path"] for entry in visual_library.discover(tmp_path)} == expected
+    else:
+        assert set(discover_visuals(directory).values()) == expected

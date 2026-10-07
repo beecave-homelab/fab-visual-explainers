@@ -10,6 +10,11 @@ from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit
 
+if __package__:
+    from .visual_inventory import InventoryError, discover_visuals
+else:
+    from visual_inventory import InventoryError, discover_visuals
+
 ROOT = Path(__file__).resolve().parent.parent
 START = "<!-- catalog:start -->"
 END = "<!-- catalog:end -->"
@@ -82,10 +87,7 @@ class Metadata(HTMLParser):
 def discover(root=ROOT):
     """Vind nieuwe categorieën en bestanden zonder een handmatige bestandslijst."""
     entries = []
-    for path in sorted((root / "visuals").rglob("*.html")):
-        resolved = path.resolve()
-        if not resolved.is_relative_to((root / "visuals").resolve()):
-            continue
+    for path in discover_visuals(root / "visuals", allow_empty=True).values():
         metadata = Metadata()
         metadata.feed(path.read_text(encoding="utf-8"))
         relative = path.relative_to(root)
@@ -180,7 +182,11 @@ class LibraryHandler(SimpleHTTPRequestHandler):
     def send_head(self):
         request_path = unquote(urlsplit(self.path).path)
         if request_path in ("/", "/index.html"):
-            content = render_index(self.root).encode("utf-8")
+            try:
+                content = render_index(self.root).encode("utf-8")
+            except InventoryError:
+                self.send_error(500, "Visual-inventaris ongeldig: controleer dubbele bestandsnamen")
+                return None
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(content)))
@@ -205,7 +211,11 @@ def main():
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
     if args.generate:
-        (ROOT / "index.html").write_text(render_index(), encoding="utf-8")
+        try:
+            content = render_index()
+        except InventoryError as error:
+            parser.error(str(error))
+        (ROOT / "index.html").write_text(content, encoding="utf-8")
         print("index.html bijgewerkt")
         return
     server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(LibraryHandler, root=ROOT))

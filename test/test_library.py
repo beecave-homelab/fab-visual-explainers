@@ -1,6 +1,5 @@
 """Bibliotheeknavigatie, actuele ontdekking en zelfstandige alternatieven."""
 
-import importlib.util
 from functools import partial
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -12,9 +11,7 @@ import pytest
 from playwright.sync_api import Page
 from support import ROOT, discover_visuals
 
-spec = importlib.util.spec_from_file_location("visual_library", ROOT / "scripts/visual_library.py")
-library = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(library)
+from scripts import visual_library as library
 
 
 def test_library__server_discovers_changes_and_limits_files(tmp_path: Path) -> None:
@@ -53,6 +50,13 @@ def test_library__server_discovers_changes_and_limits_files(tmp_path: Path) -> N
             with pytest.raises(HTTPError) as error:
                 urlopen(base + path)
             assert error.value.code == 404
+        duplicate = tmp_path / "visuals" / visual.name
+        duplicate.write_text("<title>Dubbele naam</title>")
+        with pytest.raises(HTTPError) as error:
+            urlopen(base)
+        assert error.value.code == 500
+        assert "Visual-inventaris ongeldig" in error.value.read().decode()
+        duplicate.unlink()
         visual.unlink()
         with urlopen(base + "/index.html") as response:
             assert "Nieuwe &amp; veilige visual" not in response.read().decode()
@@ -159,3 +163,38 @@ def test_library__new_visual_uses_intro_when_metadata_missing(tmp_path: Path) ->
         library.discover(tmp_path)[0]["description"]
         == "De eigen beschrijving gaat voor de inleiding."
     )
+
+
+@pytest.mark.parametrize("module", [False, True], ids=["script", "module"])
+def test_library__generator_rejects_duplicates_without_overwriting(
+    tmp_path: Path, module: bool
+) -> None:
+    """Beide CLI-startwijzen laden de inventaris en behouden uitvoer bij fouten."""
+    import shutil
+    import subprocess
+    import sys
+
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    for name in ("visual_library.py", "visual_inventory.py"):
+        shutil.copyfile(ROOT / "scripts" / name, scripts / name)
+    target = tmp_path / "index.html"
+    target.write_text((ROOT / "index.html").read_text())
+    first = tmp_path / "visuals" / "a" / "voorbeeld.html"
+    first.parent.mkdir(parents=True)
+    first.write_text('<title>Voorbeeld</title><meta name="description" content="Testinhoud">')
+    command = [sys.executable]
+    command += ["-m", "scripts.visual_library"] if module else [str(scripts / "visual_library.py")]
+    command += ["--generate"]
+    cwd = tmp_path if module else tmp_path.parent
+    result = subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr
+    generated = target.read_text()
+    assert 'href="visuals/a/voorbeeld.html"' in generated
+    duplicate = tmp_path / "visuals" / "b" / first.name
+    duplicate.parent.mkdir()
+    duplicate.write_text(first.read_text())
+    result = subprocess.run(command, cwd=cwd, capture_output=True, text=True, check=False)
+    assert result.returncode != 0
+    assert "Dubbele HTML-bestandsnaam" in result.stderr
+    assert target.read_text() == generated
