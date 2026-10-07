@@ -51,12 +51,14 @@ class Metadata(HTMLParser):
         self.title = ""
         self.heading = ""
         self.description = ""
+        self.description_count = 0
         self.intro = ""
         self.active = None
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
         if tag == "meta" and attributes.get("name", "").lower() == "description":
+            self.description_count += 1
             self.description = attributes.get("content") or ""
         if tag == "br" and self.active:
             self.handle_data(" ")

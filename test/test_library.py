@@ -137,6 +137,10 @@ def test_library__descriptions_come_from_each_visual() -> None:
     for entry in entries:
         metadata = library.Metadata()
         metadata.feed((ROOT / entry["path"]).read_text())
+        assert metadata.description_count == 1, (
+            f"{entry['path']}: verwacht precies één description-meta, "
+            f"gevonden: {metadata.description_count}"
+        )
         assert len(metadata.description.strip()) >= 35, entry["path"]
         assert entry["description"] == " ".join(metadata.description.split())
         assert entry["description"] != entry["title"]
