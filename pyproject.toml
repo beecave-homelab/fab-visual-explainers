@@ -21,6 +21,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+pythonpath = ["."]
 addopts = "-ra --strict-config --strict-markers"
 faulthandler_timeout = 30
 

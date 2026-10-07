@@ -4,6 +4,28 @@ Zelfstandige HTML-prototypes voor functioneel applicatiebeheer. Open een HTML-be
 
 [AGENTS.md](AGENTS.md) bevat de projectafspraken. De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft concepten en actuele status.
 
+## Alle visuals bekijken
+
+De [landingspagina](index.html) geeft een doorzoekbaar overzicht per onderwerp. Elke visual opent in een nieuw tabblad. De pagina staat buiten `visuals/` en telt niet als extra prototype.
+
+Start de lokale bibliotheek vanuit deze map om nieuwe visuals automatisch te laten opnemen:
+
+```sh
+python3 scripts/visual_library.py
+```
+
+Open daarna [de lokale bibliotheek](http://127.0.0.1:8765/). De server leest bij iedere paginalading alle `.html`-bestanden onder `visuals/`, inclusief submappen en nieuwe categorieën. Voeg een bestand toe, verwijder of verplaats het, en ververs het overzicht. Namen komen uit de HTML-titel; beschrijvingen uit `<meta name="description" content="…">` in ieder HTML-bestand. Geef nieuwe visuals hierin een korte toelichting op wat je kunt bekijken of onderzoeken. Ontbreekt die metadata, dan gebruikt het overzicht de eerste bruikbare inleiding na de hoofdkop, en anders de hoofdkop zelf. Er is geen aparte bestandslijst om bij te houden. De twee incidentvarianten hebben een eigen ingang.
+
+De server gebruikt alleen de Python-standaardbibliotheek, luistert uitsluitend lokaal en serveert de landingspagina en HTML onder `visuals/`. Stop met `Ctrl+C`. Gebruik bij een bezette poort bijvoorbeeld `python3 scripts/visual_library.py --port 8766` en open de URL die het script toont. De prototypes blijven zelfstandig te openen; deze server is een optionele bladerhulp.
+
+`index.html` kan ook rechtstreeks worden geopend, met zoeken, filters en alle opgeslagen links. Die kopie ontdekt geen nieuwe bestanden vanuit de browser. Werk het opgeslagen overzicht na bibliotheekwijzigingen bij met:
+
+```sh
+python3 scripts/visual_library.py --generate
+```
+
+De HTML tussen `catalog:start` en `catalog:end` is gegenereerd; pas vormgeving en interactie erbuiten aan. Alle links blijven zonder JavaScript beschikbaar. Afdrukken toont de volledige bibliotheek, ook wanneer een zoekfilter actief is.
+
 ## Een document, rapport of toestand visualiseren
 
 Gebruik de projectskill [fab-html-template-reuse](.agents/skills/fab-html-template-reuse/SKILL.md), bijvoorbeeld: “Gebruik $fab-html-template-reuse om dit openbare rapport voor FAB te visualiseren.” De [hergebruikgids](docs/template-reuse.md) helpt het patroon kiezen en geeft per HTML-bestand aan wat samen moet worden aangepast en behouden.
@@ -34,10 +56,10 @@ Gebruik Python 3.11 of hoger, uv en Google Chrome of Playwright Chromium (zie [b
 ```sh
 uv sync --locked
 uv run --locked pytest
-uv run --locked ruff check test
-uv run --locked ruff format --check test
+uv run --locked ruff check test scripts
+uv run --locked ruff format --check test scripts
 uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check visuals/
+uv run --locked djlint --check visuals/ index.html
 ```
 
 Dependencies en instellingen staan in `pyproject.toml`; versies zijn vastgelegd in `uv.lock`. Zie [test/README.md](test/README.md) voor gerichte tests, formattercommando’s, uitvoerbestanden en de grenzen van deze controles.

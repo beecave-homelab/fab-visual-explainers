@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Verken de FAB HTML-visuals per onderwerp. Zoek een visual voor incidenten, wijzigingen, toegang, gegevens of kennis.">
+    <title>FAB visualbibliotheek</title>
+    <style>
+    :root { --paper:#f3f6fa; --ink:#18334b; --blue:#234bd1; --muted:#50667c; --line:#d6e0eb; --signal:#e9ef94; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:"Avenir Next",Avenir,"Segoe UI",sans-serif; line-height:1.55; }
+    a { color:inherit; }
+    button,input { font:inherit; }
+    button,a,input { -webkit-tap-highlight-color:transparent; }
+    :focus-visible { outline:3px solid var(--blue); outline-offset:5px; }
+    [hidden] { display:none !important; }
+    .skip { position:absolute; top:-80px; left:20px; padding:12px; background:white; z-index:2; }
+    .skip:focus { top:12px; }
+    .masthead { max-width:1500px; margin:auto; padding:26px 5%; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { display:flex; gap:12px; align-items:center; font-weight:700; letter-spacing:-.03em; }
+    .brand-mark { display:grid; grid-template-columns:repeat(2,8px); gap:4px; transform:rotate(-12deg); }
+    .brand-mark i { width:8px; height:8px; background:var(--blue); border-radius:2px; }
+    .masthead p { margin:0; color:var(--muted); font-size:.87rem; }
+    main { max-width:1500px; margin:auto; padding:0 5% 60px; }
+    .hero { padding:40px 0 46px; display:grid; grid-template-columns:1fr 1fr; gap:6%; align-items:end; }
+    h1 { margin:0; font-size:clamp(3rem,5.5vw,5.5rem); font-weight:650; line-height:1.04; letter-spacing:-.065em; }
+    .intro { max-width:42ch; margin:24px 0 0; font-size:1.08rem; color:var(--muted); }
+    .search-panel { background:var(--blue); color:white; padding:32px; border-radius:22px 22px 22px 4px; }
+    .search-panel label { display:block; font-weight:600; font-size:1.35rem; margin-bottom:16px; letter-spacing:-.03em; }
+    .search-field { display:flex; align-items:center; gap:12px; background:white; color:var(--ink); border-radius:8px; padding:4px 14px; }
+    .search-field svg { flex-shrink:0; width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; }
+    input { min-width:0; width:100%; padding:13px 0; border:0; background:transparent; color:var(--ink); }
+    input:focus { outline:0; }
+    .search-field:focus-within { outline:3px solid var(--signal); outline-offset:4px; }
+    input::placeholder { color:var(--muted); opacity:1; }
+    .search-panel p { font-size:.9rem; margin:16px 0 0; }
+    .library-layout { display:grid; grid-template-columns:235px minmax(0,1fr); gap:44px; border-top:1px solid var(--line); padding-top:30px; }
+    .navigation { align-self:start; position:sticky; top:24px; }
+    .navigation h2 { font-size:1rem; margin:0 0 18px; }
+    .filters { display:grid; gap:6px; }
+    .filters button { display:flex; justify-content:space-between; gap:10px; align-items:center; text-align:left; border:0; padding:12px 14px; border-radius:8px; color:var(--ink); background:transparent; cursor:pointer; font-size:.9rem; }
+    .filters button:hover { background:#e4ebf5; }
+    .filters button[aria-pressed="true"] { background:var(--ink); color:white; }
+    .category-count { font-size:.8rem; opacity:.85; }
+    .library-note { margin:26px 0 18px; padding-left:12px; border-left:3px solid var(--signal); font-size:.82rem; color:var(--muted); max-width:32ch; }
+    .refresh { font-size:.85rem; text-underline-offset:4px; }
+    #result-count { margin:0 0 24px; font-size:.88rem; color:var(--muted); }
+    .category { margin-bottom:38px; }
+    .category-heading { margin-bottom:18px; }
+    .category-heading h2 { margin:0 0 4px; font-size:1.45rem; line-height:1.25; letter-spacing:-.035em; }
+    .category-heading p { margin:0; font-size:.88rem; color:var(--muted); max-width:70ch; }
+    .visual-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .visual { min-width:0; background:white; border:1px solid var(--line); border-radius:10px; }
+    .visual a { display:flex; flex-direction:column; height:100%; min-height:205px; padding:22px; text-decoration:none; border-radius:10px; }
+    .visual:hover { border-color:var(--blue); }
+    .visual-title { font-size:1.12rem; font-weight:650; line-height:1.3; letter-spacing:-.025em; overflow-wrap:anywhere; }
+    .visual-description { display:block; margin:12px 0 22px; font-size:.88rem; color:var(--muted); overflow-wrap:anywhere; }
+    .visual-open { margin-top:auto; font-size:.8rem; color:var(--blue); display:flex; align-items:center; gap:8px; }
+    .visual-open svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.7; }
+    .footer { border-top:1px solid var(--line); margin-top:16px; padding-top:20px; color:var(--muted); font-size:.8rem; }
+    @media(min-width:1500px) { .visual-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media(max-width:1150px) { .visual-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .library-layout { grid-template-columns:210px minmax(0,1fr); gap:28px; } }
+    @media(max-width:760px) { .masthead { padding-top:20px; } .masthead p { display:none; } .hero { grid-template-columns:1fr; gap:28px; padding:28px 0; } .intro { margin-top:18px; } .search-panel { padding:24px; } .library-layout { grid-template-columns:1fr; gap:24px; } .navigation { position:static; } .filters { display:flex; flex-wrap:wrap; gap:8px; } .filters button { padding:9px 12px; border:1px solid var(--line); } .library-note { max-width:70ch; margin-top:18px; } .navigation h2 { margin-bottom:12px; } }
+    @media(max-width:440px) { .visual-grid { grid-template-columns:1fr; } .visual a { min-height:165px; } .search-panel { padding:20px; } .search-panel label { font-size:1.17rem; } }
+    @media print { body { background:white; } .masthead { padding:0 0 18px; } main { padding:0; } .hero { display:block; padding:0 0 20px; } h1 { font-size:32pt; } h1 br { display:none; } .search-panel,.navigation,.skip { display:none; } .library-layout { display:block; } .visual-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .visual { break-inside:avoid; } .visual a { min-height:0; padding:12px; } .visual-description { margin:8px 0; } .visual-open { display:none; } .category[hidden],.visual[hidden] { display:block !important; } .category-heading { break-after:avoid; } #result-count,#empty { display:none; } }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#library">Naar de visuals</a>
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark"
+      aria-hidden="true"><i></i><i></i><i></i><i></i></span>FAB visualbibliotheek</div>
+      <p>Functioneel applicatiebeheer</p>
+    </header>
+    <main>
+      <div class="hero">
+        <div>
+          <h1>
+            Een vraag.
+            <br>
+            Een visual.
+          </h1>
+          <p class="intro">Van verstoring tot verandering. Verken de voorbeelden en kies de visual die bij je vraag past.</p>
+        </div>
+        <div class="search-panel" hidden>
+          <label for="search">Waar wil je meer zicht op?</label>
+          <div class="search-field">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m16 16 5 5" />
+            </svg><input id="search"
+       type="search"
+       placeholder="Zoek op naam, onderwerp of vraag"
+       autocomplete="off">
+          </div>
+          <p>Elke visual opent in een nieuw tabblad. Je overzicht blijft hier.</p>
+        </div>
+      </div>
+      <div id="library"><!-- djlint:off -->
+      <!-- catalog:start -->
+<div class="library-layout">
+  <aside class="navigation" aria-label="Categorieën">
+    <h2>Kies je onderwerp</h2>
+    <div class="filters" hidden>
+      <button type="button" data-filter="all" aria-pressed="true"><span>Alle visuals</span><span class="category-count">32</span></button>
+      <button type="button" data-filter="incident_en_continuiteit" aria-pressed="false"><span>Incident &amp; continuïteit</span><span class="category-count">7</span></button><button type="button" data-filter="wijziging_en_acceptatie" aria-pressed="false"><span>Wijziging &amp; acceptatie</span><span class="category-count">11</span></button><button type="button" data-filter="landschap_en_processen" aria-pressed="false"><span>Landschap &amp; processen</span><span class="category-count">3</span></button><button type="button" data-filter="toegang" aria-pressed="false"><span>Toegang</span><span class="category-count">2</span></button><button type="button" data-filter="gegevens_en_ketens" aria-pressed="false"><span>Gegevens &amp; ketens</span><span class="category-count">4</span></button><button type="button" data-filter="bronnen_en_kennis" aria-pressed="false"><span>Bronnen &amp; kennis</span><span class="category-count">5</span></button>
+    </div>
+    <p class="library-note">Prototypes met synthetische voorbeelden. Aanwezigheid zegt niets over inhoudelijke goedkeuring of validatie met gebruikers.</p>
+    <a class="refresh" href="index.html">Overzicht verversen</a>
+  </aside>
+  <div class="library-content">
+    <p id="result-count" role="status">32 visuals om te verkennen</p>
+    <p id="empty" hidden>Geen visuals gevonden. Probeer een ander zoekwoord of kies alle onderwerpen.</p>
+    <section class="category" data-category="incident_en_continuiteit" aria-labelledby="heading-incident_en_continuiteit">
+  <div class="category-heading"><h2 id="heading-incident_en_continuiteit">Incident &amp; continuïteit</h2><p>Verstoring begrijpen, herstel organiseren en zorg laten doorgaan.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="incident_en_continuiteit bekende fouten vergelijk een melding met bekende foutpatronen en bekijk of een tijdelijke werkwijze aan de toepassingsvoorwaarden voldoet. visuals/incident_en_continuiteit/fab-known-error-map.html">
+  <a href="visuals/incident_en_continuiteit/fab-known-error-map.html" target="_blank" rel="noopener" aria-label="Bekende fouten (nieuw tabblad)">
+    <span class="visual-title">Bekende fouten</span>
+    <span class="visual-description">Vergelijk een melding met bekende foutpatronen en bekijk of een tijdelijke werkwijze aan de toepassingsvoorwaarden voldoet.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit continuïteitskaart bekijk bij applicatie-uitval de zorgimpact, voorwaarden voor tijdelijke werkwijzen, verantwoordelijke rollen en herstelcontroles. visuals/incident_en_continuiteit/fab-continuiteitskaart.html">
+  <a href="visuals/incident_en_continuiteit/fab-continuiteitskaart.html" target="_blank" rel="noopener" aria-label="Continuïteitskaart (nieuw tabblad)">
+    <span class="visual-title">Continuïteitskaart</span>
+    <span class="visual-description">Bekijk bij applicatie-uitval de zorgimpact, voorwaarden voor tijdelijke werkwijzen, verantwoordelijke rollen en herstelcontroles.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit escalatiekaart onderzoek wie bij een verstoring aan zet is, wanneer escalatie nodig is en welke informatie de overdracht vraagt. visuals/incident_en_continuiteit/fab-escalatiekaart.html">
+  <a href="visuals/incident_en_continuiteit/fab-escalatiekaart.html" target="_blank" rel="noopener" aria-label="Escalatiekaart (nieuw tabblad)">
+    <span class="visual-title">Escalatiekaart</span>
+    <span class="visual-description">Onderzoek wie bij een verstoring aan zet is, wanneer escalatie nodig is en welke informatie de overdracht vraagt.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit oorzaakopsporing onderzoek mogelijke oorzaken van een verstoring aan de hand van aanwijzingen, ontbrekend bewijs en volgende controles. visuals/incident_en_continuiteit/fab-oorzaakopsporing.html">
+  <a href="visuals/incident_en_continuiteit/fab-oorzaakopsporing.html" target="_blank" rel="noopener" aria-label="Oorzaakopsporing (nieuw tabblad)">
+    <span class="visual-title">Oorzaakopsporing</span>
+    <span class="visual-description">Onderzoek mogelijke oorzaken van een verstoring aan de hand van aanwijzingen, ontbrekend bewijs en volgende controles.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit serviceradar bekijk een verstoring vanuit melder, proces en keten. breng impact, controlepunten en eigenaarschap samen. visuals/incident_en_continuiteit/fab-serviceradar.html">
+  <a href="visuals/incident_en_continuiteit/fab-serviceradar.html" target="_blank" rel="noopener" aria-label="Serviceradar (nieuw tabblad)">
+    <span class="visual-title">Serviceradar</span>
+    <span class="visual-description">Bekijk een verstoring vanuit melder, proces en keten. Breng impact, controlepunten en eigenaarschap samen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit van melding naar oplossing (algemeen) doorloop incidentafhandeling van melding tot oplossing: triage, onderzoek, escalatie en terugkoppeling. variant in algemene vormgeving. visuals/incident_en_continuiteit/incident-onepager.html">
+  <a href="visuals/incident_en_continuiteit/incident-onepager.html" target="_blank" rel="noopener" aria-label="Van melding naar oplossing (algemeen) (nieuw tabblad)">
+    <span class="visual-title">Van melding naar oplossing (algemeen)</span>
+    <span class="visual-description">Doorloop incidentafhandeling van melding tot oplossing: triage, onderzoek, escalatie en terugkoppeling. Variant in algemene vormgeving.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="incident_en_continuiteit van melding naar oplossing (attent) doorloop incidentafhandeling van melding tot oplossing: triage, onderzoek, escalatie en terugkoppeling. variant in attent-vormgeving. visuals/incident_en_continuiteit/incident-onepager-attent.html">
+  <a href="visuals/incident_en_continuiteit/incident-onepager-attent.html" target="_blank" rel="noopener" aria-label="Van melding naar oplossing (Attent) (nieuw tabblad)">
+    <span class="visual-title">Van melding naar oplossing (Attent)</span>
+    <span class="visual-description">Doorloop incidentafhandeling van melding tot oplossing: triage, onderzoek, escalatie en terugkoppeling. Variant in Attent-vormgeving.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section><section class="category" data-category="wijziging_en_acceptatie" aria-labelledby="heading-wijziging_en_acceptatie">
+  <div class="category-heading"><h2 id="heading-wijziging_en_acceptatie">Wijziging &amp; acceptatie</h2><p>Gevolgen onderzoeken, testen en een besluit voorbereiden.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="wijziging_en_acceptatie adoptiekaart bekijk per afdeling hoe een nieuwe werkwijze bekend, geleerd, gebruikt en beheerst wordt, en waar ondersteuning nodig is. visuals/wijziging_en_acceptatie/fab-adoptiekaart.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-adoptiekaart.html" target="_blank" rel="noopener" aria-label="Adoptiekaart (nieuw tabblad)">
+    <span class="visual-title">Adoptiekaart</span>
+    <span class="visual-description">Bekijk per afdeling hoe een nieuwe werkwijze bekend, geleerd, gebruikt en beheerst wordt, en waar ondersteuning nodig is.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie beheerbaarheid scan onderzoek of een oplevering beheerbaar is: inrichting, testen, monitoring, ondersteuning en borging, met bewijs en open controles. visuals/wijziging_en_acceptatie/fab-beheerbaarheid-scan.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-beheerbaarheid-scan.html" target="_blank" rel="noopener" aria-label="Beheerbaarheid Scan (nieuw tabblad)">
+    <span class="visual-title">Beheerbaarheid Scan</span>
+    <span class="visual-description">Onderzoek of een oplevering beheerbaar is: inrichting, testen, monitoring, ondersteuning en borging, met bewijs en open controles.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie change impact map volg de gevolgen van een wijziging door beheergebieden heen. bekijk afhankelijkheden, voorgenomen maatregelen en open acties. visuals/wijziging_en_acceptatie/fab-change-impact-map.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-change-impact-map.html" target="_blank" rel="noopener" aria-label="Change Impact Map (nieuw tabblad)">
+    <span class="visual-title">Change Impact Map</span>
+    <span class="visual-description">Volg de gevolgen van een wijziging door beheergebieden heen. Bekijk afhankelijkheden, voorgenomen maatregelen en open acties.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie decision canvas vergelijk invoeringsopties, harde voorwaarden en onzekerheden. onderzoek hoe weging het advies voor toelaatbare opties beïnvloedt. visuals/wijziging_en_acceptatie/fab-decision-canvas.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-decision-canvas.html" target="_blank" rel="noopener" aria-label="Decision Canvas (nieuw tabblad)">
+    <span class="visual-title">Decision Canvas</span>
+    <span class="visual-description">Vergelijk invoeringsopties, harde voorwaarden en onzekerheden. Onderzoek hoe weging het advies voor toelaatbare opties beïnvloedt.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie go/no-go cockpit bekijk welke criteria, bevindingen en ontbrekende akkoorden livegang belemmeren en hoe ze samen het besluitadvies bepalen. visuals/wijziging_en_acceptatie/fab-go-no-go-cockpit.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-go-no-go-cockpit.html" target="_blank" rel="noopener" aria-label="Go/No-Go Cockpit (nieuw tabblad)">
+    <span class="visual-title">Go/No-Go Cockpit</span>
+    <span class="visual-description">Bekijk welke criteria, bevindingen en ontbrekende akkoorden livegang belemmeren en hoe ze samen het besluitadvies bepalen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie omgevingsvergelijker vergelijk inrichting, versies, koppelingen en testrollen per omgeving. onderzoek of een testresultaat ook voor productie geldt. visuals/wijziging_en_acceptatie/fab-omgevingsvergelijker.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-omgevingsvergelijker.html" target="_blank" rel="noopener" aria-label="Omgevingsvergelijker (nieuw tabblad)">
+    <span class="visual-title">Omgevingsvergelijker</span>
+    <span class="visual-description">Vergelijk inrichting, versies, koppelingen en testrollen per omgeving. Onderzoek of een testresultaat ook voor productie geldt.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie pilot cockpit volg een proef met nulmeting, meetweken, bijwerkingen en stopcriteria. bekijk de onderbouwing voor doorgaan, aanpassen of stoppen. visuals/wijziging_en_acceptatie/fab-pilot-cockpit.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-pilot-cockpit.html" target="_blank" rel="noopener" aria-label="Pilot Cockpit (nieuw tabblad)">
+    <span class="visual-title">Pilot Cockpit</span>
+    <span class="visual-description">Volg een proef met nulmeting, meetweken, bijwerkingen en stopcriteria. Bekijk de onderbouwing voor doorgaan, aanpassen of stoppen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie release impact explorer vertaal releasepunten naar lokale gevolgen per doelgroep. bekijk benodigde tests, acties, eigenaren en open vragen. visuals/wijziging_en_acceptatie/fab-release-impact-explorer.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-release-impact-explorer.html" target="_blank" rel="noopener" aria-label="Release Impact Explorer (nieuw tabblad)">
+    <span class="visual-title">Release Impact Explorer</span>
+    <span class="visual-description">Vertaal releasepunten naar lokale gevolgen per doelgroep. Bekijk benodigde tests, acties, eigenaren en open vragen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie releaseatelier verken de fasen van een wijziging, van intake tot nazorg, met de vragen, werkstukken en beslismomenten per fase. visuals/wijziging_en_acceptatie/fab-releaseatelier.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-releaseatelier.html" target="_blank" rel="noopener" aria-label="Releaseatelier (nieuw tabblad)">
+    <span class="visual-title">Releaseatelier</span>
+    <span class="visual-description">Verken de fasen van een wijziging, van intake tot nazorg, met de vragen, werkstukken en beslismomenten per fase.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie risk &amp; control map volg risico’s via maatregelen en gecontroleerd bewijs naar restrisico. bekijk wat nog toetsing of bevoegde acceptatie vraagt. visuals/wijziging_en_acceptatie/fab-risk-control-map.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-risk-control-map.html" target="_blank" rel="noopener" aria-label="Risk &amp; Control Map (nieuw tabblad)">
+    <span class="visual-title">Risk &amp; Control Map</span>
+    <span class="visual-description">Volg risico’s via maatregelen en gecontroleerd bewijs naar restrisico. Bekijk wat nog toetsing of bevoegde acceptatie vraagt.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="wijziging_en_acceptatie test coverage map verbind eisen en praktijkscenario’s met inrichting, tests, bevindingen en bewijs. bekijk waar dekking of bevoegd akkoord ontbreekt. visuals/wijziging_en_acceptatie/fab-test-coverage-map.html">
+  <a href="visuals/wijziging_en_acceptatie/fab-test-coverage-map.html" target="_blank" rel="noopener" aria-label="Test Coverage Map (nieuw tabblad)">
+    <span class="visual-title">Test Coverage Map</span>
+    <span class="visual-description">Verbind eisen en praktijkscenario’s met inrichting, tests, bevindingen en bewijs. Bekijk waar dekking of bevoegd akkoord ontbreekt.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section><section class="category" data-category="landschap_en_processen" aria-labelledby="heading-landschap_en_processen">
+  <div class="category-heading"><h2 id="heading-landschap_en_processen">Landschap &amp; processen</h2><p>Samenhang tussen applicaties, processen en versies bekijken.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="landschap_en_processen applicatielandschap bekijk welke applicaties het werk ondersteunen, hoe ze samenhangen en waar koppelingen en beheerafhankelijkheden liggen. visuals/landschap_en_processen/fab-applicatielandschap.html">
+  <a href="visuals/landschap_en_processen/fab-applicatielandschap.html" target="_blank" rel="noopener" aria-label="Applicatielandschap (nieuw tabblad)">
+    <span class="visual-title">Applicatielandschap</span>
+    <span class="visual-description">Bekijk welke applicaties het werk ondersteunen, hoe ze samenhangen en waar koppelingen en beheerafhankelijkheden liggen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="landschap_en_processen life cycle map vergelijk ondersteuningstermijnen van applicatieonderdelen en bekijk wanneer voorbereiding van een upgrade nodig is. visuals/landschap_en_processen/fab-life-cycle-map.html">
+  <a href="visuals/landschap_en_processen/fab-life-cycle-map.html" target="_blank" rel="noopener" aria-label="Life Cycle Map (nieuw tabblad)">
+    <span class="visual-title">Life Cycle Map</span>
+    <span class="visual-description">Vergelijk ondersteuningstermijnen van applicatieonderdelen en bekijk wanneer voorbereiding van een upgrade nodig is.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="landschap_en_processen proces × applicatie-map volg het proces van aanmelding tot eerste zorgmoment. bekijk gebruikte applicaties, registraties en handmatige overdrachten. visuals/landschap_en_processen/fab-proces-applicatie-map.html">
+  <a href="visuals/landschap_en_processen/fab-proces-applicatie-map.html" target="_blank" rel="noopener" aria-label="Proces × Applicatie-map (nieuw tabblad)">
+    <span class="visual-title">Proces × Applicatie-map</span>
+    <span class="visual-description">Volg het proces van aanmelding tot eerste zorgmoment. Bekijk gebruikte applicaties, registraties en handmatige overdrachten.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section><section class="category" data-category="toegang" aria-labelledby="heading-toegang">
+  <div class="category-heading"><h2 id="heading-toegang">Toegang</h2><p>Rollen, rechten en veranderingen in toegang onderzoeken.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="toegang autorisatielandschap vergelijk rollen, modelrechten, feitelijke toegang en tijdelijke uitzonderingen. onderzoek scope, controles en open punten. visuals/toegang/fab-autorisatielandschap.html">
+  <a href="visuals/toegang/fab-autorisatielandschap.html" target="_blank" rel="noopener" aria-label="Autorisatielandschap (nieuw tabblad)">
+    <span class="visual-title">Autorisatielandschap</span>
+    <span class="visual-description">Vergelijk rollen, modelrechten, feitelijke toegang en tijdelijke uitzonderingen. Onderzoek scope, controles en open punten.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="toegang joiner-mover-leaver bekijk welke acties bij instroom, rolwijziging en vertrek nodig zijn voor applicatierechten, apparatuur en fysieke toegang. visuals/toegang/fab-joiner-mover-leaver.html">
+  <a href="visuals/toegang/fab-joiner-mover-leaver.html" target="_blank" rel="noopener" aria-label="Joiner-Mover-Leaver (nieuw tabblad)">
+    <span class="visual-title">Joiner-Mover-Leaver</span>
+    <span class="visual-description">Bekijk welke acties bij instroom, rolwijziging en vertrek nodig zijn voor applicatierechten, apparatuur en fysieke toegang.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section><section class="category" data-category="gegevens_en_ketens" aria-labelledby="heading-gegevens_en_ketens">
+  <div class="category-heading"><h2 id="heading-gegevens_en_ketens">Gegevens &amp; ketens</h2><p>Gegevens volgen en kwaliteit en verwerking controleren.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="gegevens_en_ketens data lineage volg één gegeven door systemen en transformaties. vergelijk waarden om te onderzoeken waar een afwijking ontstaat. visuals/gegevens_en_ketens/fab-data-lineage.html">
+  <a href="visuals/gegevens_en_ketens/fab-data-lineage.html" target="_blank" rel="noopener" aria-label="Data Lineage (nieuw tabblad)">
+    <span class="visual-title">Data Lineage</span>
+    <span class="visual-description">Volg één gegeven door systemen en transformaties. Vergelijk waarden om te onderzoeken waar een afwijking ontstaat.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="gegevens_en_ketens data quality map bekijk kwaliteitsafwijkingen in overdrachtsberichten, hun overlap, getroffen afnemers en mogelijke herstelroutes. visuals/gegevens_en_ketens/fab-data-quality-map.html">
+  <a href="visuals/gegevens_en_ketens/fab-data-quality-map.html" target="_blank" rel="noopener" aria-label="Data Quality Map (nieuw tabblad)">
+    <span class="visual-title">Data Quality Map</span>
+    <span class="visual-description">Bekijk kwaliteitsafwijkingen in overdrachtsberichten, hun overlap, getroffen afnemers en mogelijke herstelroutes.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="gegevens_en_ketens ketenkaart volg een dossierwijziging van registratie tot financiële verwerking en rapportage. bekijk overdrachten, controles en verstoringen. visuals/gegevens_en_ketens/fab-ketenkaart.html">
+  <a href="visuals/gegevens_en_ketens/fab-ketenkaart.html" target="_blank" rel="noopener" aria-label="Ketenkaart (nieuw tabblad)">
+    <span class="visual-title">Ketenkaart</span>
+    <span class="visual-description">Volg een dossierwijziging van registratie tot financiële verwerking en rapportage. Bekijk overdrachten, controles en verstoringen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="gegevens_en_ketens rapportage lineage herleid een rapportagegetal naar bronvelden en bewerkingen. controleer definities, verversing en bekende beperkingen. visuals/gegevens_en_ketens/fab-rapportage-lineage.html">
+  <a href="visuals/gegevens_en_ketens/fab-rapportage-lineage.html" target="_blank" rel="noopener" aria-label="Rapportage Lineage (nieuw tabblad)">
+    <span class="visual-title">Rapportage Lineage</span>
+    <span class="visual-description">Herleid een rapportagegetal naar bronvelden en bewerkingen. Controleer definities, verversing en bekende beperkingen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section><section class="category" data-category="bronnen_en_kennis" aria-labelledby="heading-bronnen_en_kennis">
+  <div class="category-heading"><h2 id="heading-bronnen_en_kennis">Bronnen &amp; kennis</h2><p>Broninformatie verkennen vanuit een overzicht of een vraag.</p></div>
+  <div class="visual-grid"><article class="visual" data-search="bronnen_en_kennis bronkaart verken de hoofdpunten van een bron, hun onderlinge verbanden en de passages die ze onderbouwen. visuals/bronnen_en_kennis/bronkaart-onepager.html">
+  <a href="visuals/bronnen_en_kennis/bronkaart-onepager.html" target="_blank" rel="noopener" aria-label="Bronkaart (nieuw tabblad)">
+    <span class="visual-title">Bronkaart</span>
+    <span class="visual-description">Verken de hoofdpunten van een bron, hun onderlinge verbanden en de passages die ze onderbouwen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="bronnen_en_kennis bronscanner scan de secties van een grote bron en bekijk per onderdeel de kern, onderbouwing en onzekerheden. visuals/bronnen_en_kennis/bron-scanner.html">
+  <a href="visuals/bronnen_en_kennis/bron-scanner.html" target="_blank" rel="noopener" aria-label="BronScanner (nieuw tabblad)">
+    <span class="visual-title">BronScanner</span>
+    <span class="visual-description">Scan de secties van een grote bron en bekijk per onderdeel de kern, onderbouwing en onzekerheden.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="bronnen_en_kennis kennisatlas bekijk informatie als een netwerk van onderwerpen. selecteer een inzicht voor uitleg, verbanden en bronverwijzingen. visuals/bronnen_en_kennis/kennisatlas.html">
+  <a href="visuals/bronnen_en_kennis/kennisatlas.html" target="_blank" rel="noopener" aria-label="Kennisatlas (nieuw tabblad)">
+    <span class="visual-title">Kennisatlas</span>
+    <span class="visual-description">Bekijk informatie als een netwerk van onderwerpen. Selecteer een inzicht voor uitleg, verbanden en bronverwijzingen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="bronnen_en_kennis vraagdossier onderzoek een beheervraag met een kort antwoord, verdiepende context, bewijsstukken en open punten. visuals/bronnen_en_kennis/vraagdossier.html">
+  <a href="visuals/bronnen_en_kennis/vraagdossier.html" target="_blank" rel="noopener" aria-label="Vraagdossier (nieuw tabblad)">
+    <span class="visual-title">Vraagdossier</span>
+    <span class="visual-description">Onderzoek een beheervraag met een kort antwoord, verdiepende context, bewijsstukken en open punten.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article><article class="visual" data-search="bronnen_en_kennis vraagkompas begin bij een herkenbare vraag en vind het bijbehorende antwoord, de bronpassages en logische vervolgvragen. visuals/bronnen_en_kennis/vraagkompas.html">
+  <a href="visuals/bronnen_en_kennis/vraagkompas.html" target="_blank" rel="noopener" aria-label="VraagKompas (nieuw tabblad)">
+    <span class="visual-title">VraagKompas</span>
+    <span class="visual-description">Begin bij een herkenbare vraag en vind het bijbehorende antwoord, de bronpassages en logische vervolgvragen.</span>
+    <span class="visual-open">Open visual <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M10 4H4v16h16v-6"/></svg></span>
+  </a>
+</article></div>
+</section>
+  </div>
+</div>
+<!-- catalog:end -->
+      <!-- djlint:on --></div>
+      <footer class="footer">
+        <p id="catalog-mode">Opgeslagen overzicht. Via de lokale bibliotheekserver worden nieuwe visuals bij iedere paginalading automatisch opgenomen.</p>
+        <noscript>
+          <p>Alle visuals staan hierboven. Zoeken en categorieën filteren zijn beschikbaar met JavaScript.</p>
+        </noscript>
+      </footer>
+    </main>
+    <script>
+    (() => {
+      const search = document.getElementById('search');
+      const buttons = [...document.querySelectorAll('[data-filter]')];
+      const sections = [...document.querySelectorAll('.category')];
+      let active = 'all';
+      const normalize = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('nl');
+      function filter() {
+        const words = normalize(search.value).trim().split(/\s+/).filter(Boolean);
+        let count = 0;
+        sections.forEach(section => {
+          let visible = 0;
+          section.querySelectorAll('.visual').forEach(card => {
+            const matches = (active === 'all' || section.dataset.category === active) && words.every(word => normalize(card.dataset.search).includes(word));
+            card.hidden = !matches;
+            if (matches) visible++;
+          });
+          section.hidden = visible === 0;
+          count += visible;
+        });
+        document.getElementById('result-count').textContent = `${count} ${count === 1 ? 'visual' : 'visuals'} om te verkennen`;
+        document.getElementById('empty').hidden = count !== 0;
+      }
+      buttons.forEach(button => button.addEventListener('click', () => {
+        active = button.dataset.filter;
+        buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        filter();
+      }));
+      search.addEventListener('input', filter);
+      document.querySelector('.search-panel').hidden = false;
+      document.querySelector('.filters')?.removeAttribute('hidden');
+      if (location.protocol !== 'file:') {
+        document.getElementById('catalog-mode').textContent = 'Nieuwe visuals verschijnen na verversen wanneer je de lokale bibliotheekserver gebruikt.';
+      }
+    })();
+    </script>
+  </body>
+</html>

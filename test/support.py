@@ -4,20 +4,10 @@ from pathlib import Path
 
 from playwright.sync_api import Page
 
+from scripts.visual_inventory import discover_visuals
+
 ROOT = Path(__file__).resolve().parent.parent
 VISUALS = ROOT / "visuals"
-
-
-def discover_visuals(directory: Path) -> dict[str, Path]:
-    """Vind alle prototypes en weiger een lege inventaris of ambigue namen."""
-    paths: dict[str, Path] = {}
-    for path in sorted(directory.rglob("*.html")):
-        if path.name in paths:
-            raise ValueError(f"Dubbele HTML-bestandsnaam: {paths[path.name]} en {path}")
-        paths[path.name] = path
-    if not paths:
-        raise ValueError(f"Geen HTML-prototypes gevonden in {directory}")
-    return paths
 
 
 HTML_PATHS = discover_visuals(VISUALS)
