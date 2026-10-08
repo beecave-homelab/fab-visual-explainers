@@ -2,6 +2,32 @@
 
 Deze gids is de centrale selectie- en bewerkkaart voor de prototypes. Gebruik hem met [AGENTS.md](../AGENTS.md#templates-gebruiken-voor-een-bron) en de [projectskill](../.agents/skills/fab-html-template-reuse/SKILL.md). Inspecteer altijd de actuele HTML; de kaarten benoemen zoekankers, geen stabiele regelnummers of universele dataschema's.
 
+## Gebruik binnen en buiten een checkout
+
+Binnen deze repository gebruikt de projectskill de lokale guidance en `visuals/`, zonder netwerk. Buiten de repository kan hij originele HTML lezen uit een aangewezen lokale of cloudmap, een beschikbare checkout of de [openbare visualmap](https://git.beecave-homelab.com/beecave/fab-html-visuals/src/master/visuals). Een map met alleen visuals is voldoende: guidance wordt met de skill gebundeld. Gebruik bij een aangewezen map de beschikbare connector en zoek de unieke bestandsnaam uit de kaart, ook wanneer de categorie-indeling ontbreekt. Meld meerdere matches of ontbrekende toegang; kies niet stilzwijgend een andere bron.
+
+Zonder aangewezen bron of beschikbare lokale bibliotheek: haal alleen de gekozen volledige HTML op via `https://git.beecave-homelab.com/beecave/fab-html-visuals/raw/master/<repositorypad>`. De links bij de kaarten geven dat repositorypad. Controleer dat de inhoud HTML met inline CSS/JavaScript is, geen Gogs-weergave, fout-/loginpagina of afgekapt fragment. Noteer gebruikte locatie en versie/peildatum of ophaaldatum. Gebundelde guidance is een momentopname: vergelijk de kaart met de echte HTML en raadpleeg bij verschil de actuele openbare gids. Geen checkout, Python, terminal of specifieke cloudleverancier vereist; ontbrekende lees-/schrijftooling blijft een concrete uitvoeringsgrens.
+
+Bouw de overdraagbare ZIP vanuit de repository met:
+
+```sh
+python3 scripts/package_template_skill.py
+```
+
+Het pakket komt in `outputs/skill-packages/fab-html-template-reuse.zip` en bevat `fab-html-template-reuse/SKILL.md`, `references/AGENTS.md`, `references/template-reuse.md` en `references/provenance.json`. De documenten worden uit de centrale bronnen gegenereerd; bewerk ze niet afzonderlijk in een ZIP. Interne guidance-links blijven binnen de bundel, overige repositorylinks verwijzen naar de openbare bestanden; HTML-links leveren de ruwe template. De ZIP bevat geen visuals, brongegevens of connectorcredentials. Genereer opnieuw na een guidancewijziging. Dit is een verpakkingsstap voor de beheerder, geen vereiste voor de gebruiker van de skill.
+
+### ZIP installeren en gebruiken
+
+Importeer de volledige ZIP met de skillimport van de gebruikte agentomgeving. Werkt die omgeving met skillmappen, pak dan de map `fab-html-template-reuse/` uit in de daarvoor bedoelde locatie en behoud `SKILL.md` en `references/` samen. Installeer geen losse Markdown-bijlagen en plaats het pakket niet verplicht naast de visuals. Binnen deze repository blijft de projectskill direct bruikbaar zonder ZIP-installatie.
+
+Roep de skill op met een bron en hoofdvraag, en vermeld eventueel de template-/cloudmap en uitvoerbestemming. Verleen via de beschikbare connector toegang tot alleen de bedoelde bestanden. Zonder aangewezen templatebron kiest de skill een beschikbare lokale bibliotheek of de openbare repository. Het pakket vereist geen specifieke agentomgeving; de mogelijkheid om volledige HTML te lezen en een bestand op te leveren blijft nodig.
+
+### Hercontrole van openbare bronnen
+
+Controleer bij iedere openbare template-ophaling of het pad nog bestaat, de volledige HTML is opgehaald en de gekozen bestandskaart op die HTML past. Controleer vóór iedere verspreiding van een nieuwe ZIP en ten minste ieder kwartaal zolang de bundel wordt onderhouden alle openbare templatelinks en de guidance tegen de actuele repository. Leg datum en uitkomst vast en genereer de ZIP opnieuw na relevante guidancewijzigingen. Dit is een onderhoudsafspraak, geen automatisch geplande controle.
+
+De hashes in `provenance.json` identificeren de gebundelde guidance; ze detecteren geen wijzigingen in openbare templates. Voor een reproduceerbaar dossier kun je de gebruikte openbare template en bijbehorende guidance aan dezelfde commit koppelen: vervang `master` in hun URLs door de gecontroleerde commit-ID en leg die vast. Kies geen willekeurige of veronderstelde release. Dit verandert niets aan de voorrang van een door de gebruiker aangewezen versie of aan netwerkvrij lokaal gebruik.
+
 ## Selectie op hoofdvraag
 
 | Vraag of bronstructuur                               | Eerste keuze                                                                                                                                                    | Wanneer een andere vorm beter past                                                                                                                            |
@@ -24,7 +50,7 @@ De twee incidentvarianten hebben hetzelfde inhoudelijke patroon. De vijf bron-/k
 
 ## Bewerkgrenzen en bestemming
 
-Kopieer het gekozen bestand naar de expliciete bestemming, anders `outputs/<document-slug>/index.html`. Houd `visuals/`, inventaris en bibliotheekoriginelen intact. `outputs/` is Git-genegeerd, geen veilige opslaggarantie: plaats daar uitsluitend openbare of door de gebruiker geschoonde bronnen. Controleer vóór schrijven of het resultaat bij dezelfde opdracht hoort; kies anders een unieke slug. Schrijven elders volgt de daar geldende afspraken en bevoegdheden.
+Kopieer het gekozen bestand naar de expliciete bestemming, anders `outputs/<document-slug>/index.html` binnen de bekende checkout of een schrijfbare taakruimte; zonder bestandssysteem lever je een downloadbaar `index.html` via de beschikbare artifacttool. Schrijf niet automatisch terug naar de originele cloud-/templatemap. Houd `visuals/`, inventaris en bibliotheekoriginelen intact. `outputs/` is Git-genegeerd, geen veilige opslaggarantie: plaats daar uitsluitend openbare of door de gebruiker geschoonde bronnen. Controleer vóór schrijven of het resultaat bij dezelfde opdracht hoort; kies anders een unieke slug. Schrijven elders volgt de daar geldende afspraken en bevoegdheden.
 
 | Laag              | Aanpassen in de kopie                                                                                                                   | Behouden of eerst onderbouwen                                                                                                                                                                       |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -394,7 +420,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 
 ## Verificatie van een gegenereerde kopie
 
-De bestaande suite scant `visuals/`, niet `outputs/`. Gebruik het bestaande Playwright/Chrome-patroon uit [test/README.md](../test/README.md) voor gerichte checks op het **expliciete uitvoerpad**, bijvoorbeeld in een tijdelijk script buiten de repository. Maak geen permanente test die een gebruikersrapport of vaste uitvoerslug vereist.
+De bestaande suite scant `visuals/`, niet `outputs/`. Gebruik beschikbare browsertooling, bijvoorbeeld het bestaande testpatroon uit [test/README.md](../test/README.md) voor gerichte checks op het **expliciete uitvoerpad**, bijvoorbeeld in een tijdelijk script buiten de repository. Maak geen permanente test die een gebruikersrapport of vaste uitvoerslug vereist.
 
 | Controle                   | Acceptatie                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
