@@ -18,6 +18,46 @@ SOURCES = {
     "docs/template-reuse.md": "references/template-reuse.md",
 }
 LINK = re.compile(r"(?P<prefix>\[[^\]\n]*\]\()(?P<target>[^\s)]+)(?P<suffix>\))")
+CODE_SPAN = re.compile(r"(?<![\\`])(?P<ticks>`+)(?!`)[\s\S]*?(?<!`)(?P=ticks)(?!`)")
+FENCE = re.compile(r"^ {0,3}(?P<marker>`{3,}|~{3,})(?P<tail>.*)$")
+
+
+def rewrite_markdown_prose(content: str, replace) -> str:
+    """Herschrijf links buiten backtick-spans en fenced codevoorbeelden."""
+
+    def rewrite_prose(text: str) -> str:
+        pieces = []
+        start = 0
+        for span in CODE_SPAN.finditer(text):
+            pieces.append(LINK.sub(replace, text[start : span.start()]))
+            pieces.append(span[0])
+            start = span.end()
+        pieces.append(LINK.sub(replace, text[start:]))
+        return "".join(pieces)
+
+    pieces = []
+    prose = []
+    fence = None
+    for line in content.splitlines(keepends=True):
+        marker = FENCE.match(line.rstrip("\r\n"))
+        if fence is not None:
+            pieces.append(line)
+            if (
+                marker
+                and marker["marker"][0] == fence[0]
+                and len(marker["marker"]) >= len(fence)
+                and not marker["tail"].strip()
+            ):
+                fence = None
+        elif marker and not (marker["marker"][0] == "`" and "`" in marker["tail"]):
+            pieces.append(rewrite_prose("".join(prose)))
+            prose = []
+            fence = marker["marker"]
+            pieces.append(line)
+        else:
+            prose.append(line)
+    pieces.append(rewrite_prose("".join(prose)))
+    return "".join(pieces)
 
 
 def package_links(content: str, source: str, destination: str) -> str:
@@ -38,7 +78,7 @@ def package_links(content: str, source: str, destination: str) -> str:
             target += f"#{parsed.fragment}"
         return match["prefix"] + target + match["suffix"]
 
-    return LINK.sub(replace, content)
+    return rewrite_markdown_prose(content, replace)
 
 
 def build_package(root: Path, output: Path) -> Path:

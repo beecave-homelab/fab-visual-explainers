@@ -7,6 +7,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from zipfile import ZipFile
 
+import pytest
+
 from scripts.package_template_skill import LINK, NAME, ROOT, SOURCES, build_package, package_links
 
 
@@ -58,3 +60,33 @@ def test_package_links__preserves_fragments_and_external_sources() -> None:
     assert "(../SKILL.md)" in result
     assert "(https://example.org/spec#focus)" in result
     assert "(#selectie)" in result
+
+
+@pytest.mark.parametrize(
+    "example",
+    [
+        "`[regels](../AGENTS.md)`",
+        "``Een ` teken en [regels](../AGENTS.md)``",
+        "`over meerdere\nregels: [regels](../AGENTS.md)`",
+        "```md\n[regels](../AGENTS.md)\n```",
+        "~~~~markdown\n[regels](../AGENTS.md)\n~~~\n~~~~",
+        "```md\n[regels](../AGENTS.md)\n",  # Niet gesloten fence blijft code.
+    ],
+)
+def test_package_links__preserves_code_examples(example: str) -> None:
+    before = "[voor](../AGENTS.md)\n"
+    after = "\n[na](../AGENTS.md)"
+    # Een ongesloten fence omvat ook alle volgende tekst.
+    closed = not example.endswith("\n")
+    text = before + example + (after if closed else "")
+    result = package_links(text, "docs/template-reuse.md", "references/template-reuse.md")
+    assert example in result
+    assert result.startswith("[voor](AGENTS.md)\n")
+    if closed:
+        assert result.endswith("\n[na](AGENTS.md)")
+
+
+def test_package_links__unmatched_backtick_does_not_hide_real_links() -> None:
+    text = "Los teken ` gevolgd door [regels](../AGENTS.md)"
+    result = package_links(text, "docs/template-reuse.md", "references/template-reuse.md")
+    assert result == "Los teken ` gevolgd door [regels](AGENTS.md)"

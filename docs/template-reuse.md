@@ -16,6 +16,18 @@ python3 scripts/package_template_skill.py
 
 Het pakket komt in `outputs/skill-packages/fab-html-template-reuse.zip` en bevat `fab-html-template-reuse/SKILL.md`, `references/AGENTS.md`, `references/template-reuse.md` en `references/provenance.json`. De documenten worden uit de centrale bronnen gegenereerd; bewerk ze niet afzonderlijk in een ZIP. Interne guidance-links blijven binnen de bundel, overige repositorylinks verwijzen naar de openbare bestanden; HTML-links leveren de ruwe template. De ZIP bevat geen visuals, brongegevens of connectorcredentials. Genereer opnieuw na een guidancewijziging. Dit is een verpakkingsstap voor de beheerder, geen vereiste voor de gebruiker van de skill.
 
+### ZIP installeren en gebruiken
+
+Importeer de volledige ZIP met de skillimport van de gebruikte agentomgeving. Werkt die omgeving met skillmappen, pak dan de map `fab-html-template-reuse/` uit in de daarvoor bedoelde locatie en behoud `SKILL.md` en `references/` samen. Installeer geen losse Markdown-bijlagen en plaats het pakket niet verplicht naast de visuals. Binnen deze repository blijft de projectskill direct bruikbaar zonder ZIP-installatie.
+
+Roep de skill op met een bron en hoofdvraag, en vermeld eventueel de template-/cloudmap en uitvoerbestemming. Verleen via de beschikbare connector toegang tot alleen de bedoelde bestanden. Zonder aangewezen templatebron kiest de skill een beschikbare lokale bibliotheek of de openbare repository. Het pakket vereist geen specifieke agentomgeving; de mogelijkheid om volledige HTML te lezen en een bestand op te leveren blijft nodig.
+
+### Hercontrole van openbare bronnen
+
+Controleer bij iedere openbare template-ophaling of het pad nog bestaat, de volledige HTML is opgehaald en de gekozen bestandskaart op die HTML past. Controleer vóór iedere verspreiding van een nieuwe ZIP en ten minste ieder kwartaal zolang de bundel wordt onderhouden alle openbare templatelinks en de guidance tegen de actuele repository. Leg datum en uitkomst vast en genereer de ZIP opnieuw na relevante guidancewijzigingen. Dit is een onderhoudsafspraak, geen automatisch geplande controle.
+
+De hashes in `provenance.json` identificeren de gebundelde guidance; ze detecteren geen wijzigingen in openbare templates. Voor een reproduceerbaar dossier kun je de gebruikte openbare template en bijbehorende guidance aan dezelfde commit koppelen: vervang `master` in hun URLs door de gecontroleerde commit-ID en leg die vast. Kies geen willekeurige of veronderstelde release. Dit verandert niets aan de voorrang van een door de gebruiker aangewezen versie of aan netwerkvrij lokaal gebruik.
+
 ## Selectie op hoofdvraag
 
 | Vraag of bronstructuur                               | Eerste keuze                                                                                                                                                    | Wanneer een andere vorm beter past                                                                                                                            |
