@@ -51,15 +51,4 @@ De ideeënnotitie bevat links naar alle prototypes. Documentatie en configuratie
 
 ## Ontwikkelen en controleren
 
-Gebruik Python 3.11 of hoger, uv en Google Chrome of Playwright Chromium (zie [browserkeuze](test/README.md#omgeving)):
-
-```sh
-uv sync --locked
-uv run --locked pytest
-uv run --locked ruff check test scripts
-uv run --locked ruff format --check test scripts
-uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check visuals/ index.html
-```
-
-Dependencies en instellingen staan in `pyproject.toml`; versies zijn vastgelegd in `uv.lock`. Zie [test/README.md](test/README.md) voor gerichte tests, formattercommando’s, uitvoerbestanden en de grenzen van deze controles.
+Zie [TESTING.md](TESTING.md) voor het inrichten van de testomgeving, het uitvoeren van tests en de formatter- en lintcontroles. De [testinventaris](test/README.md) beschrijft de beschikbare scenario's en hun dekking.

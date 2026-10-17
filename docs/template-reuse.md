@@ -420,7 +420,7 @@ De statische laag omvat bij **ieder** bestand ook `<title>`, hoofdkop, introduct
 
 ## Verificatie van een gegenereerde kopie
 
-De bestaande suite scant `visuals/`, niet `outputs/`. Gebruik beschikbare browsertooling, bijvoorbeeld het bestaande testpatroon uit [test/README.md](../test/README.md) voor gerichte checks op het **expliciete uitvoerpad**, bijvoorbeeld in een tijdelijk script buiten de repository. Maak geen permanente test die een gebruikersrapport of vaste uitvoerslug vereist.
+De bestaande suite scant `visuals/`, niet `outputs/`. Gebruik beschikbare browsertooling, bijvoorbeeld het bestaande testpatroon uit [TESTING.md](../TESTING.md) voor gerichte checks op het **expliciete uitvoerpad**, bijvoorbeeld in een tijdelijk script buiten de repository. Maak geen permanente test die een gebruikersrapport of vaste uitvoerslug vereist.
 
 | Controle                   | Acceptatie                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
