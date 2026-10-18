@@ -63,7 +63,7 @@ Behoud bewijslast: maak een falende controle niet groen door de verwachting te v
 ```sh
 uv run --locked ruff check test scripts
 uv run --locked ruff format --check test scripts
-uv run --locked mdformat --check *.md test/README.md
+uv run --locked mdformat --check *.md test/README.md docs
 uv run --locked djlint --check visuals/ index.html
 ```
 
@@ -72,7 +72,7 @@ Opmaak bijwerken:
 ```sh
 uv run --locked ruff check test scripts --fix
 uv run --locked ruff format test scripts
-uv run --locked mdformat *.md test/README.md
+uv run --locked mdformat *.md test/README.md docs
 uv run --locked djlint --reformat visuals/ index.html
 ```
 

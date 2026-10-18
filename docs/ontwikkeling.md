@@ -15,7 +15,7 @@ uv sync --locked
 uv run --locked pytest
 uv run --locked ruff check test scripts
 uv run --locked ruff format --check test scripts
-uv run --locked mdformat --check *.md docs/ontwikkeling.md docs/bibliotheek-beheren.md test/README.md
+uv run --locked mdformat --check *.md test/README.md docs
 uv run --locked djlint --check visuals/ index.html
 ```
 

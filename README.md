@@ -9,9 +9,9 @@ De bibliotheek is bedoeld om werkwijzen te verkennen en te bespreken met collega
 Je hoeft niets te installeren om de voorbeelden te bekijken.
 
 1. [Download de bibliotheek als ZIP](https://github.com/beecave-homelab/fab-visual-explainers/archive/refs/heads/main.zip).
-2. Pak de ZIP volledig uit en behoud de mapstructuur.
-3. Open `index.html` in je browser.
-4. Zoek op een onderwerp of kies een categorie. Open vervolgens een visual in een nieuw tabblad.
+1. Pak de ZIP volledig uit en behoud de mapstructuur.
+1. Open `index.html` in je browser.
+1. Zoek op een onderwerp of kies een categorie. Open vervolgens een visual in een nieuw tabblad.
 
 Je kunt ook een afzonderlijk HTML-bestand uit `visuals/` openen. Bewaar de hele bibliotheek als je de verwijzingen naar andere voorbeelden wilt kunnen volgen.
 
