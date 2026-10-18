@@ -2,7 +2,7 @@
 
 De prototypes zijn zelfstandige HTML-bestanden met inline CSS, JavaScript en synthetische voorbeelddata. Er is geen backend of buildstap. Ontwikkeltools zijn alleen nodig om bestanden te wijzigen en te controleren.
 
-Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie](../ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de concepten en actuele status. De [functiebeschrijving](../functie-beschrijving-functioneel-applicatiebeheer.md) is het aangeleverde toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
+Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie](../ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de concepten en actuele status. De aangeleverde functiebeschrijving is het toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 
 ## Ontwikkelomgeving
 
