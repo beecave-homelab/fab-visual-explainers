@@ -46,6 +46,15 @@ De eerste installatie heeft netwerktoegang nodig voor pakketten en de browser. D
 
 Gebruik `UV_CACHE_DIR` en `PLAYWRIGHT_BROWSERS_PATH` wanneer een cloudomgeving eigen cachepaden vereist. Geef bij latere tests dezelfde `PLAYWRIGHT_BROWSERS_PATH` mee. De scripts gebruiken uv en Playwright met de proxy- en certificaatinstellingen van de omgeving. Ze configureren zelf geen proxy of certificaten.
 
+Playwright beheert standaard een gedeelde browsercache en kan oudere browserbuilds opruimen. Gebruik op een host met meerdere projecten een cache per checkout om die installaties gescheiden te houden:
+
+```sh
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright"
+./install.sh
+```
+
+Behoud deze variabele bij latere browsertests. De map `.cache/` wordt door Git genegeerd.
+
 Een mislukte download, installatie of browsercontrole stopt de setup met een foutcode. Bij een geweigerde browserstart controleer je de sandboxregels van de omgeving. Volg daarnaast de machineafspraken in [AGENTS.md](../AGENTS.md). Een geslaagde setup bewijst dat de tools starten; ze bewijst niet dat alle prototypes zijn getest.
 
 De [testinventaris](../test/README.md) beschrijft welke tests beschikbaar zijn.
