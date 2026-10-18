@@ -51,6 +51,7 @@ Gebruik geen cliëntgegevens, accounts, volledige logs of vertrouwelijke documen
 - [HTML-templates hergebruiken](docs/template-reuse.md) voor patroonkeuze en het aanpassen van een kopie.
 - [Bibliotheek beheren](docs/bibliotheek-beheren.md) voor de lokale server en het bijwerken van het overzicht.
 - [Ontwikkelen en controleren](docs/ontwikkeling.md) voor ontwikkelaars en bijdragers.
+- [Testen en kwaliteitscontroles](TESTING.md) voor de testomgeving en uitvoering.
 
 ## Licentie
 

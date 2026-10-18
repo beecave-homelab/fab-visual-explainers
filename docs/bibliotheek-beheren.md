@@ -36,7 +36,7 @@ Controleer beschrijvingen, inventarislinks en bibliotheekgedrag met:
 uv run --locked pytest test/test_library.py
 ```
 
-Zie [ontwikkelen en controleren](ontwikkeling.md) voor de testomgeving en verdere controles.
+Zie [TESTING.md](../TESTING.md) voor de testomgeving en verdere controles.
 
 ## Indeling en telling
 

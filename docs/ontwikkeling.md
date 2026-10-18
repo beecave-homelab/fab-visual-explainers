@@ -2,24 +2,13 @@
 
 De prototypes zijn zelfstandige HTML-bestanden met inline CSS, JavaScript en synthetische voorbeelddata. Er is geen backend of buildstap. Ontwikkeltools zijn alleen nodig om bestanden te wijzigen en te controleren.
 
-Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie](../ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de concepten en actuele status. De [functiebeschrijving](../functie-beschrijving-functioneel-applicatiebeheer.md) is het aangeleverde toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
+Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie](../ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de concepten en actuele status. De aangeleverde functiebeschrijving is het toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 
 ## Ontwikkelomgeving
 
-Gebruik Python 3.11 of hoger en uv. Voor browserregressies is Google Chrome of Playwright Chromium nodig. Zie [de testdocumentatie](../test/README.md#omgeving) voor browserkeuze en installatie. Volg daarnaast de uitvoeringsafspraken in [AGENTS.md](../AGENTS.md) voor de machine waarop je test.
+De vereisten, browserkeuze en installatieopdrachten staan in [TESTING.md](../TESTING.md#omgeving). Volg ook de uitvoeringsafspraken in [AGENTS.md](../AGENTS.md) voor de machine waarop je test.
 
-Voer vanuit de hoofdmap uit:
-
-```sh
-uv sync --locked
-uv run --locked pytest
-uv run --locked ruff check test scripts
-uv run --locked ruff format --check test scripts
-uv run --locked mdformat --check *.md test/README.md docs
-uv run --locked djlint --check visuals/ index.html
-```
-
-Dependencies en instellingen staan in `pyproject.toml`. `uv.lock` legt de versies vast. Zie [tests en kwaliteitscontroles](../test/README.md) voor gerichte tests, formattercommando's, tijdelijke uitvoer en de grenzen van deze controles.
+Lees [testen en kwaliteitscontroles](../TESTING.md) voor volledige en gerichte testuitvoering, formatteropdrachten, tijdelijke uitvoer en de grenzen van de controles. De [testinventaris](../test/README.md) beschrijft de beschikbare scenario's.
 
 ## Waar staat wat?
 
