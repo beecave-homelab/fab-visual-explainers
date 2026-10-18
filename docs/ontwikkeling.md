@@ -6,6 +6,8 @@ Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie
 
 ## Ontwikkelomgeving
 
+Gebruik [de installatiescripts](installatie.md) om de ontwikkelomgeving in te richten en de tools te controleren.
+
 De vereisten, browserkeuze en installatieopdrachten staan in [TESTING.md](../TESTING.md#omgeving). Volg ook de uitvoeringsafspraken in [AGENTS.md](../AGENTS.md) voor de machine waarop je test.
 
 Lees [testen en kwaliteitscontroles](../TESTING.md) voor volledige en gerichte testuitvoering, formatteropdrachten, tijdelijke uitvoer en de grenzen van de controles. De [testinventaris](../test/README.md) beschrijft de beschikbare scenario's.

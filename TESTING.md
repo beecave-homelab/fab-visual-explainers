@@ -4,6 +4,8 @@ Dit document beschrijft hoe je de tests en kwaliteitscontroles uitvoert. De [tes
 
 ## Omgeving
 
+Voor automatische inrichting kun je [de installatiescripts](docs/installatie.md) gebruiken. De setup controleert de tools en browser, maar voert de regressiesuite niet uit.
+
 Python 3.11 of hoger, uv en Google Chrome of de bij Playwright passende Chromium-installatie zijn nodig. `pyproject.toml` definieert de ontwikkelafhankelijkheden; `uv.lock` legt de opgeloste versies vast. Er is geen Python-applicatiepakket of buildstap voor de HTML.
 
 ```sh
