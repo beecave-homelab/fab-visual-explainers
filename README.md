@@ -1,65 +1,58 @@
-# FAB HTML-visuals
+# FAB Visual Explainers
 
-Zelfstandige HTML-prototypes voor functioneel applicatiebeheer. Open een HTML-bestand rechtstreeks in de browser; er is geen backend of buildstap. De voorbeelden zijn synthetisch en niet vrijgegeven voor operationeel gebruik.
+Interactieve voorbeelden voor functioneel applicatiebeheerders. Bekijk hoe een incident samenhangt met een zorgproces, welke gevolgen een wijziging heeft of waar een gegeven in de keten wordt gebruikt. Je kiest een onderdeel en kunt daarna de bijbehorende relaties, details en bewijsinformatie bekijken.
 
-[AGENTS.md](AGENTS.md) bevat de projectafspraken. De [ideeënnotitie](ideeen_voor_interactieve_fab_one_pagers.md) beschrijft concepten en actuele status.
+De bibliotheek is bedoeld om werkwijzen te verkennen en te bespreken met collega's, kerngebruikers en proceseigenaren. De voorbeelden bevatten synthetische gegevens en zijn niet vrijgegeven voor operationeel gebruik.
 
-## Alle visuals bekijken
+## Beginnen
 
-De [landingspagina](index.html) geeft een doorzoekbaar overzicht per onderwerp. Elke visual opent in een nieuw tabblad. De pagina staat buiten `visuals/` en telt niet als extra prototype.
+Je hoeft niets te installeren om de voorbeelden te bekijken.
 
-Start de lokale bibliotheek vanuit deze map om nieuwe visuals automatisch te laten opnemen:
+1. [Download de bibliotheek als ZIP](https://github.com/beecave-homelab/fab-visual-explainers/archive/refs/heads/main.zip).
+1. Pak de ZIP volledig uit en behoud de mapstructuur.
+1. Open `index.html` in je browser.
+1. Zoek op een onderwerp of kies een categorie. Open vervolgens een visual in een nieuw tabblad.
 
-```sh
-python3 scripts/visual_library.py
-```
+Je kunt ook een afzonderlijk HTML-bestand uit `visuals/` openen. Bewaar de hele bibliotheek als je de verwijzingen naar andere voorbeelden wilt kunnen volgen.
 
-Open daarna [de lokale bibliotheek](http://127.0.0.1:8765/). De server leest bij iedere paginalading alle `.html`-bestanden onder `visuals/`, inclusief submappen en nieuwe categorieën. Voeg een bestand toe, verwijder of verplaats het, en ververs het overzicht. Namen komen uit de HTML-titel; beschrijvingen uit `<meta name="description" content="…">` in ieder HTML-bestand. Geef nieuwe visuals hierin een korte toelichting op wat je kunt bekijken of onderzoeken. Ontbreekt die metadata, dan gebruikt het overzicht de eerste bruikbare inleiding na de hoofdkop, en anders de hoofdkop zelf. Er is geen aparte bestandslijst om bij te houden. De twee incidentvarianten hebben een eigen ingang.
+## Welk voorbeeld past bij je vraag?
 
-De server gebruikt alleen de Python-standaardbibliotheek, luistert uitsluitend lokaal en serveert de landingspagina en HTML onder `visuals/`. Stop met `Ctrl+C`. Gebruik bij een bezette poort bijvoorbeeld `python3 scripts/visual_library.py --port 8766` en open de URL die het script toont. De prototypes blijven zelfstandig te openen; deze server is een optionele bladerhulp.
+De bibliotheek bevat 32 visuals voor 31 concepten. De twee incidentvarianten tonen dezelfde inhoud in een andere vormgeving.
 
-`index.html` kan ook rechtstreeks worden geopend, met zoeken, filters en alle opgeslagen links. Die kopie ontdekt geen nieuwe bestanden vanuit de browser. Werk het opgeslagen overzicht na bibliotheekwijzigingen bij met:
+- Onderzoek een verstoring met het [Incidentoverzicht](visuals/incident_en_continuiteit/incident-onepager.html), [Oorzaakopsporing](visuals/incident_en_continuiteit/fab-oorzaakopsporing.html) of de [Continuïteitskaart](visuals/incident_en_continuiteit/fab-continuiteitskaart.html).
+- Bekijk de gevolgen van een wijziging en de benodigde tests met de [Change Impact Map](visuals/wijziging_en_acceptatie/fab-change-impact-map.html) of [Test Coverage Map](visuals/wijziging_en_acceptatie/fab-test-coverage-map.html).
+- Verken welke applicaties een proces ondersteunen met het [Applicatielandschap](visuals/landschap_en_processen/fab-applicatielandschap.html) of de [Proces × Applicatie-map](visuals/landschap_en_processen/fab-proces-applicatie-map.html).
+- Bekijk toegangsrechten en rolwisselingen met het [Autorisatielandschap](visuals/toegang/fab-autorisatielandschap.html) of [Joiner-Mover-Leaver](visuals/toegang/fab-joiner-mover-leaver.html).
+- Volg gegevens en onderzoek afwijkingen met de [Ketenkaart](visuals/gegevens_en_ketens/fab-ketenkaart.html) of [Data Quality Map](visuals/gegevens_en_ketens/fab-data-quality-map.html).
+- Onderzoek een document of onderbouw een antwoord met [BronScanner](visuals/bronnen_en_kennis/bron-scanner.html) of [Vraagdossier](visuals/bronnen_en_kennis/vraagdossier.html).
 
-```sh
-python3 scripts/visual_library.py --generate
-```
+Deze links tonen op GitHub de broncode. Open de bestanden uit de uitgepakte ZIP om de visuals te gebruiken. In `index.html` vind je alle voorbeelden met een korte beschrijving.
 
-De HTML tussen `catalog:start` en `catalog:end` is gegenereerd; pas vormgeving en interactie erbuiten aan. Alle links blijven zonder JavaScript beschikbaar. Afdrukken toont de volledige bibliotheek, ook wanneer een zoekfilter actief is.
+## Een visual gebruiken in overleg
 
-## Een document, rapport of toestand visualiseren
+Kies een voorbeeld dat past bij de vraag die je wilt bespreken. Bekijk eerst het overzicht en kies daarna een onderdeel om relaties en details te onderzoeken. Controleer bij een status of conclusie ook de bron, open vragen en bewijsinformatie.
 
-Gebruik de projectskill [fab-html-template-reuse](.agents/skills/fab-html-template-reuse/SKILL.md), bijvoorbeeld: “Gebruik $fab-html-template-reuse om dit openbare rapport voor FAB te visualiseren.” De [hergebruikgids](docs/template-reuse.md) helpt het patroon kiezen en geeft per HTML-bestand aan wat samen moet worden aangepast en behouden.
+Gebruik de voorbeelden om te bespreken welke informatie jullie nodig hebben en wie daarover gaat. Een groene status in een demonstratie is geen akkoord voor een echte wijziging, toegang of noodwerkwijze. Voor praktijkgebruik moeten bevoegde eigenaren de inhoud en regels lokaal toetsen. Ook gebruikerstests en een volledige toegankelijkheidscontrole blijven nodig.
 
-Binnen deze repository leest de projectskill de lokale guidance en `visuals/`, zonder netwerk. Buiten de repository kan hij een aangewezen lokale of cloudmap, een beschikbare checkout of de openbare repository gebruiken. Hij maakt steeds een brongebonden kopie. Zonder opgegeven bestemming komt die binnen deze checkout in `outputs/<document-slug>/index.html`; elders gebruikt de skill een schrijfbare taakruimte of levert een downloadbaar HTML-bestand. `outputs/` wordt hier door Git genegeerd en staat buiten de prototypeinventaris. Maak met `python3 scripts/package_template_skill.py` een overdraagbare skill-ZIP in `outputs/skill-packages/fab-html-template-reuse.zip`, met de guidance en zonder visuals. De bronbestanden blijven centraal onderhouden; de ZIP werkt zonder checkout. De skill is niet persoonlijk geïnstalleerd. Openbare of geschoonde broninformatie is toegestaan in presentatiekopieën; bibliotheekontwerp en tests blijven synthetisch. Zie [de twee werkstromen](AGENTS.md#templates-gebruiken-voor-een-bron) voor de grenzen.
+## Je eigen document visualiseren
 
-## Indeling
+Je kunt een bestaand patroon gebruiken voor een openbaar rapport of een document waaruit vertrouwelijke informatie is verwijderd. De [hergebruikgids](docs/template-reuse.md) helpt je kiezen welk patroon bij je bron en hoofdvraag past.
 
-De prototypes staan onder `visuals/`, ingedeeld naar hoofdtaak. Ieder bestand heeft één vaste plek; relaties tussen categorieën blijven via relatieve links bereikbaar. De bestaande HTML-bestandsnamen blijven behouden.
+Werk je met een AI-agent die skills ondersteunt? Gebruik dan de projectskill [fab-html-template-reuse](.agents/skills/fab-html-template-reuse/SKILL.md), bijvoorbeeld met deze opdracht:
 
-| Map onder `visuals/`        | HTML-bestanden |
-| --------------------------- | -------------- |
-| `incident_en_continuiteit/` | 7              |
-| `wijziging_en_acceptatie/`  | 11             |
-| `landschap_en_processen/`   | 3              |
-| `toegang/`                  | 2              |
-| `gegevens_en_ketens/`       | 4              |
-| `bronnen_en_kennis/`        | 5              |
+> Gebruik $fab-html-template-reuse om dit openbare rapport voor functioneel applicatiebeheerders te visualiseren. Laat zien welke passages het antwoord op mijn vraag onderbouwen en welke vragen openblijven.
 
-De bibliotheek bevat 32 HTML-bestanden voor 31 concepten; de twee incidentvarianten tellen als één concept. De [visuele review van 4 oktober 2026](docs/visual-review-2026-10-04.md) beschrijft sterke punten, verbeteringen en resterende grenzen per prototype.
+De skill maakt een afzonderlijke kopie. De oorspronkelijke voorbeelden blijven behouden. Binnen deze repository komt het resultaat standaard in `outputs/<document-slug>/index.html`. Een eigen presentatie is daarmee nog niet gepubliceerd of goedgekeurd voor praktijkgebruik.
 
-De ideeënnotitie bevat links naar alle prototypes. Documentatie en configuratie staan in de root; regressietests staan in `test/`.
+Gebruik geen cliëntgegevens, accounts, volledige logs of vertrouwelijke documenten in deelbare HTML.
 
-## Ontwikkelen en controleren
+## Verder lezen
 
-Gebruik Python 3.11 of hoger, uv en Google Chrome of Playwright Chromium (zie [browserkeuze](test/README.md#omgeving)):
+- [HTML-templates hergebruiken](docs/template-reuse.md) voor patroonkeuze en het aanpassen van een kopie.
+- [Bibliotheek beheren](docs/bibliotheek-beheren.md) voor de lokale server en het bijwerken van het overzicht.
+- [Ontwikkelen en controleren](docs/ontwikkeling.md) voor ontwikkelaars en bijdragers.
+- [Testen en kwaliteitscontroles](TESTING.md) voor de testomgeving en uitvoering.
 
-```sh
-uv sync --locked
-uv run --locked pytest
-uv run --locked ruff check test scripts
-uv run --locked ruff format --check test scripts
-uv run --locked mdformat --check *.md test/README.md
-uv run --locked djlint --check visuals/ index.html
-```
+## Licentie
 
-Dependencies en instellingen staan in `pyproject.toml`; versies zijn vastgelegd in `uv.lock`. Zie [test/README.md](test/README.md) voor gerichte tests, formattercommando’s, uitvoerbestanden en de grenzen van deze controles.
+De code is beschikbaar onder de [MIT-licentie](LICENSE).
