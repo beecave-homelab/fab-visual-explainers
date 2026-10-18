@@ -24,6 +24,10 @@ Lees [testen en kwaliteitscontroles](../TESTING.md) voor volledige en gerichte t
 | `.agents/skills/fab-html-template-reuse/` | Projectskill voor het maken van brongebonden kopieën.                                   |
 | `outputs/`                                | Git-genegeerde uitvoer van hergebruik en skillpakketten, buiten de prototypeinventaris. |
 
+## Wijzigingen vastleggen
+
+Werk [CHANGELOG.md](../CHANGELOG.md) bij als onderdeel van dezelfde wijziging. Ook onderhoud aan documentatie, tests en scripts krijgt een vermelding. De [projectafspraken](../AGENTS.md#changelog-en-versies) beschrijven wanneer een hogere bibliotheekversie nodig is. Zie [releases voorbereiden](releases.md) voor de controle en publicatie.
+
 ## Bibliotheek of presentatiekopie wijzigen
 
 Een wijziging aan `visuals/` is bibliotheekonderhoud. Houd bij toevoegingen en verwijderingen de inventaris, aantallen, beheerkaarten en links bij. Werk na wijzigingen aan titels of beschrijvingen ook het opgeslagen overzicht bij. Zie [bibliotheek beheren](bibliotheek-beheren.md).

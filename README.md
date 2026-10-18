@@ -48,6 +48,7 @@ Gebruik geen cliëntgegevens, accounts, volledige logs of vertrouwelijke documen
 
 ## Verder lezen
 
+- [Changelog](CHANGELOG.md) voor wijzigingen aan de bibliotheek en het onderhoud.
 - [HTML-templates hergebruiken](docs/template-reuse.md) voor patroonkeuze en het aanpassen van een kopie.
 - [Bibliotheek beheren](docs/bibliotheek-beheren.md) voor de lokale server en het bijwerken van het overzicht.
 - [Ontwikkelen en controleren](docs/ontwikkeling.md) voor ontwikkelaars en bijdragers.
