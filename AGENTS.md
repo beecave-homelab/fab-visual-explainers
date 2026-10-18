@@ -80,7 +80,7 @@ uv sync --locked
 uv run --locked pytest
 uv run --locked ruff check test
 uv run --locked ruff format --check test
-uv run --locked mdformat --check *.md test/README.md
+uv run --locked mdformat --check *.md test/README.md docs
 uv run --locked djlint --check visuals/
 ```
 
