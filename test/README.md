@@ -4,6 +4,8 @@ Deze map bevat pytest-scenario's voor de zelfstandige HTML-prototypes en de bibl
 
 Lees [TESTING.md](../TESTING.md) voor de testomgeving, browserkeuze, uitvoering, tijdelijke bestanden en kwaliteitscontroles.
 
+`test_release_version.py` controleert versie- en lockfileconsistentie, changelogvereisten, kalenderdatums en de voorwaarden voor HTML-wijzigingen. Een tijdelijke Git-repository toetst ook het herkennen van verplaatste HTML en het onderscheid tussen commits en lokale bestanden.
+
 ## Inventaris en padresolutie
 
 De suite bouwt de HTML-inventaris recursief op uit `visuals/` via `scripts/visual_inventory.py`. De bibliotheekingang gebruikt dezelfde module. Bestandslinks buiten de visualmap, kapotte links en directorylinks worden niet opgenomen. Alleen de bibliotheek mag leeg zijn. Dubbele namen geven ook daar een fout, via HTTP 500 of een CLI-fout zonder het opgeslagen overzicht te overschrijven.

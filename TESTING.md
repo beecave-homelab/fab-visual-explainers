@@ -43,6 +43,24 @@ Iedere test krijgt een eigen browsercontext. Externe HTTP(S)-requests worden geb
 
 Behoud bewijslast: maak een falende controle niet groen door de verwachting te verzwakken. Onderzoek of de test een verouderde aanname bevat of dat de pagina een regressie heeft. Testuitvoering bewijst geen volledige toegankelijkheidsaudit, lokale inhoudelijke goedkeuring of gebruikerswaarde.
 
+## Changelog- en versiecontrole
+
+Controleer de lokale versie, lockfile en changelog met:
+
+```sh
+uv run --locked python scripts/check_release_version.py
+```
+
+Vergelijk na committen met de opgehaalde doelbranch:
+
+```sh
+uv run --locked python scripts/check_release_version.py --base github/main --head HEAD
+```
+
+Deze controle eist voor iedere repositorywijziging een changelogupdate. HTML-wijzigingen vereisen ook een hogere versie en een gedateerde changelogsectie. `--base` is de doelbranch; de vergelijking gebruikt de merge-base van doelref en `--head`, zodat doelbranch-eigen wijzigingen zoals een versiestijging de PR-controle niet beïnvloeden. Gebruik bij een andere remotestructuur de echte doelref. De vergelijking ziet geen ongecommitteerde wijzigingen.
+
+Voor publicatie geldt aanvullend `--release`. Dit vereist een gedateerde beschrijving van de huidige versie en een lege sectie `Nog niet uitgebracht`. Zolang alleen de oorspronkelijke basisversie met ongepubliceerde onderhoudsregels bestaat, hoort deze releasecontrole te falen. Zie [releases voorbereiden](docs/releases.md) voor de volledige werkwijze.
+
 ## Formatter- en lintcommando's
 
 ```sh
