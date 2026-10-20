@@ -87,19 +87,25 @@ def git(root: Path, *args: str) -> str:
 
 
 def check_refs(base: str, head: str = "HEAD", *, root: Path = ROOT) -> bool:
-    """Controleer commits, inclusief verwijderde en hernoemde HTML-bestanden."""
+    """Controleer commits, inclusief verwijderde en hernoemde HTML-bestanden.
+
+    ``base`` is de doelbranchref; de vergelijking gebruikt de gemeenschappelijke
+    voorouder (merge-base) van doelref en ``head``. Zo dragen wijzigingen die
+    alleen op de doelbranch zijn gebeurd, zoals een versiestijging of een
+    HTML-wijziging, niet bij aan de gecontroleerde diff.
+    """
     base_sha, head_sha = [
-        git(root, "rev-parse", "--verify", "--end-of-options", f"{ref}^{{commit}}").strip()
-        for ref in (base, head)
+        git(root, "rev-parse", "--verify", f"{ref}^{{commit}}").strip() for ref in (base, head)
     ]
-    paths = set(git(root, "ls-tree", "-r", "--name-only", base_sha).splitlines())
+    merge_base = git(root, "merge-base", base_sha, head_sha).strip()
+    paths = set(git(root, "ls-tree", "-r", "--name-only", merge_base).splitlines())
     changed = set(
-        git(root, "diff", "--no-renames", "--name-only", "-z", base_sha, head_sha, "--")
+        git(root, "diff", "--no-renames", "--name-only", "-z", merge_base, head_sha, "--")
         .rstrip("\0")
         .split("\0")
     ) - {""}
     return check_change(
-        lambda name: git(root, "show", f"{base_sha}:{name}") if name in paths else "",
+        lambda name: git(root, "show", f"{merge_base}:{name}") if name in paths else "",
         lambda name: git(root, "show", f"{head_sha}:{name}"),
         changed,
     )
@@ -108,7 +114,10 @@ def check_refs(base: str, head: str = "HEAD", *, root: Path = ROOT) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release", action="store_true", help="Eis een publiceerbare changelog")
-    parser.add_argument("--base", help="Opgehaalde doelref voor controle van de PR-diff")
+    parser.add_argument(
+        "--base",
+        help="Doelbranchref; de vergelijking gebruikt hiervan de merge-base met --head",
+    )
     parser.add_argument("--head", default="HEAD", help="Te controleren commit, samen met --base")
     args = parser.parse_args()
     try:

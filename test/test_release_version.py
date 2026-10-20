@@ -94,31 +94,85 @@ def test_version__rejects_duplicate_sections_and_empty_release_notes() -> None:
         check_version(source.__getitem__, release=True)
 
 
+def run_git(repo: Path, *args: str) -> str:
+    """Voer git uit in een synthetisch testrepository."""
+    return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+
+
+def seed_repo(repo: Path) -> str:
+    """Maak een synthetisch repository met een geldige initiële commit."""
+    run_git(repo, "init", "-q")
+    run_git(repo, "config", "user.name", "Synthetic test")
+    run_git(repo, "config", "user.email", "test@example.invalid")
+    for name, value in files().items():
+        (repo / name).write_text(value)
+    (repo / "index.html").write_text("<h1>Synthetic</h1>")
+    run_git(repo, "add", ".")
+    run_git(repo, "commit", "-qm", "Initial synthetic tree")
+    return run_git(repo, "rev-parse", "HEAD")
+
+
 def test_refs__uses_commits_and_detects_renamed_html(tmp_path: Path) -> None:
     """Een echte Git-vergelijking ontdekt ook een verplaatst HTML-bestand."""
-
-    def git(*args: str) -> str:
-        return subprocess.check_output(["git", "-C", str(tmp_path), *args], text=True).strip()
-
-    git("init", "-q")
-    git("config", "user.name", "Synthetic test")
-    git("config", "user.email", "test@example.invalid")
-    for name, value in files().items():
-        (tmp_path / name).write_text(value)
-    (tmp_path / "index.html").write_text("<h1>Synthetic</h1>")
-    git("add", ".")
-    git("commit", "-qm", "Initial synthetic tree")
-    base = git("rev-parse", "HEAD")
+    base = seed_repo(tmp_path)
     (tmp_path / "index.html").rename(tmp_path / "other.html")
     (tmp_path / "CHANGELOG.md").write_text(files(pending="- Verplaats HTML.")["CHANGELOG.md"])
-    git("add", ".")
-    git("commit", "-qm", "Move HTML without bump")
+    run_git(tmp_path, "add", ".")
+    run_git(tmp_path, "commit", "-qm", "Move HTML without bump")
     # An uncommitted valid bump cannot repair an invalid committed change.
     (tmp_path / "pyproject.toml").write_text(files("0.2.0")["pyproject.toml"])
     with pytest.raises(ValueError, match="hogere SemVer"):
         check_refs(base, root=tmp_path)
     with pytest.raises(subprocess.CalledProcessError):
         check_refs("missing-ref", root=tmp_path)
+
+
+def test_refs__advanced_target_does_not_fail_maintenance_feature(tmp_path: Path) -> None:
+    """Target-only wijzigingen en versiestijging horen niet bij de PR-diff."""
+    initial = seed_repo(tmp_path)
+    run_git(tmp_path, "checkout", "-q", "-b", "target")
+    for name, value in files("0.2.0", released=True).items():
+        (tmp_path / name).write_text(value)
+    (tmp_path / "index.html").write_text("<h1>Target</h1>")
+    run_git(tmp_path, "add", ".")
+    run_git(tmp_path, "commit", "-qm", "Target-only bump with HTML change")
+    run_git(tmp_path, "checkout", "-q", "-b", "feature", initial)
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "guide.md").write_text("Synthetische gids.\n")
+    (tmp_path / "CHANGELOG.md").write_text(
+        files(pending="- Onderhoud aan de gids.")["CHANGELOG.md"]
+    )
+    run_git(tmp_path, "add", ".")
+    run_git(tmp_path, "commit", "-qm", "Maintenance feature without bump")
+    assert not check_refs("target", root=tmp_path)
+
+
+def test_refs__feature_html_still_needs_own_bump(tmp_path: Path) -> None:
+    """Doelbranch-voortgang maskert geen eigen HTML-wijziging zonder bump."""
+    initial = seed_repo(tmp_path)
+    run_git(tmp_path, "checkout", "-q", "-b", "target")
+    for name, value in files("0.2.0", released=True).items():
+        (tmp_path / name).write_text(value)
+    run_git(tmp_path, "add", ".")
+    run_git(tmp_path, "commit", "-qm", "Target-only bump")
+    run_git(tmp_path, "checkout", "-q", "-b", "feature", initial)
+    (tmp_path / "index.html").write_text("<h1>Feature</h1>")
+    (tmp_path / "CHANGELOG.md").write_text(files(pending="- Wijzig HTML.")["CHANGELOG.md"])
+    run_git(tmp_path, "add", ".")
+    run_git(tmp_path, "commit", "-qm", "Feature HTML change without bump")
+    # An uncommitted bump cannot repair an invalid committed change.
+    (tmp_path / "pyproject.toml").write_text(files("0.3.0")["pyproject.toml"])
+    with pytest.raises(ValueError, match="hogere SemVer"):
+        check_refs("target", root=tmp_path)
+
+
+def test_refs__rejects_histories_without_common_ancestor(tmp_path: Path) -> None:
+    """Zonder gemeenschappelijke voorouder is er geen vergelijkbare basis."""
+    initial = seed_repo(tmp_path)
+    run_git(tmp_path, "checkout", "-q", "--orphan", "unrelated")
+    run_git(tmp_path, "commit", "-qm", "Unrelated root commit", "--allow-empty")
+    with pytest.raises(subprocess.CalledProcessError):
+        check_refs(initial, root=tmp_path)
 
 
 @pytest.mark.parametrize(("before", "after"), [("0.1.9", "0.1.10"), ("0.9.0", "0.10.0")])

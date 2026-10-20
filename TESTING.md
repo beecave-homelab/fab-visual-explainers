@@ -57,7 +57,7 @@ Vergelijk na committen met de opgehaalde doelbranch:
 uv run --locked python scripts/check_release_version.py --base github/main --head HEAD
 ```
 
-Deze controle eist voor iedere repositorywijziging een changelogupdate. HTML-wijzigingen vereisen ook een hogere versie en een gedateerde changelogsectie. Gebruik bij een andere remotestructuur de echte doelref. De vergelijking ziet geen ongecommitteerde wijzigingen.
+Deze controle eist voor iedere repositorywijziging een changelogupdate. HTML-wijzigingen vereisen ook een hogere versie en een gedateerde changelogsectie. `--base` is de doelbranch; de vergelijking gebruikt de merge-base van doelref en `--head`, zodat doelbranch-eigen wijzigingen zoals een versiestijging de PR-controle niet beïnvloeden. Gebruik bij een andere remotestructuur de echte doelref. De vergelijking ziet geen ongecommitteerde wijzigingen.
 
 Voor publicatie geldt aanvullend `--release`. Dit vereist een gedateerde beschrijving van de huidige versie en een lege sectie `Nog niet uitgebracht`. Zolang alleen de oorspronkelijke basisversie met ongepubliceerde onderhoudsregels bestaat, hoort deze releasecontrole te falen. Zie [releases voorbereiden](docs/releases.md) voor de volledige werkwijze.
 

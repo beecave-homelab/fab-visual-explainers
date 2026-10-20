@@ -36,7 +36,7 @@ git fetch github main
 uv run --locked python scripts/check_release_version.py --base github/main --head HEAD
 ```
 
-Vervang `github/main` door de echte doelref wanneer de checkout andere remotenamen gebruikt. Ontbrekende refs zijn een fout. De controle vergelijkt commits en ziet geen ongecommitteerde bestanden. Iedere gewijzigde commitreeks vereist een changelogwijziging. Bij HTML-wijzigingen controleert het script ook de versiestijging en de nieuwe releasebeschrijving. Het bepaalt niet of een wijziging minor of patch is.
+Vervang `github/main` door de echte doelref wanneer de checkout andere remotenamen gebruikt. Ontbrekende refs zijn een fout. `--base` is de doelbranch, maar de vergelijking gebruikt de gemeenschappelijke voorouder (merge-base) van doelref en `--head` als basis voor diff, oude versie en changelog. Wijzigingen die alleen op de doelbranch zijn gebeuren, zoals een versiestijging of HTML-wijziging, horen zo niet bij de gecontroleerde PR-diff. Historieën zonder gemeenschappelijke voorouder zijn een fout. De controle vergelijkt commits en ziet geen ongecommitteerde bestanden. Iedere gewijzigde commitreeks vereist een changelogwijziging. Bij HTML-wijzigingen controleert het script ook de versiestijging en de nieuwe releasebeschrijving. Het bepaalt niet of een wijziging minor of patch is.
 
 Voer daarnaast de relevante controles uit [TESTING.md](../TESTING.md). De lokale versiecontrole vervangt geen tests, review of toestemming voor publicatie. Er is op dit moment geen CI-workflow die deze controle automatisch uitvoert.
 
