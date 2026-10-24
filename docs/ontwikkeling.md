@@ -4,6 +4,8 @@ De prototypes zijn zelfstandige HTML-bestanden met inline CSS, JavaScript en syn
 
 Lees vóór een bijdrage de [projectafspraken](../AGENTS.md). De [ideeënnotitie](../ideeen_voor_interactieve_fab_one_pagers.md) beschrijft de concepten en actuele status. De aangeleverde functiebeschrijving is het toetskader, geen onafhankelijk gevalideerde beroepsstandaard.
 
+Het [codebase-overzicht](../project-overview.md) beschrijft de ingangen, uitvoerpaden, bronbestanden en architectuurgrenzen van de HTML-bibliotheek en de Python-hulpmiddelen.
+
 ## Ontwikkelomgeving
 
 Gebruik [de installatiescripts](installatie.md) om de ontwikkelomgeving in te richten en de tools te controleren.
