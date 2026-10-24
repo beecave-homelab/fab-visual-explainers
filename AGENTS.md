@@ -63,6 +63,13 @@ De HTML staat onder `visuals/`, in `incident_en_continuiteit/`, `wijziging_en_ac
 - Koppel sub-issues met de native GitHub-relatie aan het overkoepelende issue en leg blokkades met issue-afhankelijkheden vast. Houd in het overkoepelende issue een gelinkt overzicht bij; de sub-issues zijn de bron voor hun uitvoeringscriteria. Als de forge een relatie niet ondersteunt, gebruik dan wederzijdse links en benoem die beperking.
 - Houd optioneel vervolgwerk buiten de verplichte oplevering en maak daarvoor pas een issue bij een concrete opdracht. Controleer na aanmaken de opgeslagen inhoud, relaties en afhankelijkheden. Sluit het overkoepelende issue pas als alle verplichte onderdelen aan hun acceptatiecriteria voldoen; een aangemaakt issue of gemergede PR bewijst dat niet op zichzelf.
 
+## Teksten controleren met Unslop
+
+- Controleer vóór iedere commit alle nieuwe en gewijzigde projectteksten met de `unslop`-skill. Dit geldt onder meer voor release notes, `CHANGELOG.md`, `README.md`, `project-overview.md`, `AGENTS.md`, `TESTING.md` en Markdown onder `docs/`. Controleer ook issue- en PR-teksten vóór plaatsing en release notes vóór publicatie.
+- Gebruik de beschikbare `unslop`-skill of de plugin `unslop-rewriter:unslop-rewrite`. Haal bij toepassing de actuele regels op uit de [Unslop-bron](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md) en lees die vóór de controle. Alleen formatteren of op trefwoorden zoeken vervangt deze controle niet.
+- Herschrijf waar nodig en behoud betekenis, taal, doelgroep en onzekerheden. Laat broncitaten, code, opdrachten, paden, links, versies en technische identificatoren intact. Controleer de definitieve tekst na aanpassingen opnieuw. Ongewijzigde bestaande tekst hoeft niet bij iedere commit te worden herschreven.
+- Vermeld bij oplevering welke teksten met Unslop zijn gecontroleerd. Zijn de skill of de actuele regels niet beschikbaar, meld dat en commit de betrokken teksten pas nadat de controle is uitgevoerd. Presenteer een overgeslagen controle niet als geslaagd.
+
 ## Changelog en versies
 
 - Werk bij iedere repositorywijziging [CHANGELOG.md](CHANGELOG.md) bij in dezelfde PR, zonder hiervoor afzonderlijk toestemming te vragen. Dit geldt ook voor documentatie, tests, scripts, configuratie en opmaak. Een changelogwijziging op zichzelf vraagt geen extra regel.
