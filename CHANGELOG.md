@@ -8,6 +8,8 @@ Dit overzicht begint op 18 oktober 2026 met de recente samengevoegde wijzigingen
 
 ### Onderhoud
 
+- Projectafspraken voor nieuwe issues toegevoegd: beoordeel de omvang, splits grotere trajecten in gekoppelde sub-issues met eigen acceptatiecriteria en leg afhankelijkheden en verificatie vast ([#8](https://github.com/beecave-homelab/fab-visual-explainers/issues/8)).
+
 - Een codebase-overzicht toegevoegd met de projectstructuur, uitvoerpaden, configuratie en verificatiegrenzen; bereikbaar vanuit de ontwikkelgids.
 
 - De README beschrijft nu hoe je de bibliotheek downloadt, opent en een voorbeeld kiest. Technische beheeruitleg staat in `docs/` ([#1](https://github.com/beecave-homelab/fab-visual-explainers/pull/1)).

@@ -55,6 +55,14 @@ De HTML staat onder `visuals/`, in `incident_en_continuiteit/`, `wijziging_en_ac
 - Houd bij toevoeging of verwijdering aantallen bestanden, concepten en kandidaten, beheerkaartjes, lokale links en leesbare alternatieven actueel. Elk concept heeft één checkbox; de twee incidentvarianten tellen als één concept. Vink alleen af zodra het HTML-bestand aanwezig is en beschrijf aanwezige interacties los van aanbevelingen. Test kritieke informatie ook zonder JavaScript en in afdrukmodus.
 - Markeer fictieve onderzoeksclaims en ongemeten scores als demonstraties. Claim geen lokale goedkeuring, productierijpheid of gebruikerswaarde zonder bewijs.
 
+## Issues afbakenen en opsplitsen
+
+- Beoordeel vóór het aanmaken van een issue of de opdracht als één samenhangende, afzonderlijk te beoordelen PR kan worden opgeleverd. Controleer eerst bestaande issues en gekoppelde PR's om dubbel werk te voorkomen.
+- Splits een groter traject op als onderdelen een eigen resultaat, acceptatiecriteria, validatie of oplevermoment nodig hebben. Houd één overkoepelend issue voor het doel en de samenhang en maak per afzonderlijk te beoordelen PR een sub-issue. Een kleine, samenhangende wijziging blijft één issue; maak geen sub-issues alleen voor losse technische stappen.
+- Geef ieder uitvoerbaar issue een concreet probleem en gewenst resultaat, afgebakende scope, toetsbare acceptatiecriteria, benodigde verificatie, afhankelijkheden en wat buiten de opdracht valt. Vermeld de uitvoeringsvolgorde en maak duidelijk welke onderdelen onafhankelijk kunnen worden opgepakt.
+- Koppel sub-issues met de native GitHub-relatie aan het overkoepelende issue en leg blokkades met issue-afhankelijkheden vast. Houd in het overkoepelende issue een gelinkt overzicht bij; de sub-issues zijn de bron voor hun uitvoeringscriteria. Als de forge een relatie niet ondersteunt, gebruik dan wederzijdse links en benoem die beperking.
+- Houd optioneel vervolgwerk buiten de verplichte oplevering en maak daarvoor pas een issue bij een concrete opdracht. Controleer na aanmaken de opgeslagen inhoud, relaties en afhankelijkheden. Sluit het overkoepelende issue pas als alle verplichte onderdelen aan hun acceptatiecriteria voldoen; een aangemaakt issue of gemergede PR bewijst dat niet op zichzelf.
+
 ## Changelog en versies
 
 - Werk bij iedere repositorywijziging [CHANGELOG.md](CHANGELOG.md) bij in dezelfde PR, zonder hiervoor afzonderlijk toestemming te vragen. Dit geldt ook voor documentatie, tests, scripts, configuratie en opmaak. Een changelogwijziging op zichzelf vraagt geen extra regel.
